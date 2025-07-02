@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    "thang-nm.catppuccin-perfect-icons",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "aaron-bond.better-comments",
+    "gruntfuggly.todo-tree",
+    "formulahendry.auto-rename-tag",
+    "coenraads.bracket-pair-colorizer-2",
+    "streetsidesoftware.code-spell-checker",
+    "wix.vscode-import-cost",
+    "oderwat.indent-rainbow",
+    "naumovs.color-highlight",
+    "VisualStudioExptTeam.vscodeintellicode",
+    "usernamehw.errorlens",
+    "msjsdiag.debugger-for-chrome",
+    "mhutchie.git-graph",
+    "PKief.material-icon-theme"
+  ]
+}
