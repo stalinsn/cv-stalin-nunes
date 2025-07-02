@@ -8,6 +8,7 @@ import { cvDataFr } from '@/data/cv-fr';
 import { cvDataDe } from '@/data/cv-de';
 import { translateWithAI } from '@/lib/translateService';
 import { CvData } from '@/types/cv';
+import { getTranslationCache, setTranslationCache } from '@/utils/translationCache';
 
 const mockMap: Record<string, CvData> = {
   ptbr: cvData,
@@ -64,6 +65,16 @@ export function useI18n() {
     const normalizedLang = normalizeLangCode(targetLang);
     if (lang === normalizedLang) return;
 
+    // Tenta cache local antes de tudo
+    const cached = getTranslationCache(JSON.stringify(data), normalizedLang);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        saveTranslation(normalizedLang, parsed);
+        return;
+      } catch {}
+    }
+
     if (translations[normalizedLang]) {
       switchLang(normalizedLang);
       return;
@@ -79,6 +90,7 @@ export function useI18n() {
           throw new Error('Tradução IA não retornou resultado.');
         }
         saveTranslation(normalizedLang, result.translated);
+        setTranslationCache(JSON.stringify(data), normalizedLang, JSON.stringify(result.translated));
         // Atualiza estatísticas para StatusBar
         setStatus({
           tokensUsed: result.tokensUsed || null,

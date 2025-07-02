@@ -1,14 +1,29 @@
 @media print {
+  html,
   body {
     background: white !important;
     color: black !important;
-    font-size: 12pt;
+    font-size: 11pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
   }
 
-  .topbar,
-  .back-top,
-  .button-group {
-    display: none !important;
+  body {
+    margin: 0.7cm 1.2cm 0.7cm 0.3cm !important; /* topo, direita, baixo, esquerda */
+    padding: 0 !important;
+    width: auto;
+    min-width: 0;
+    max-width: 100vw;
+  }
+
+  main {
+    margin: 0 auto !important;
+    padding: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
   }
 
   .card {
@@ -16,15 +31,31 @@
     color: black !important;
     border: 1px solid #ccc !important;
     box-shadow: none !important;
+    page-break-inside: avoid !important;
+    font-size: 0.97em !important;
   }
 
   .tag {
     background: #eee !important;
     color: black !important;
+    font-size: 0.97em !important;
   }
 
   a {
     color: black !important;
     text-decoration: underline;
+  }
+
+  /* Esconde elementos indesejados */
+  .topbar,
+  .back-top,
+  .button-group,
+  .statusbar-draggable,
+  .modal-overlay,
+  .modal,
+  .loading-overlay,
+  .lgpd-bar,
+  [style*="position: fixed"][style*="bottom: 0"] {
+    display: none !important;
   }
 }

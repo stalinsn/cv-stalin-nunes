@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useI18n } from "@/hooks/useI18n";
 import { useTheme } from "@/hooks/useTheme";
 import { labels } from "@/data/labels";
@@ -22,37 +22,35 @@ import '@/styles/statusbar.css';
 
 function LoadingOverlay({ show }: { show: boolean }) {
   if (!show) return null;
-  return (
-    <div className="loading-overlay">
-      {/* Overlay escuro/translúcido cobrindo toda a tela */}
-    </div>
-  );
+  return <div className="loading-overlay" />;
 }
 
 export default function Home() {
-  const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode } = useI18n();
+  const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode, translations } = useI18n();
   const { theme, toggleTheme } = useTheme();
   const [pendingLang, setPendingLang] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [tokenError, setTokenError] = useState<string | null>(null);
   const [usosRestantes, setUsosRestantes] = useState<number | null>(null);
   const [showLGPD, setShowLGPD] = useState(true);
   const [showPrivacy, setShowPrivacy] = useState(false);
 
-  // Novo handleTranslate que só delega para o hook
   const onTranslate = async (targetLang: string) => {
     if (targetLang === lang) return;
+    if (translations[targetLang]) {
+      await handleTranslate(targetLang);
+      setSelectedLang(null);
+      setShowConfirmModal(false);
+      return;
+    }
     setSelectedLang(targetLang);
     setShowConfirmModal(true);
   };
 
-  // Novo handleConfirmTranslate recebendo token
   const handleConfirmTranslate = async (tokenInput: string) => {
-    setTokenError(null);
+    setToken(null);
     if (!selectedLang) return;
-    // Valida token antes de traduzir
     const res = await fetch('/api/validate-token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -60,22 +58,20 @@ export default function Home() {
     });
     const result = await res.json();
     if (!result.success) {
-      setTokenError(result.error || 'Token inválido ou esgotado.');
+      setToken(result.error || 'Token inválido ou esgotado.');
       return;
     }
     setShowConfirmModal(false);
-    setToken(tokenInput); // salva para enviar na tradução
+    setToken(tokenInput);
     setUsosRestantes(result.usos_restantes ?? null);
     await handleTranslate(selectedLang, tokenInput, 'modal');
     setSelectedLang(null);
   };
 
-  // Limpa token ao trocar idioma
-  React.useEffect(() => {
+  useEffect(() => {
     setToken(null);
   }, [selectedLang]);
 
-  // Modal: usuário aceita fallback para mock
   const handleAcceptFallback = async () => {
     if (pendingLang) {
       setUserAcceptedFallback(true);
@@ -85,34 +81,18 @@ export default function Home() {
       setPendingLang(null);
     }
   };
-  // Modal: usuário recusa fallback
   const handleCancelFallback = () => {
     setUserAcceptedFallback(false);
     setPendingLang(null);
   };
-
   const handleCancelTranslate = () => {
     setShowConfirmModal(false);
     setSelectedLang(null);
   };
-
   function safe<T>(value: T | undefined | null, fallback = "Não informado"): T | string {
     return value ?? fallback;
   }
-
-  // Seleciona labels conforme idioma (fallback para pt)
   const labelSet = labels[lang as keyof typeof labels] || labels.pt;
-
-  // StatusBar deve persistir enquanto houver estatísticas relevantes
-  const hasStatus =
-    loading ||
-    !!error ||
-    status.tokensUsed !== null ||
-    status.elapsedTime !== null ||
-    status.payloadSize !== null ||
-    status.charCount !== null;
-
-  // Mensagem dinâmica para status
   const statusMessage = error
     ? `Erro: ${error}`
     : loading
@@ -141,25 +121,19 @@ export default function Home() {
           translationModeMock: labelSet.translationModeMock,
         }}
       />
-
-      {hasStatus && (
-        <StatusBar
-          loading={loading}
-          statusMessage={statusMessage}
-          tokensUsed={status.tokensUsed}
-          elapsedTime={status.elapsedTime}
-          payloadSize={status.payloadSize}
-          charCount={status.charCount}
-          model={status.model}
-          usosRestantes={usosRestantes}
-        />
-      )}
-
-      {/* Exibe feedback de erro se houver */}
+      <StatusBar
+        loading={loading}
+        statusMessage={statusMessage}
+        tokensUsed={status.tokensUsed}
+        elapsedTime={status.elapsedTime}
+        payloadSize={status.payloadSize}
+        charCount={status.charCount}
+        model={status.model}
+        usosRestantes={usosRestantes}
+      />
       {error && (
         <div style={{ color: 'red', margin: '1rem' }}>Erro: {error}</div>
       )}
-
       <main className="wrapper">
         <header className="card" id="header">
           <h1 className="text-3xl font-bold">{safe(data?.name)}</h1>
@@ -182,7 +156,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {labelSet.linkedin} {data?.contact?.linkedin ? '' : `(${labelSet.notAvailable})`}
+                LinkedIn
               </a>
             </p>
           )}
@@ -237,24 +211,19 @@ export default function Home() {
         </div>
       )}
       <PrivacyModal open={showPrivacy} onClose={() => setShowPrivacy(false)} />
-
       <FallbackModal
         open={!!(error && error.includes('Gostaria de usar a tradução padrão?'))}
         onAccept={handleAcceptFallback}
         onCancel={handleCancelFallback}
       />
-
       <ConfirmTranslateModal
         open={showConfirmModal}
         targetLanguage={selectedLang || ''}
         languageLabel={selectedLang ? languageLabels[selectedLang] : ''}
-        usosRestantes={usosRestantes}
         onConfirm={handleConfirmTranslate}
         onCancel={handleCancelTranslate}
       />
-      {tokenError && (
-        <div style={{ color: 'var(--accent)', textAlign: 'center', marginTop: 8 }}>{tokenError}</div>
-      )}
+      <BackToTop label="Voltar ao topo" />
     </>
   );
 }

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { clearTranslationCache } from "@/utils/translationCache";
 
 interface NavbarLabels {
   theme: string;
@@ -38,6 +39,19 @@ export default function Navbar({
   onChangeTranslationMode,
   labels,
 }: NavbarProps) {
+  const [cacheCleared, setCacheCleared] = useState(false);
+
+  const handleClearCache = () => {
+    clearTranslationCache();
+    setCacheCleared(true);
+    setTimeout(() => setCacheCleared(false), 2000);
+  };
+
+  // Verifica se há cache salvo
+  const hasCache =
+    typeof window !== "undefined" &&
+    Object.keys(localStorage).some((k) => k.startsWith("translation_"));
+
   return (
     <header className="topbar">
       <div className="toolbar">
@@ -57,10 +71,7 @@ export default function Navbar({
 
           <div className="language-selector">
             <label>{labels.language}:</label>
-            <select
-              value={lang}
-              onChange={(e) => onTranslate(e.target.value)}
-            >
+            <select value={lang} onChange={(e) => onTranslate(e.target.value)}>
               {languages.map((l) => (
                 <option key={l.code} value={l.code}>
                   {l.label}
@@ -84,6 +95,16 @@ export default function Navbar({
           <button className="btn" onClick={() => window.print()}>
             {labels.exportPDF}
           </button>
+
+          {hasCache && (
+            <button
+              className="btn"
+              style={{ marginLeft: 8 }}
+              onClick={handleClearCache}
+            >
+              {cacheCleared ? "Cache limpo!" : "Limpar cache de traduções"}
+            </button>
+          )}
         </div>
       </div>
     </header>
