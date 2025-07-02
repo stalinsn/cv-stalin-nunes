@@ -16,6 +16,7 @@ import BackToTop from "@/components/BackToTop";
 import StatusBar from "@/components/StatusBar";
 import FallbackModal from "@/components/FallbackModal";
 import ConfirmTranslateModal from "@/components/ConfirmTranslateModal";
+import PrivacyModal from '@/components/PrivacyModal';
 
 import '@/styles/statusbar.css';
 
@@ -34,6 +35,11 @@ export default function Home() {
   const [pendingLang, setPendingLang] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [tokenError, setTokenError] = useState<string | null>(null);
+  const [usosRestantes, setUsosRestantes] = useState<number | null>(null);
+  const [showLGPD, setShowLGPD] = useState(true);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   // Novo handleTranslate que só delega para o hook
   const onTranslate = async (targetLang: string) => {
@@ -42,13 +48,32 @@ export default function Home() {
     setShowConfirmModal(true);
   };
 
-  const handleConfirmTranslate = async () => {
-    if (selectedLang) {
-      setShowConfirmModal(false);
-      await handleTranslate(selectedLang);
-      setSelectedLang(null);
+  // Novo handleConfirmTranslate recebendo token
+  const handleConfirmTranslate = async (tokenInput: string) => {
+    setTokenError(null);
+    if (!selectedLang) return;
+    // Valida token antes de traduzir
+    const res = await fetch('/api/validate-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: tokenInput })
+    });
+    const result = await res.json();
+    if (!result.success) {
+      setTokenError(result.error || 'Token inválido ou esgotado.');
+      return;
     }
+    setShowConfirmModal(false);
+    setToken(tokenInput); // salva para enviar na tradução
+    setUsosRestantes(result.usos_restantes ?? null);
+    await handleTranslate(selectedLang, tokenInput, 'modal');
+    setSelectedLang(null);
   };
+
+  // Limpa token ao trocar idioma
+  React.useEffect(() => {
+    setToken(null);
+  }, [selectedLang]);
 
   // Modal: usuário aceita fallback para mock
   const handleAcceptFallback = async () => {
@@ -121,11 +146,12 @@ export default function Home() {
         <StatusBar
           loading={loading}
           statusMessage={statusMessage}
-          tokensUsed={loading ? null : status.tokensUsed}
-          elapsedTime={loading ? null : status.elapsedTime}
-          payloadSize={loading ? null : status.payloadSize}
-          charCount={loading ? null : status.charCount}
-          model={loading ? '' : status.model}
+          tokensUsed={status.tokensUsed}
+          elapsedTime={status.elapsedTime}
+          payloadSize={status.payloadSize}
+          charCount={status.charCount}
+          model={status.model}
+          usosRestantes={usosRestantes}
         />
       )}
 
@@ -172,7 +198,45 @@ export default function Home() {
         <Languages data={data} title={data.languagesTitle || labelSet.languages} />
       </main>
       <Footer />
-      <BackToTop label={labelSet.backToTop} />
+      {showLGPD && (
+        <div style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '100vw',
+          background: theme === 'dark' ? '#232b22' : 'var(--accent)',
+          color: theme === 'dark' ? 'var(--accent)' : '#fff',
+          borderTop: theme === 'dark' ? '2px solid var(--accent)' : '2px solid var(--accent-hover)',
+          boxShadow: '0 -2px 12px rgba(0,0,0,0.13)',
+          padding: '1em 0.5em',
+          textAlign: 'center',
+          zIndex: 99999,
+          fontWeight: 500,
+          fontSize: '1.08em',
+          letterSpacing: '0.01em',
+        }}>
+          Este site usa cookies técnicos e coleta dados de uso para proteger sua privacidade e garantir o funcionamento da tradução IA. <a href="#privacidade" style={{color: theme === 'dark' ? 'var(--accent)' : '#fff',textDecoration:'underline',fontWeight:600,cursor:'pointer'}} onClick={e => {e.preventDefault();setShowPrivacy(true);}}>Saiba mais</a>.
+          <button
+            style={{
+              marginLeft: 18,
+              background: theme === 'dark' ? 'var(--accent)' : '#fff',
+              color: theme === 'dark' ? '#232b22' : 'var(--accent)',
+              border: 'none',
+              borderRadius: 6,
+              padding: '0.4em 1.2em',
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontSize: '1em',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+              transition: 'background 0.2s',
+            }}
+            onClick={() => setShowLGPD(false)}
+          >
+            OK
+          </button>
+        </div>
+      )}
+      <PrivacyModal open={showPrivacy} onClose={() => setShowPrivacy(false)} />
 
       <FallbackModal
         open={!!(error && error.includes('Gostaria de usar a tradução padrão?'))}
@@ -184,9 +248,13 @@ export default function Home() {
         open={showConfirmModal}
         targetLanguage={selectedLang || ''}
         languageLabel={selectedLang ? languageLabels[selectedLang] : ''}
+        usosRestantes={usosRestantes}
         onConfirm={handleConfirmTranslate}
         onCancel={handleCancelTranslate}
       />
+      {tokenError && (
+        <div style={{ color: 'var(--accent)', textAlign: 'center', marginTop: 8 }}>{tokenError}</div>
+      )}
     </>
   );
 }

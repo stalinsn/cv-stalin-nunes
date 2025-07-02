@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import '@/styles/statusbar.css';
+import { statusbarFacts } from './statusbarFacts';
 
 interface StatusBarProps {
   loading: boolean;
@@ -11,6 +12,7 @@ interface StatusBarProps {
   payloadSize: number | null;
   charCount: number | null;
   model: string;
+  usosRestantes?: number | null;
 }
 
 export default function StatusBar({
@@ -21,6 +23,7 @@ export default function StatusBar({
   payloadSize,
   charCount,
   model,
+  usosRestantes,
 }: StatusBarProps) {
   const [expanded, setExpanded] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -91,10 +94,19 @@ export default function StatusBar({
     return `${h}h ${min % 60}min ${s}s`;
   }
 
+  // Função para sortear curiosidade
+  function randomFact(arr: string[], vars?: Record<string, string|number>) {
+    const fact = arr[Math.floor(Math.random() * arr.length)];
+    if (!vars) return fact;
+    return fact.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ''));
+  }
+
   // Anedotas para cada estatística
   const anecdotes = {
-    tokens: 'Sabia que 1 token é como um pedacinho de frase? Quanto mais tokens, mais caro! 💸',
-    elapsed: 'Tempo é dinheiro... mas aqui é só curiosidade mesmo! ⏳',
+    tokens: 'Tokens são pedaços de palavras. Exemplo: [Olá] [!] [mundo] [!] = 4 tokens',
+    elapsed: elapsedTime !== null
+      ? `Processamento: ${Math.round(elapsedTime * 1000)} ms. Sabia que um piscar de olhos dura cerca de 300 ms? 👀`
+      : '',
     speed: 'Se fosse uma tartaruga, seria mais devagar. 🐢',
     payload: 'Daria pra enviar isso por pombo-correio? Talvez não... 🕊️',
     charCount: 'Já pensou em escrever um livro? Esse texto já é um capítulo! 📖',
@@ -135,7 +147,14 @@ export default function StatusBar({
         }}
         onMouseDown={onMouseDown}
       >
-        <p style={{ margin: 0, fontWeight: 'bold' }}>{statusMessage}</p>
+        <p style={{ margin: 0, fontWeight: 'bold' }}>
+          {statusMessage}
+          {usosRestantes !== undefined && usosRestantes !== null && statusMessage.includes('Tradução concluída') && (
+            <span style={{ fontWeight: 400, fontSize: '0.92em', color: 'var(--accent)', marginLeft: 8 }}>
+              ({usosRestantes} uso{usosRestantes === 1 ? '' : 's'} restantes)
+            </span>
+          )}
+        </p>
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={() => setExpanded(!expanded)}
@@ -176,21 +195,21 @@ export default function StatusBar({
             <div style={{marginBottom: '0.5em', position:'relative'}}>
               <p style={{margin:0}} className="statusbar-stat-hover" tabIndex={0}>
                 🧠 Tokens usados: {tokensUsed}
-                <span className="statusbar-anecdote">{anecdotes.tokens}</span>
+                <span className="statusbar-anecdote">{randomFact(statusbarFacts.tokens)}</span>
               </p>
               <div style={{fontSize:'0.82em',color:'#bdbdbd',marginTop:'0.1em'}}>
-                Token = unidade de texto para IA (ex: &apos;Olá, mundo!&apos; ≈ 4 tokens)
+                Tokens são blocos de texto. Exemplo: <span style={{fontFamily:'monospace'}}>[Olá] [!] [mundo] [!]</span> = 4 tokens
               </div>
             </div>
           )}
           {elapsedTime !== null && (
             <div style={{marginBottom: '0.5em', position:'relative'}}>
               <p style={{margin:0}} className="statusbar-stat-hover" tabIndex={0}>
-                ⏱️ Tempo: {formatSeconds(elapsedTime)}
-                <span className="statusbar-anecdote">{anecdotes.elapsed}</span>
+                ⏱️ Tempo: {formatSeconds(elapsedTime)} <span style={{color:'#bdbdbd',fontSize:'0.93em'}}>({Math.round(elapsedTime * 1000)} ms)</span>
+                <span className="statusbar-anecdote">{randomFact(statusbarFacts.elapsed, { ms: Math.round(elapsedTime * 1000) })}</span>
               </p>
               <div style={{fontSize:'0.82em',color:'#bdbdbd',marginTop:'0.1em'}}>
-                {elapsedTime < 60 ? 'Tradução instantânea!' : `Equivale a ${formatSeconds(elapsedTime)} de processamento.`}
+                Tempo total de processamento da tradução.
               </div>
             </div>
           )}
@@ -198,7 +217,7 @@ export default function StatusBar({
             <div style={{marginBottom: '0.5em', position:'relative'}}>
               <p style={{margin:0}} className="statusbar-stat-hover" tabIndex={0}>
                 ⚡ Velocidade: {speed} tokens/s
-                <span className="statusbar-anecdote">{anecdotes.speed}</span>
+                <span className="statusbar-anecdote">{randomFact(statusbarFacts.speed)}</span>
               </p>
               <div style={{fontSize:'0.82em',color:'#bdbdbd',marginTop:'0.1em'}}>
                 Quanto maior, mais rápida a tradução.
@@ -209,7 +228,7 @@ export default function StatusBar({
             <div style={{marginBottom: '0.5em', position:'relative'}}>
               <p style={{margin:0}} className="statusbar-stat-hover" tabIndex={0}>
                 📦 Payload: {payloadSize.toFixed(2)} KB
-                <span className="statusbar-anecdote">{anecdotes.payload}</span>
+                <span className="statusbar-anecdote">{randomFact(statusbarFacts.payload)}</span>
               </p>
               <div style={{fontSize:'0.82em',color:'#bdbdbd',marginTop:'0.1em'}}>
                 Aproximadamente {Math.ceil(payloadSize/2)} páginas de texto puro.
@@ -220,7 +239,7 @@ export default function StatusBar({
             <div style={{marginBottom: '0.5em', position:'relative'}}>
               <p style={{margin:0}} className="statusbar-stat-hover" tabIndex={0}>
                 📝 Caracteres: {charCount}
-                <span className="statusbar-anecdote">{anecdotes.charCount}</span>
+                <span className="statusbar-anecdote">{randomFact(statusbarFacts.charCount)}</span>
               </p>
               <div style={{fontSize:'0.82em',color:'#bdbdbd',marginTop:'0.1em'}}>
                 ≈ {Math.ceil(charCount/280)} tweets completos
@@ -232,7 +251,7 @@ export default function StatusBar({
               <div style={{marginBottom: '0.5em', position:'relative'}}>
                 <p style={{margin:0}} className="statusbar-stat-hover" tabIndex={0}>
                   💰 Custo estimado: ${costUSD.toFixed(5)} (~R${costBRL.toFixed(5)})
-                  <span className="statusbar-anecdote">{anecdotes.cost}</span>
+                  <span className="statusbar-anecdote">{randomFact(statusbarFacts.cost)}</span>
                 </p>
                 <div style={{fontSize:'0.82em',color:'#bdbdbd',marginTop:'0.1em'}}>
                   Base OpenAI, dólar = R$5,20
@@ -241,7 +260,7 @@ export default function StatusBar({
               <div style={{marginBottom: '0.5em', position:'relative'}}>
                 <p style={{margin:0}} className="statusbar-stat-hover" tabIndex={0}>
                   🧾 Com $1 você faz aprox. {requisicoesPorDolar} requisições desse tamanho
-                  <span className="statusbar-anecdote">{anecdotes.reqs}</span>
+                  <span className="statusbar-anecdote">{randomFact(statusbarFacts.reqs)}</span>
                 </p>
                 <div style={{fontSize:'0.82em',color:'#bdbdbd',marginTop:'0.1em'}}>
                   Quanto menor o custo, mais traduções por dólar!
@@ -252,7 +271,7 @@ export default function StatusBar({
           <div style={{marginBottom: '0.5em', position:'relative'}}>
             <p style={{margin:0}} className="statusbar-stat-hover" tabIndex={0}>
               🤖 Modelo: {model}
-              <span className="statusbar-anecdote">{anecdotes.model}</span>
+              <span className="statusbar-anecdote">{randomFact(statusbarFacts.model)}</span>
             </p>
             <div style={{fontSize:'0.82em',color:'#bdbdbd',marginTop:'0.1em'}}>
               Exemplo: gpt-3.5-turbo

@@ -59,7 +59,7 @@ export function useI18n() {
   /**
    * Faz a tradução usando IA ou Mock
    */
-  const handleTranslate = async (targetLang: string) => {
+  const handleTranslate = async (targetLang: string, token?: string, origem?: string) => {
     setError(null);
     const normalizedLang = normalizeLangCode(targetLang);
     if (lang === normalizedLang) return;
@@ -73,7 +73,7 @@ export function useI18n() {
       setLoading(true);
       const start = Date.now();
       try {
-        const result = await translateWithAI(data, normalizedLang);
+        const result = await translateWithAI(data, normalizedLang, token, origem);
         const elapsed = Date.now() - start;
         if (!result || !result.translated) {
           throw new Error('Tradução IA não retornou resultado.');

@@ -1,5 +1,7 @@
 import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
+import { updateTokenRow } from '@/lib/updateTokenRow';
+import crypto from 'crypto';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -16,7 +18,7 @@ const languageNames: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-  const { cvData, targetLang } = await req.json();
+  const { cvData, targetLang, token, stats, origem } = await req.json();
   const langName = languageNames[targetLang] || targetLang;
 
   const prompt = `Traduza este currículo para ${langName} e retorne **apenas** o JSON.
@@ -41,6 +43,7 @@ Exemplo:
 Currículo:
 ${JSON.stringify(cvData, null, 2)}`;
 
+  const start = Date.now();
   const completion = await openai.chat.completions.create({
     model: process.env.NEXT_PUBLIC_OPENAI_MODEL || "gpt-3.5-turbo",
     messages: [
@@ -51,17 +54,54 @@ ${JSON.stringify(cvData, null, 2)}`;
     ],
     temperature: 0,
   });
-
+  const elapsed = (Date.now() - start) / 1000;
   const result = completion.choices[0].message?.content?.trim();
   const tokensUsed = completion.usage?.total_tokens || 0;
-
+  const modelo = process.env.NEXT_PUBLIC_OPENAI_MODEL || "gpt-3.5-turbo";
+  const userAgent = req.headers.get('user-agent') || '';
+  const ip = req.headers.get('x-forwarded-for') || req.ip || '';
+  const texto_hash = crypto.createHash('sha256').update(JSON.stringify(cvData)).digest('hex');
+  let status = 'sucesso';
   try {
     const json = JSON.parse(result || "{}");
+    // Atualiza planilha com estatísticas
+    await updateTokenRow({
+      token,
+      update: {
+        ultimo_uso: new Date().toISOString(),
+        ip,
+        idioma: targetLang,
+        tokens: tokensUsed.toString(),
+        tempo: elapsed.toFixed(2),
+        modelo,
+        user_agent: userAgent,
+        texto_hash,
+        status,
+        origem: origem || '',
+        // tentativas: incrementa no updateTokenRow
+      }
+    });
     return NextResponse.json({
       translated: json,
       tokensUsed,
     });
   } catch (error) {
+    status = 'erro';
+    await updateTokenRow({
+      token,
+      update: {
+        ultimo_uso: new Date().toISOString(),
+        ip,
+        idioma: targetLang,
+        tokens: tokensUsed.toString(),
+        tempo: elapsed.toFixed(2),
+        modelo,
+        user_agent: userAgent,
+        texto_hash,
+        status,
+        origem: origem || '',
+      }
+    });
     console.error("Erro ao parsear a resposta da IA:", error);
     return NextResponse.json(
       { error: "Falha ao converter a resposta em JSON" },
