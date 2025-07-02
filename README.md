@@ -1,6 +1,8 @@
-# CV Stalin Souza Nunes
+# CV do Stalin Souza Nunes
 
-Bem-vindo ao repositório do currículo interativo e multilíngue de Stalin Souza Nunes!
+Bem-vindo ao repositório do currículo interativo e multilíngue do Stalin Souza Nunes!
+
+Welcome to this curriculum vitae project, feel free to translate from Portuguese to English as you wish :)
 
 ## 🚀 Visão Geral
 Este projeto é um currículo digital moderno, responsivo e multilíngue, desenvolvido com **Next.js** e **TypeScript**. Ele permite alternar entre diferentes idiomas, exportar para PDF, imprimir, alternar temas (claro/escuro), e testar traduções automáticas via IA.
