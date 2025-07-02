@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useI18n } from "@/hooks/useI18n";
 import { useTheme } from "@/hooks/useTheme";
 import { labels } from "@/data/labels";
+import { languageLabels } from "@/data/languageLabels";
 
 import Navbar from "@/components/Navbar";
 import Summary from "@/components/Summary";
@@ -14,20 +15,38 @@ import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
 import StatusBar from "@/components/StatusBar";
 import FallbackModal from "@/components/FallbackModal";
+import ConfirmTranslateModal from "@/components/ConfirmTranslateModal";
+
+import '@/styles/statusbar.css';
+
+function LoadingOverlay({ show }: { show: boolean }) {
+  if (!show) return null;
+  return (
+    <div className="loading-overlay">
+      {/* Overlay escuro/translúcido cobrindo toda a tela */}
+    </div>
+  );
+}
 
 export default function Home() {
   const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode } = useI18n();
   const { theme, toggleTheme } = useTheme();
   const [pendingLang, setPendingLang] = useState<string | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedLang, setSelectedLang] = useState<string | null>(null);
 
   // Novo handleTranslate que só delega para o hook
   const onTranslate = async (targetLang: string) => {
     if (targetLang === lang) return;
-    if (translationMode === 'ai') {
-      setPendingLang(targetLang);
-      await handleTranslate(targetLang);
-    } else {
-      await handleTranslate(targetLang);
+    setSelectedLang(targetLang);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmTranslate = async () => {
+    if (selectedLang) {
+      setShowConfirmModal(false);
+      await handleTranslate(selectedLang);
+      setSelectedLang(null);
     }
   };
 
@@ -45,6 +64,11 @@ export default function Home() {
   const handleCancelFallback = () => {
     setUserAcceptedFallback(false);
     setPendingLang(null);
+  };
+
+  const handleCancelTranslate = () => {
+    setShowConfirmModal(false);
+    setSelectedLang(null);
   };
 
   function safe<T>(value: T | undefined | null, fallback = "Não informado"): T | string {
@@ -74,6 +98,7 @@ export default function Home() {
 
   return (
     <>
+      <LoadingOverlay show={loading} />
       <Navbar
         lang={lang}
         onTranslate={onTranslate}
@@ -81,6 +106,15 @@ export default function Home() {
         theme={theme}
         translationMode={translationMode}
         onChangeTranslationMode={setTranslationMode}
+        labels={{
+          theme: labelSet.theme,
+          language: labelSet.language,
+          mode: labelSet.mode,
+          exportPDF: labelSet.exportPDF,
+          translationModeAI: labelSet.translationModeAI,
+          translationModeFree: labelSet.translationModeFree,
+          translationModeMock: labelSet.translationModeMock,
+        }}
       />
 
       {hasStatus && (
@@ -122,20 +156,20 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {data?.contact?.linkedin ? "LinkedIn" : "LinkedIn não disponível"}
+                {labelSet.linkedin} {data?.contact?.linkedin ? '' : `(${labelSet.notAvailable})`}
               </a>
             </p>
           )}
         </header>
-        <Summary data={data} title={labelSet.summary} />
+        <Summary data={data} title={data.summaryTitle || labelSet.summary} />
         <Skills
           data={{ coreSkills: data?.coreSkills || [], technicalSkills: data?.technicalSkills || {} }}
-          titleMain={labelSet.coreSkills}
-          titleTech={labelSet.technicalSkills}
+          titleMain={data.coreSkillsTitle || labelSet.coreSkills}
+          titleTech={data.technicalSkillsTitle || labelSet.technicalSkills}
         />
-        <Experience data={data} title={labelSet.experience} />
-        <Education data={data} title={labelSet.education} />
-        <Languages data={data} title={labelSet.languages} />
+        <Experience data={data} title={data.experienceTitle || labelSet.experience} />
+        <Education data={data} title={data.educationTitle || labelSet.education} />
+        <Languages data={data} title={data.languagesTitle || labelSet.languages} />
       </main>
       <Footer />
       <BackToTop label={labelSet.backToTop} />
@@ -144,6 +178,14 @@ export default function Home() {
         open={!!(error && error.includes('Gostaria de usar a tradução padrão?'))}
         onAccept={handleAcceptFallback}
         onCancel={handleCancelFallback}
+      />
+
+      <ConfirmTranslateModal
+        open={showConfirmModal}
+        targetLanguage={selectedLang || ''}
+        languageLabel={selectedLang ? languageLabels[selectedLang] : ''}
+        onConfirm={handleConfirmTranslate}
+        onCancel={handleCancelTranslate}
       />
     </>
   );

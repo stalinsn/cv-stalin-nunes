@@ -1,5 +1,14 @@
-
 import React from "react";
+
+interface NavbarLabels {
+  theme: string;
+  language: string;
+  mode: string;
+  exportPDF: string;
+  translationModeAI: string;
+  translationModeFree: string;
+  translationModeMock: string;
+}
 
 interface NavbarProps {
   lang: string;
@@ -8,6 +17,7 @@ interface NavbarProps {
   theme: "light" | "dark";
   translationMode: string;
   onChangeTranslationMode: (mode: string) => void;
+  labels: NavbarLabels;
 }
 
 const languages = [
@@ -19,12 +29,6 @@ const languages = [
   { code: "it", label: "Italiano" },
 ];
 
-const modes = [
-  { value: "ai", label: "IA" },
-  { value: "free", label: "Gratuito" },
-  { value: "mock", label: "Mock" },
-];
-
 export default function Navbar({
   lang,
   onTranslate,
@@ -32,15 +36,15 @@ export default function Navbar({
   theme,
   translationMode,
   onChangeTranslationMode,
+  labels,
 }: NavbarProps) {
   return (
     <header className="topbar">
       <div className="toolbar">
         <span className="brand">CV · Stalin Nunes</span>
-
         <div className="button-group">
           <div className="theme-toggle">
-            <span className="theme-label">Tema</span>
+            <span className="theme-label">{labels.theme}</span>
             <label className="switch">
               <input
                 type="checkbox"
@@ -52,7 +56,7 @@ export default function Navbar({
           </div>
 
           <div className="language-selector">
-            <label>Idioma:</label>
+            <label>{labels.language}:</label>
             <select
               value={lang}
               onChange={(e) => onTranslate(e.target.value)}
@@ -66,21 +70,19 @@ export default function Navbar({
           </div>
 
           <div className="translation-mode">
-            <label>Modo:</label>
+            <label>{labels.mode}:</label>
             <select
               value={translationMode}
               onChange={(e) => onChangeTranslationMode(e.target.value)}
             >
-              {modes.map((mode) => (
-                <option key={mode.value} value={mode.value}>
-                  {mode.label}
-                </option>
-              ))}
+              <option value="ai">{labels.translationModeAI}</option>
+              <option value="free">{labels.translationModeFree}</option>
+              <option value="mock">{labels.translationModeMock}</option>
             </select>
           </div>
 
           <button className="btn" onClick={() => window.print()}>
-            Exportar PDF
+            {labels.exportPDF}
           </button>
         </div>
       </div>

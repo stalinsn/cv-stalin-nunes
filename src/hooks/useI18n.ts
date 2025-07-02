@@ -45,15 +45,27 @@ export function useI18n() {
     setData(cvData);
   }, []);
 
+  // Normaliza o código do idioma para os suportados nas labels
+  function normalizeLangCode(code: string) {
+    if (code.startsWith('pt')) return 'pt';
+    if (code.startsWith('en')) return 'en';
+    if (code.startsWith('es')) return 'es';
+    if (code.startsWith('fr')) return 'fr';
+    if (code.startsWith('de')) return 'de';
+    if (code.startsWith('it')) return 'it';
+    return code;
+  }
+
   /**
    * Faz a tradução usando IA ou Mock
    */
   const handleTranslate = async (targetLang: string) => {
     setError(null);
-    if (lang === targetLang) return;
+    const normalizedLang = normalizeLangCode(targetLang);
+    if (lang === normalizedLang) return;
 
-    if (translations[targetLang]) {
-      switchLang(targetLang);
+    if (translations[normalizedLang]) {
+      switchLang(normalizedLang);
       return;
     }
 
@@ -61,12 +73,12 @@ export function useI18n() {
       setLoading(true);
       const start = Date.now();
       try {
-        const result = await translateWithAI(data, targetLang);
+        const result = await translateWithAI(data, normalizedLang);
         const elapsed = Date.now() - start;
         if (!result || !result.translated) {
           throw new Error('Tradução IA não retornou resultado.');
         }
-        saveTranslation(targetLang, result.translated);
+        saveTranslation(normalizedLang, result.translated);
         // Atualiza estatísticas para StatusBar
         setStatus({
           tokensUsed: result.tokensUsed || null,
@@ -85,8 +97,8 @@ export function useI18n() {
     }
 
     if (translationMode === 'mock' || (error && userAcceptedFallback)) {
-      if (mockMap[targetLang]) {
-        saveTranslation(targetLang, mockMap[targetLang]);
+      if (mockMap[normalizedLang]) {
+        saveTranslation(normalizedLang, mockMap[normalizedLang]);
         setError(null);
       } else {
         setError('Tradução mock não disponível para este idioma.');

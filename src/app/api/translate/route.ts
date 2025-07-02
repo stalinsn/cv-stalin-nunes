@@ -22,6 +22,22 @@ export async function POST(req: NextRequest) {
   const prompt = `Traduza este currículo para ${langName} e retorne **apenas** o JSON.
 Preserve a estrutura do objeto, apenas traduza os textos.
 
+IMPORTANTE: Adicione os seguintes campos ao JSON traduzido, com os títulos das seções principais traduzidos:
+- summaryTitle
+- coreSkillsTitle
+- technicalSkillsTitle
+- experienceTitle
+- educationTitle
+- languagesTitle
+
+Exemplo:
+{
+  ...
+  "summaryTitle": "Professional Summary",
+  "coreSkillsTitle": "Core Skills",
+  ...
+}
+
 Currículo:
 ${JSON.stringify(cvData, null, 2)}`;
 

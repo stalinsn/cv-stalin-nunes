@@ -36,4 +36,11 @@ export interface CvData {
   experience: Experience[];
   education: Education[];
   interests: string[];
+  // Títulos traduzidos por IA (opcionais)
+  summaryTitle?: string;
+  coreSkillsTitle?: string;
+  technicalSkillsTitle?: string;
+  experienceTitle?: string;
+  educationTitle?: string;
+  languagesTitle?: string;
 }
