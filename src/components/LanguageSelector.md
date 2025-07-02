@@ -1,3 +1,5 @@
+[⬅ Voltar ao Índice](../../DOCUMENTATION.md)
+
 # LanguageSelector
 
 ## 1. Descrição do Componente

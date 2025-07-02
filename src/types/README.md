@@ -1,13 +1,13 @@
 # Documentação dos Tipos (Types)
 
-Esta pasta contém definições TypeScript para dados do currículo e traduções.
+[⬅ Voltar ao Índice](../../DOCUMENTATION.md)
 
-Consulte a documentação individual de cada arquivo para detalhes de uso e manutenção.
+Esta pasta contém definições TypeScript para dados do currículo e traduções.
 
 ---
 
 ## Arquivos Documentados
-- cv.ts
-- translation.ts
+- [cv.ts](cv.md)
+- [translation.ts](translation.md)
 
 Os tipos garantem segurança e clareza na manipulação dos dados.

@@ -1,3 +1,5 @@
+[⬅ Voltar ao Índice](../../DOCUMENTATION.md)
+
 # translate
 
 ## 1. Descrição

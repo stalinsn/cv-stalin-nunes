@@ -1,14 +1,14 @@
 # Documentação dos Utilitários (Utils)
 
-Esta pasta contém utilitários auxiliares para funcionalidades específicas do projeto.
+[⬅ Voltar ao Índice](../../DOCUMENTATION.md)
 
-Consulte a documentação individual de cada arquivo para detalhes de uso e manutenção.
+Esta pasta contém utilitários auxiliares para funcionalidades específicas do projeto.
 
 ---
 
 ## Arquivos Documentados
-- PasswordModal.tsx
-- translate.ts
-- translateFree.ts
+- [PasswordModal.tsx](PasswordModal.md)
+- [translate.ts](translate.md)
+- [translateFree.ts](translateFree.md)
 
 Os utilitários apoiam a lógica e a experiência do usuário.

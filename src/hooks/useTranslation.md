@@ -1,3 +1,5 @@
+[⬅ Voltar ao Índice](../../DOCUMENTATION.md)
+
 # useTranslation
 
 ## 1. Descrição do Hook

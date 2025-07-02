@@ -5,6 +5,11 @@ Bem-vindo ao repositório do currículo interativo e multilíngue de Stalin Souz
 ## 🚀 Visão Geral
 Este projeto é um currículo digital moderno, responsivo e multilíngue, desenvolvido com **Next.js** e **TypeScript**. Ele permite alternar entre diferentes idiomas, exportar para PDF, imprimir, alternar temas (claro/escuro), e testar traduções automáticas via IA.
 
+## 📚 Documentação Técnica
+- Toda a documentação técnica do projeto está disponível em arquivos Markdown organizados por módulos.
+- Use o arquivo [DOCUMENTATION.md](DOCUMENTATION.md) como índice interativo para navegar entre componentes, hooks, utilitários, dados e tipos.
+- Todos os arquivos de documentação possuem links de retorno ao índice, facilitando a navegação em Obsidian, VS Code ou qualquer leitor Markdown.
+
 ## 🧩 Funcionalidades
 - **Internacionalização (i18n):** Suporte a português, inglês, espanhol, francês e alemão.
 - **Tradução com IA:** Integração com API de tradução, fallback para tradução mock.
@@ -44,6 +49,7 @@ cv-stalin-nunes/
 ├── package.json
 ├── tsconfig.json
 ├── CHANGELOG.md
+├── DOCUMENTATION.md
 └── README.md
 ```
 
@@ -76,7 +82,7 @@ TRANSLATE_API_KEY=sua-chave-aqui
 ```
 
 ## 📄 Licença
-Este projeto é open-source, licenciado sob MIT.
+Este projeto é open-source, licenciado sob GPL v3. Qualquer modificação ou redistribuição deve manter o código aberto e sob a mesma licença.
 
 ---
 

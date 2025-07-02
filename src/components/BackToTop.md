@@ -1,3 +1,5 @@
+[⬅ Voltar ao Índice](../../DOCUMENTATION.md)
+
 # BackToTop
 
 ## 1. Descrição do Componente

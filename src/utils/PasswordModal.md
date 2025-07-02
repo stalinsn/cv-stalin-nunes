@@ -1,3 +1,5 @@
+[⬅ Voltar ao Índice](../../DOCUMENTATION.md)
+
 # PasswordModal
 
 ## 1. Descrição do Componente

@@ -1,3 +1,5 @@
+[⬅ Voltar ao Índice](../../DOCUMENTATION.md)
+
 # translateFree (Utils)
 
 ## 1. Descrição

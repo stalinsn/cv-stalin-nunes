@@ -1,18 +1,18 @@
 # Documentação das Bibliotecas (lib)
 
-Esta pasta contém funções utilitárias e serviços para exportação, tradução e integração com APIs.
+[⬅ Voltar ao Índice](../../DOCUMENTATION.md)
 
-Consulte a documentação individual de cada arquivo para detalhes de uso e manutenção.
+Esta pasta contém funções utilitárias e serviços para exportação, tradução e integração com APIs.
 
 ---
 
 ## Arquivos Documentados
-- exportPDF.ts
-- exportPrint.ts
-- translateAI.ts
-- translateFree.ts
-- translateMock.ts
-- translateService.ts
-- translation.ts
+- [exportPDF.ts](exportPDF.md)
+- [exportPrint.ts](exportPrint.md)
+- [translateAI.ts](translateAI.md)
+- [translateFree.ts](translateFree.md)
+- [translateMock.ts](translateMock.md)
+- [translateService.ts](translateService.md)
+- [translation.ts](translation.md)
 
 Cada arquivo possui um escopo funcional para apoiar a lógica do projeto.
