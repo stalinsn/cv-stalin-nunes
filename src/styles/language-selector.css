@@ -1,0 +1,49 @@
+.lang-selector {
+  position: relative;
+  width: 220px;
+}
+
+.lang-selector input {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.lang-selector input:focus {
+  outline: 1px solid var(--accent);
+}
+
+.lang-selector .dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-top: 4px;
+  list-style: none;
+  padding: 0;
+  z-index: 999;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.lang-selector .dropdown li {
+  padding: 0.6rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.lang-selector .dropdown li:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.lang-selector .dropdown li:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}

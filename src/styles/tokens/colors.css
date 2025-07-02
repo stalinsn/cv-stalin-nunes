@@ -1,0 +1,21 @@
+:root {
+  --bg: #0a0d0a;
+  --card-bg: #111411;
+  --text: #f5f7f5;
+  --text-light: #9ca3af;
+  --accent: #22c55e;
+  --accent-hover: #34d399;
+  --border: rgba(255, 255, 255, 0.1);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='light'] {
+  --bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --text: #111827;
+  --text-light: #6b7280;
+  --accent: #1e9e61;
+  --accent-hover: #30be7b;
+  --border: rgba(0, 0, 0, 0.06);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
