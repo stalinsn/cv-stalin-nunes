@@ -31,29 +31,52 @@ Este projeto é um currículo digital moderno, responsivo e multilíngue, desenv
 - **Estrutura de Dados Separada:**
   - Dados do CV organizados por idioma em `src/data`.
 
-## 🗂️ Estrutura do Projeto
+## 🆕 Novidades e Recursos Avançados
+- **Cache local de traduções:** Traduções feitas por IA são salvas localmente, evitando custos extras e acelerando a navegação. O usuário pode limpar o cache manualmente pela Navbar.
+- **Controle de tokens via Google Sheets:** Tradução IA só é liberada mediante token válido, com backend seguro e transparente usando Google Sheets. Tokens são validados, decrementados e bloqueios são aplicados conforme uso.
+- **Transparência LGPD:** Barra fixa de aviso, modal de política de privacidade e respeito total à privacidade do usuário. Nenhum texto traduzido é armazenado, apenas hash/IP/user agent para controle de abuso.
+- **StatusBar aprimorada:** Exibe curiosidades, feedback de uso, estatísticas de tradução e pode ser movida livremente na tela.
+- **Botão “Limpar cache de traduções”** na Navbar, disponível sempre que houver traduções salvas localmente.
+
+## 📦 Integração Google Sheets (Passo a Passo Resumido)
+1. Crie um projeto no Google Cloud Platform e ative a API do Google Sheets.
+2. Gere uma conta de serviço e baixe o JSON de credenciais.
+3. Compartilhe sua planilha com o e-mail da conta de serviço.
+4. Configure as variáveis `GOOGLE_SERVICE_ACCOUNT_JSON` e `GOOGLE_SHEET_ID` no `.env.local`.
+5. Veja detalhes e exemplos em `DOCUMENTATION.md`.
+
+## 🗂️ Estrutura de Pastas (atualizada)
 ```
-cv-stalin-nunes/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   └── translate-test/
-│   ├── components/
-│   ├── data/
-│   ├── hooks/
-│   ├── lib/
-│   ├── styles/
-│   ├── types/
-│   └── utils/
-├── public/
-├── .gitignore
-├── package.json
-├── tsconfig.json
-├── CHANGELOG.md
-├── DOCUMENTATION.md
-└── README.md
+src/
+  app/
+    layout.tsx
+    page.tsx
+    api/
+      translate/route.ts
+      validate-token/route.ts
+    translate-test/
+  components/
+    Navbar.tsx
+    StatusBar.tsx
+    ConfirmTranslateModal.tsx
+    PrivacyModal.tsx
+    ...
+  data/
+    cv-ptbr.ts
+    cv-en.ts
+    ...
+  hooks/
+  lib/
+  styles/
+  types/
+  utils/
+public/
+  images/
+.env.local
 ```
+
+## ℹ️ Mais detalhes
+- Consulte o arquivo `DOCUMENTATION.md` para documentação técnica, exemplos de integração, troubleshooting e dicas de uso avançado.
 
 ## 🛠️ Tecnologias & Práticas
 - **Next.js** (App Router)

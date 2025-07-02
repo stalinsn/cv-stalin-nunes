@@ -4,6 +4,24 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), e este projeto adota a [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [1.2.0] - 2025-07-02
+### Adicionado
+- Cache local de traduções por idioma/texto (evita custo extra e requisições desnecessárias).
+- Botão "Limpar cache de traduções" na Navbar, com feedback visual.
+- Estrutura de README atualizada, com instruções modernas, estrutura real de pastas e integração Google Sheets.
+- Documentação detalhada de integração, configuração e uso no `DOCUMENTATION.md`.
+
+### Alterado
+- StatusBar agora sempre visível e com drag & drop preservando posição.
+- Layout e espaçamento refinados em todas as seções para visual mais elegante e responsivo.
+- Modal de confirmação de tradução só aparece quando necessário (não exibe para idiomas já traduzidos).
+- Código limpo: remoção de comentários, variáveis e anotações desnecessárias.
+
+### Corrigido
+- Problemas de proporção e alinhamento entre cards/seções.
+- Problemas de sumiço da StatusBar ao trocar de idioma ou durante tradução.
+- Pequenos bugs de UX e warnings/lint.
+
 ## [1.1.1] - 2025-07-02
 ### Alterado
 - Modal de confirmação de tradução agora segue o tema global (tokens CSS), respeitando claro/escuro.
