@@ -4,6 +4,15 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), e este projeto adota a [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [1.1.1] - 2025-07-02
+### Alterado
+- Modal de confirmação de tradução agora segue o tema global (tokens CSS), respeitando claro/escuro.
+- StatusBar com drag & drop suave e preciso (atualização direta no DOM, sem lag).
+- Correção de hooks e return condicional para evitar warnings do React.
+- Ajuste visual e uso consistente de tokens nos botões, overlays e modais.
+- Refino de responsividade, acessibilidade e experiência de loading.
+- Pequenas correções de lint e remoção de código morto.
+
 ## [1.1.0] - 2025-07-01
 ### Adicionado
 - Documentação detalhada para todos os componentes, hooks, utilitários, dados e tipos, em arquivos Markdown individuais.
