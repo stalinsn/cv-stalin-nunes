@@ -138,7 +138,7 @@ export default function Home() {
         handleTranslate(savedLang);
       }
     }
-  }, []);
+  }, [handleTranslate, lang, saveTranslation, translations]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

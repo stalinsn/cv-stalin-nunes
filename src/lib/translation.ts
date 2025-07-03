@@ -1,5 +1,5 @@
 import { translateWithAI } from './translateAI';
-import { translateMock, translateMockString } from './translateMock';
+import { translateMockString } from './translateMock';
 
 const useAI = process.env.NEXT_PUBLIC_ENABLE_AI === 'true';
 
