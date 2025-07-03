@@ -20,10 +20,11 @@ const mockMap: Record<string, CvData> = {
 };
 
 export function useI18n() {
-  const [lang, setLang] = useState<string>('ptbr');
+  // Corrigido: valor inicial de lang e translations para 'pt-br'
+  const [lang, setLang] = useState<string>('pt-br');
   const [data, setData] = useState<CvData>(cvData);
   const [translations, setTranslations] = useState<Record<string, CvData>>({
-    ptbr: cvData,
+    'pt-br': cvData,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,19 +42,33 @@ export function useI18n() {
 
   // Se o cvData base mudar, limpa cache de traduções
   useEffect(() => {
-    setTranslations({ ptbr: cvData });
-    setLang('ptbr');
+    setTranslations({ 'pt-br': cvData });
+    setLang('pt-br');
     setData(cvData);
   }, []);
 
-  // Normaliza o código do idioma para os suportados nas labels
+  // Persistir idioma no localStorage sempre que mudar
+  useEffect(() => {
+    if (typeof window !== 'undefined' && lang) {
+      localStorage.setItem('lastLang', lang);
+    }
+  }, [lang]);
+
+  // Sempre normaliza o lang ao trocar
+  useEffect(() => {
+    if (lang && normalizeLangCode(lang) !== lang) {
+      setLang(normalizeLangCode(lang));
+    }
+  }, [lang]);
+
+  // Normaliza o código do idioma para os suportados nas labels (mas não para setLang)
   function normalizeLangCode(code: string) {
-    if (code.startsWith('pt')) return 'pt';
-    if (code.startsWith('en')) return 'en';
-    if (code.startsWith('es')) return 'es';
-    if (code.startsWith('fr')) return 'fr';
-    if (code.startsWith('de')) return 'de';
-    if (code.startsWith('it')) return 'it';
+    if (code === 'pt-br' || code === 'en-us' || code === 'es-es' || code === 'fr-fr' || code === 'de-de') return code;
+    if (code.startsWith('pt')) return 'pt-br';
+    if (code.startsWith('en')) return 'en-us';
+    if (code.startsWith('es')) return 'es-es';
+    if (code.startsWith('fr')) return 'fr-fr';
+    if (code.startsWith('de')) return 'de-de';
     return code;
   }
 
@@ -123,9 +138,14 @@ export function useI18n() {
    * Troca para idioma já existente no cache
    */
   const switchLang = (targetLang: string) => {
-    if (translations[targetLang]) {
-      setLang(targetLang);
-      setData(translations[targetLang]);
+    const normalizedLang = normalizeLangCode(targetLang);
+    if (translations[normalizedLang]) {
+      setLang(normalizedLang); // força atualização do idioma da interface
+      setData(translations[normalizedLang]);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('lastLang', normalizedLang);
+      }
+      return;
     }
   };
 
@@ -133,21 +153,28 @@ export function useI18n() {
    * Salva uma tradução nova no cache e aplica
    */
   const saveTranslation = (targetLang: string, translatedData: CvData) => {
+    const normalizedLang = normalizeLangCode(targetLang);
     setTranslations((prev) => ({
       ...prev,
-      [targetLang]: translatedData,
+      [normalizedLang]: translatedData,
     }));
-    setLang(targetLang);
+    setLang(normalizedLang);
     setData(translatedData);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lastLang', normalizedLang);
+    }
   };
 
   /**
-   * Limpa todas as traduções do cache (exceto ptbr)
+   * Limpa todas as traduções do cache (exceto pt-br)
    */
   const clearTranslations = () => {
-    setTranslations({ ptbr: cvData });
-    setLang('ptbr');
+    setTranslations({ 'pt-br': cvData });
+    setLang('pt-br');
     setData(cvData);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lastLang', 'pt-br');
+    }
   };
 
   // Adiciona exportação de translationMode no hook

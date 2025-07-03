@@ -1,34 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Language } from "@/types/cv";
 import { clearTranslationCache } from "@/utils/translationCache";
-
-interface NavbarLabels {
-  theme: string;
-  language: string;
-  mode: string;
-  exportPDF: string;
-  translationModeAI: string;
-  translationModeFree: string;
-  translationModeMock: string;
-}
+import { labels as globalLabels } from '@/data/labels';
 
 interface NavbarProps {
-  lang: string;
-  onTranslate: (targetLang: string) => void;
+  lang: Language;
+  onTranslate: (targetLang: Language) => void;
   onToggleTheme: () => void;
   theme: "light" | "dark";
   translationMode: string;
   onChangeTranslationMode: (mode: string) => void;
-  labels: NavbarLabels;
+  labels: {
+    theme?: string;
+    language?: string;
+    mode?: string;
+    exportPDF?: string;
+    translationModeAI?: string;
+    translationModeFree?: string;
+    translationModeMock?: string;
+    clearCache?: string;
+    languageNames?: { [key: string]: string };
+  };
+  onClearTranslations?: () => void;
 }
 
-const languages = [
-  { code: "ptbr", label: "Português" },
-  { code: "en", label: "Inglês" },
-  { code: "es", label: "Espanhol" },
-  { code: "fr", label: "Francês" },
-  { code: "de", label: "Alemão" },
-  { code: "it", label: "Italiano" },
-];
+// Gera as opções de idioma a partir do arquivo de labels
+const languageCodes = Object.keys(globalLabels.languageNames || {}) as Language[];
 
 export default function Navbar({
   lang,
@@ -38,19 +35,38 @@ export default function Navbar({
   translationMode,
   onChangeTranslationMode,
   labels,
+  onClearTranslations,
 }: NavbarProps) {
   const [cacheCleared, setCacheCleared] = useState(false);
+  const [hasCache, setHasCache] = useState(false);
+
+  // Salva o idioma selecionado no localStorage e chama o onTranslate
+  const handleLanguageChange = (value: string) => {
+    localStorage.setItem('lastLang', value);
+    onTranslate(value as Language);
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setHasCache(Object.keys(localStorage).some((k) => k.startsWith("translation_")));
+      // Ao montar, se houver um idioma salvo, aplica
+      const savedLang = localStorage.getItem('lastLang');
+      if (savedLang && savedLang !== lang) {
+        onTranslate(savedLang as Language);
+      }
+    }
+  }, []);
 
   const handleClearCache = () => {
     clearTranslationCache();
     setCacheCleared(true);
+    setHasCache(false);
+    if (onClearTranslations) onClearTranslations();
     setTimeout(() => setCacheCleared(false), 2000);
   };
 
-  // Verifica se há cache salvo
-  const hasCache =
-    typeof window !== "undefined" &&
-    Object.keys(localStorage).some((k) => k.startsWith("translation_"));
+  // Usar labels.languageNames para nomes por extenso
+  const languageNames = globalLabels.languageNames;
 
   return (
     <header className="topbar">
@@ -71,10 +87,13 @@ export default function Navbar({
 
           <div className="language-selector">
             <label>{labels.language}:</label>
-            <select value={lang} onChange={(e) => onTranslate(e.target.value)}>
-              {languages.map((l) => (
-                <option key={l.code} value={l.code}>
-                  {l.label}
+            <select
+              value={lang}
+              onChange={(e) => handleLanguageChange(e.target.value)}
+            >
+              {languageCodes.map((code) => (
+                <option key={code} value={code}>
+                  {languageNames[code] || code}
                 </option>
               ))}
             </select>
@@ -98,11 +117,11 @@ export default function Navbar({
 
           {hasCache && (
             <button
-              className="btn"
-              style={{ marginLeft: 8 }}
+              className="btn btn-secondary"
               onClick={handleClearCache}
+              disabled={cacheCleared}
             >
-              {cacheCleared ? "Cache limpo!" : "Limpar cache de traduções"}
+              {cacheCleared ? "Cache limpo!" : labels.clearCache}
             </button>
           )}
         </div>

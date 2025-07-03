@@ -4,6 +4,8 @@ import { useI18n } from "@/hooks/useI18n";
 import { useTheme } from "@/hooks/useTheme";
 import { labels } from "@/data/labels";
 import { languageLabels } from "@/data/languageLabels";
+import { getTranslationCache } from '@/utils/translationCache';
+import { cvData } from '@/data/cv-ptbr';
 
 import Navbar from "@/components/Navbar";
 import Summary from "@/components/Summary";
@@ -26,7 +28,7 @@ function LoadingOverlay({ show }: { show: boolean }) {
 }
 
 export default function Home() {
-  const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode, translations } = useI18n();
+  const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode, translations, clearTranslations, saveTranslation } = useI18n();
   const { theme, toggleTheme } = useTheme();
   const [pendingLang, setPendingLang] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -39,11 +41,13 @@ export default function Home() {
   const onTranslate = async (targetLang: string) => {
     if (targetLang === lang) return;
     if (translations[targetLang]) {
+      // Se já existe cache, só troca para o idioma
       await handleTranslate(targetLang);
       setSelectedLang(null);
       setShowConfirmModal(false);
       return;
     }
+    // Só abre modal se não houver cache
     setSelectedLang(targetLang);
     setShowConfirmModal(true);
   };
@@ -92,7 +96,6 @@ export default function Home() {
   function safe<T>(value: T | undefined | null, fallback = "Não informado"): T | string {
     return value ?? fallback;
   }
-  const labelSet = labels[lang as keyof typeof labels] || labels.pt;
   const statusMessage = error
     ? `Erro: ${error}`
     : loading
@@ -101,25 +104,76 @@ export default function Home() {
     ? 'Tradução concluída com IA!'
     : '';
 
+  // Forçar lang a ser do tipo Language
+  const langTyped = lang as import("@/types/cv").Language;
+
+  // Persistência do idioma selecionado
+  useEffect(() => {
+    const savedLang = typeof window !== 'undefined' ? localStorage.getItem('lastLang') : null;
+    if (savedLang && savedLang !== lang && savedLang !== 'pt-br') {
+      const cacheKey = JSON.stringify(cvData);
+      const cached = getTranslationCache(cacheKey, savedLang);
+      if (translations[savedLang]) {
+        handleTranslate(savedLang);
+      } else if (cached) {
+        // Carrega o cache do localStorage para o estado antes de trocar o idioma
+        try {
+          const parsed = JSON.parse(cached);
+          saveTranslation(savedLang, parsed);
+        } catch {}
+      } else {
+        handleTranslate(savedLang);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lastLang', lang);
+    }
+  }, [lang]);
+
+  // Salva o cache do português (pt-br) no localStorage ao carregar pela primeira vez
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const cacheKey = JSON.stringify(cvData);
+      if (!getTranslationCache(cacheKey, 'pt-br')) {
+        localStorage.setItem(`translation_pt-br_${cacheKey}`, JSON.stringify(cvData));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Ao limpar cache, resetar idioma e localStorage
+  const handleClearTranslations = () => {
+    clearTranslations();
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lastLang', 'pt-br');
+    }
+  };
+
   return (
     <>
       <LoadingOverlay show={loading} />
       <Navbar
-        lang={lang}
+        lang={langTyped}
         onTranslate={onTranslate}
         onToggleTheme={toggleTheme}
         theme={theme}
         translationMode={translationMode}
         onChangeTranslationMode={setTranslationMode}
         labels={{
-          theme: labelSet.theme,
-          language: labelSet.language,
-          mode: labelSet.mode,
-          exportPDF: labelSet.exportPDF,
-          translationModeAI: labelSet.translationModeAI,
-          translationModeFree: labelSet.translationModeFree,
-          translationModeMock: labelSet.translationModeMock,
+          theme: labels.toggleTheme[langTyped] || "Tema",
+          language: labels.language?.[langTyped] || "Idioma",
+          mode: labels.mode?.[langTyped] || "Modo",
+          exportPDF: labels.downloadPDF[langTyped] || "Exportar PDF",
+          translationModeAI: labels.translationModeAI?.[langTyped] || "IA",
+          translationModeFree: labels.translationModeFree?.[langTyped] || "Gratuito",
+          translationModeMock: labels.translationModeMock?.[langTyped] || "Mock",
+          clearCache: labels.clearCache?.[langTyped] || "Limpar cache de tradução",
         }}
+        onClearTranslations={handleClearTranslations}
       />
       <StatusBar
         loading={loading}
@@ -137,39 +191,17 @@ export default function Home() {
       <main className="wrapper">
         <header className="card" id="header">
           <h1 className="text-3xl font-bold">{safe(data?.name)}</h1>
-          <h2 className="text-lg text-accent font-medium">
-            {safe(data?.title)}
-          </h2>
-          <p>{safe(data?.location)}</p>
-          {data?.contact && (
-            <p>
-              <a
-                href={`tel:${data?.contact?.phone?.replace(/[^\d]/g, "") || ""}`}
-              >
-                {safe(data?.contact?.phone)}
-              </a>{" "}·{" "}
-              <a href={`mailto:${data?.contact?.email || ""}`}>
-                {safe(data?.contact?.email)}
-              </a>{" "}·{" "}
-              <a
-                href={data?.contact?.linkedin || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                LinkedIn
-              </a>
-            </p>
-          )}
+          <h2 className="text-lg text-accent font-medium">{safe(data?.title)}</h2>
         </header>
-        <Summary data={data} title={data.summaryTitle || labelSet.summary} />
+        <Summary data={data} title={data.summaryTitle || labels.summary?.[langTyped] || "Resumo Profissional"} />
         <Skills
-          data={{ coreSkills: data?.coreSkills || [], technicalSkills: data?.technicalSkills || {} }}
-          titleMain={data.coreSkillsTitle || labelSet.coreSkills}
-          titleTech={data.technicalSkillsTitle || labelSet.technicalSkills}
+          data={data}
+          titleMain={data.coreSkillsTitle || labels.coreSkills?.[langTyped] || "Competências Principais"}
+          titleTech={data.technicalSkillsTitle || labels.technicalSkills?.[langTyped] || "Competências Técnicas"}
         />
-        <Experience data={data} title={data.experienceTitle || labelSet.experience} />
-        <Education data={data} title={data.educationTitle || labelSet.education} />
-        <Languages data={data} title={data.languagesTitle || labelSet.languages} />
+        <Experience data={data} title={data.experienceTitle || labels.experience?.[langTyped] || "Experiência Profissional"} />
+        <Education data={data} title={data.educationTitle || labels.education?.[langTyped] || "Formação Acadêmica"} />
+        <Languages data={data} title={data.languagesTitle || labels.languages?.[langTyped] || "Idiomas"} />
       </main>
       <Footer />
       {showLGPD && (
@@ -189,7 +221,7 @@ export default function Home() {
           fontSize: '1.08em',
           letterSpacing: '0.01em',
         }}>
-          Este site usa cookies técnicos e coleta dados de uso para proteger sua privacidade e garantir o funcionamento da tradução IA. <a href="#privacidade" style={{color: theme === 'dark' ? 'var(--accent)' : '#fff',textDecoration:'underline',fontWeight:600,cursor:'pointer'}} onClick={e => {e.preventDefault();setShowPrivacy(true);}}>Saiba mais</a>.
+          {labels.cookiesNotice?.[langTyped] || 'Este site usa cookies técnicos e coleta dados de uso para proteger sua privacidade e garantir o funcionamento da tradução IA.'} <a href="#privacidade" style={{color: theme === 'dark' ? 'var(--accent)' : '#fff',textDecoration:'underline',fontWeight:600,cursor:'pointer'}} onClick={e => {e.preventDefault();setShowPrivacy(true);}}>{labels.privacyPolicy?.[langTyped] || 'Política de Privacidade'}</a>.
           <button
             style={{
               marginLeft: 18,
@@ -206,11 +238,11 @@ export default function Home() {
             }}
             onClick={() => setShowLGPD(false)}
           >
-            OK
+            {labels.cookiesOk?.[langTyped] || 'OK'}
           </button>
         </div>
       )}
-      <PrivacyModal open={showPrivacy} onClose={() => setShowPrivacy(false)} />
+      <PrivacyModal open={showPrivacy} onClose={() => setShowPrivacy(false)} lang={langTyped} />
       <FallbackModal
         open={!!(error && error.includes('Gostaria de usar a tradução padrão?'))}
         onAccept={handleAcceptFallback}
