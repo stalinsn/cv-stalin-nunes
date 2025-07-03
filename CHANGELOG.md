@@ -2,7 +2,31 @@
 
 Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
-O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), e este projeto adota a [Semantic Versioning](https://semver.org/lang/pt-BR/).
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
+
+## [1.3.2] - 2025-07-03
+### Fixed
+- Translation confirmation modal now only opens by user action (select), never by side effects or loops.
+- Clear visual feedback for invalid token in authentication modal.
+- Privacy policy modal now uses themed background, border, and shadow.
+- Full isolation of modal flows: "No" button only closes, "Yes" only acts after validation.
+- Removed all side effects that could auto-open modals.
+
+### Changed
+- UX and accessibility refinements for all modals.
+- Standardized modal state and feedback control.
+
+## [1.1.2] - 2025-07-03
+### Fixed
+- Modal de confirmação de tradução agora só abre por ação do usuário (select), sem loops ou reabertura indesejada.
+- Feedback visual claro para token inválido no modal de autenticação.
+- Modal de política de privacidade agora segue o tema (fundo, cor, borda, sombra).
+- Isolamento total do fluxo dos modais: botão "Não" só fecha, botão "Sim" só executa ação após validação.
+- Removido qualquer efeito colateral de abertura automática de modal.
+
+### Changed
+- Refino de UX e acessibilidade dos modais.
+- Padronização do controle de estado dos modais e feedbacks.
 
 ## [1.3.1] - 2025-07-03
 ### Added
