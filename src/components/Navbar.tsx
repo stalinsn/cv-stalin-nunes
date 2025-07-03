@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import { Language } from "@/types/cv";
-import { clearTranslationCache } from "@/utils/translationCache";
 import '@/styles/components/navbar.css';
 import '@/styles/components/theme-toggle.css';
 import NavbarContainer from "./Navbar/NavbarContainer";
@@ -40,18 +39,13 @@ export default function Navbar({
   hasCache,
   cacheCleared,
 }: NavbarProps) {
-  const [cacheClearedState, setCacheCleared] = useState(false);
-
   const handleLanguageChange = (value: string) => {
     localStorage.setItem('lastLang', value);
     onTranslate(value as Language);
   };
 
   const handleClearCache = () => {
-    clearTranslationCache();
-    setCacheCleared(true);
     if (onClearTranslations) onClearTranslations();
-    setTimeout(() => setCacheCleared(false), 2000);
   };
 
   return (
@@ -88,7 +82,7 @@ export default function Navbar({
             <ClearCacheButton
               label={labels.clearCache || "Limpar Cache"}
               onClear={handleClearCache}
-              disabled={cacheClearedState}
+              disabled={!!cacheCleared}
             />
           )}
         </div>
