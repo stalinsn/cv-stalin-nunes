@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Language } from "@/types/cv";
 import { clearTranslationCache } from "@/utils/translationCache";
 import { labels as globalLabels } from '@/data/labels';
@@ -44,16 +44,6 @@ export default function Navbar({
     localStorage.setItem('lastLang', value);
     onTranslate(value as Language);
   };
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setHasCache(Object.keys(localStorage).some((k) => k.startsWith("translation_")));
-      const savedLang = localStorage.getItem('lastLang');
-      if (savedLang && savedLang !== lang) {
-        onTranslate(savedLang as Language);
-      }
-    }
-  }, [lang, onTranslate]);
 
   const handleClearCache = () => {
     clearTranslationCache();

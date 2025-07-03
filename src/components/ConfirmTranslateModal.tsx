@@ -6,6 +6,7 @@ interface ConfirmTranslateModalProps {
   languageLabel: string;
   onConfirm: (token: string) => void;
   onCancel: () => void;
+  error?: string | null;
 }
 
 export default function ConfirmTranslateModal({
@@ -13,9 +14,13 @@ export default function ConfirmTranslateModal({
   languageLabel,
   onConfirm,
   onCancel,
+  error,
 }: ConfirmTranslateModalProps) {
   const [token, setToken] = useState('');
-  const [error, setError] = useState('');
+  const [internalError, setInternalError] = useState('');
+  React.useEffect(() => {
+    setInternalError(error || '');
+  }, [error]);
   if (!open) return null;
   return (
     <div className="modal-overlay">
@@ -33,15 +38,15 @@ export default function ConfirmTranslateModal({
           type="text"
           placeholder="Insira seu token de autorização"
           value={token}
-          onChange={e => { setToken(e.target.value); setError(''); }}
+          onChange={e => { setToken(e.target.value); setInternalError(''); }}
         />
-        {error && <div className="confirm-modal-error">{error}</div>}
+        {(internalError) && <div className="confirm-modal-error">{internalError}</div>}
         <div className="flex gap-4 justify-end">
           <button
             className="btn btn-primary"
             onClick={() => {
               if (!token.trim()) {
-                setError('Informe o token para liberar a tradução IA!');
+                setInternalError('Informe o token para liberar a tradução IA!');
                 return;
               }
               onConfirm(token.trim());

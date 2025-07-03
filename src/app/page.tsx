@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useI18n } from "@/hooks/useI18n";
 import { useTheme } from "@/hooks/useTheme";
 import { labels } from "@/data/labels";
@@ -32,10 +32,10 @@ export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const [pendingLang, setPendingLang] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const [usosRestantes, setUsosRestantes] = useState<number | null>(null);
   const [showLGPD, setShowLGPD] = useState(true);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [tokenError, setTokenError] = useState<string | null>(null);
 
   // Estado global para togglers das seções
   const [sectionsOpen, setSectionsOpen] = useState({
@@ -59,21 +59,23 @@ export default function Home() {
     });
   };
 
-  // Lógica simplificada para o modal de confirmação de tradução
-  const onTranslate = async (targetLang: string) => {
+  // Lógica para abrir o modal de tradução apenas por interação do select
+  // Função chamada pelo select: só abre o modal se necessário
+  const handleLanguageSelect = useCallback((targetLang: string) => {
+    setTokenError(null); // Limpa erro ao abrir modal
     if (targetLang === lang) return;
     if (translations[targetLang]) {
-      await handleTranslate(targetLang);
-      setSelectedLang(null);
+      handleTranslate(targetLang);
       setShowConfirmModal(false);
       return;
     }
-    setSelectedLang(targetLang);
+    setPendingLang(targetLang);
     setShowConfirmModal(true);
-  };
+  }, [lang, translations, handleTranslate]);
 
+  // Confirmação do modal: só aqui pode chamar IA
   const handleConfirmTranslate = async (tokenInput: string) => {
-    if (!selectedLang) return;
+    if (!pendingLang) return;
     const res = await fetch('/api/validate-token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -82,18 +84,22 @@ export default function Home() {
     const result = await res.json();
     if (!result.success) {
       setUsosRestantes(result.usos_restantes ?? null);
+      setTokenError('Token inválido! Verifique e tente novamente.');
       return;
     }
     setShowConfirmModal(false);
     setUsosRestantes(result.usos_restantes ?? null);
-    await handleTranslate(selectedLang, tokenInput, 'modal');
-    setSelectedLang(null);
-    setShowConfirmModal(false); // Garante fechamento
+    setTokenError(null);
+    await handleTranslate(pendingLang, tokenInput, 'modal');
+    setPendingLang(null);
+    setShowConfirmModal(false);
   };
 
+  // Cancelamento do modal: só fecha o modal, sem alterar outros estados
   const handleCancelTranslate = () => {
     setShowConfirmModal(false);
-    setSelectedLang(null);
+    setPendingLang(null);
+    setTokenError(null);
   };
 
   const handleAcceptFallback = async () => {
@@ -128,15 +134,13 @@ export default function Home() {
       const cacheKey = JSON.stringify(cvData);
       const cached = getTranslationCache(cacheKey, savedLang);
       if (translations[savedLang]) {
-        handleTranslate(savedLang);
+        handleTranslate(savedLang); // Só troca idioma se já existe tradução
       } else if (cached) {
         try {
           const parsed = JSON.parse(cached);
           saveTranslation(savedLang, parsed);
         } catch {}
-      } else {
-        handleTranslate(savedLang);
-      }
+      } // Nunca chama IA automaticamente
     }
   }, [handleTranslate, lang, saveTranslation, translations]);
 
@@ -167,7 +171,7 @@ export default function Home() {
       <LoadingOverlay show={loading} />
       <Navbar
         lang={langTyped}
-        onTranslate={onTranslate}
+        onTranslate={handleLanguageSelect}
         onToggleTheme={toggleTheme}
         theme={theme}
         translationMode={translationMode}
@@ -303,9 +307,10 @@ export default function Home() {
       />
       <ConfirmTranslateModal
         open={showConfirmModal}
-        languageLabel={selectedLang ? languageLabels[selectedLang] : ''}
+        languageLabel={pendingLang ? languageLabels[pendingLang] : ''}
         onConfirm={handleConfirmTranslate}
         onCancel={handleCancelTranslate}
+        error={tokenError}
       />
       <BackToTop label="Voltar ao topo" />
     </>

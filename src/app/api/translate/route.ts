@@ -19,6 +19,20 @@ const languageNames: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   const { cvData, targetLang, token, origem } = await req.json();
+  if (!token) {
+    return NextResponse.json({ error: 'Token de autorização obrigatório.' }, { status: 401 });
+  }
+  // Validação do token via chamada interna
+  const validateRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/validate-token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  });
+  const validateJson = await validateRes.json();
+  if (!validateJson.success) {
+    return NextResponse.json({ error: 'Token inválido ou esgotado.' }, { status: 401 });
+  }
+
   const langName = languageNames[targetLang] || targetLang;
 
   const prompt = `Traduza este currículo para ${langName} e retorne **apenas** o JSON.
