@@ -4,7 +4,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { labels } from '@/data/labels';
 
 export default function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { toggleTheme } = useTheme();
   const { lang } = useI18n();
 
   return (

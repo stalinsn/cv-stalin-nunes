@@ -40,7 +40,6 @@ export async function POST(req: NextRequest) {
     range: `${SHEET_NAME}!A2:C`, // pula cabeçalho
   });
   const rows = data.values || [];
-  let found = false;
   for (let i = 0; i < rows.length; i++) {
     const [sheetToken, usos, ativo] = rows[i];
     if (sheetToken === token && ativo === 'TRUE' && Number(usos) > 0) {
@@ -54,7 +53,6 @@ export async function POST(req: NextRequest) {
         valueInputOption: 'RAW',
         requestBody: { values: [[newUsos.toString()]] },
       });
-      found = true;
       return NextResponse.json({ success: true, usos_restantes: newUsos });
     }
   }

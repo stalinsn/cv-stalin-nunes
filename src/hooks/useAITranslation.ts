@@ -11,9 +11,9 @@ export function useAITranslation() {
   const [charCount, setCharCount] = useState<number | null>(null);
 
   const translateAllCV = async (
-    cvData: any,
+    cvData: Record<string, unknown>,
     targetLang: string
-  ): Promise<any | null> => {
+  ): Promise<unknown | null> => {
     if (!targetLang) return null;
 
     const jsonPayload = JSON.stringify(cvData);

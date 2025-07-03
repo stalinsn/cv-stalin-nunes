@@ -3,18 +3,14 @@ import '@/styles/components/confirm-translate-modal.css';
 
 interface ConfirmTranslateModalProps {
   open: boolean;
-  targetLanguage: string;
   languageLabel: string;
-  usosRestantes?: number | null;
   onConfirm: (token: string) => void;
   onCancel: () => void;
 }
 
 export default function ConfirmTranslateModal({
   open,
-  targetLanguage,
   languageLabel,
-  usosRestantes,
   onConfirm,
   onCancel,
 }: ConfirmTranslateModalProps) {

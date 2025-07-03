@@ -6,7 +6,7 @@ const SHEET_ID = '1ESe5JpZFiZTRVDAPZ3uxLAXBek3KoNE3NXDuLqXS6bk';
 const SHEET_NAME = 'TokensIA';
 const CREDENTIALS_PATH = path.resolve(process.cwd(), 'google-service-account.json');
 
-export async function updateTokenRow({ token, update }: { token: string, update: Record<string, any> }) {
+export async function updateTokenRow({ token, update }: { token: string, update: Record<string, unknown> }) {
   const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf8'));
   const auth = new google.auth.GoogleAuth({
     credentials,

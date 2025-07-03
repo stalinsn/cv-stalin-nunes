@@ -1,4 +1,4 @@
-export async function translateWithAI(cvData: any, targetLang: string, token?: string, origem?: string) {
+export async function translateWithAI(cvData: Record<string, unknown>, targetLang: string, token?: string, origem?: string) {
   const res = await fetch('/api/translate', {
     method: 'POST',
     body: JSON.stringify({ cvData, targetLang, token, origem }),

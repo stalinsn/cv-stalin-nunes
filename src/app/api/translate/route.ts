@@ -18,7 +18,7 @@ const languageNames: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-  const { cvData, targetLang, token, stats, origem } = await req.json();
+  const { cvData, targetLang, token, origem } = await req.json();
   const langName = languageNames[targetLang] || targetLang;
 
   const prompt = `Traduza este currículo para ${langName} e retorne **apenas** o JSON.

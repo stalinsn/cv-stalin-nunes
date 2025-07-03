@@ -102,20 +102,6 @@ export default function StatusBar({
     return fact.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ''));
   }
 
-  // Anedotas para cada estatística
-  const anecdotes = {
-    tokens: 'Tokens são pedaços de palavras. Exemplo: [Olá] [!] [mundo] [!] = 4 tokens',
-    elapsed: elapsedTime !== null
-      ? `Processamento: ${Math.round(elapsedTime * 1000)} ms. Sabia que um piscar de olhos dura cerca de 300 ms? 👀`
-      : '',
-    speed: 'Se fosse uma tartaruga, seria mais devagar. 🐢',
-    payload: 'Daria pra enviar isso por pombo-correio? Talvez não... 🕊️',
-    charCount: 'Já pensou em escrever um livro? Esse texto já é um capítulo! 📖',
-    cost: 'Com esse valor, quase dá pra comprar um café... ☕',
-    reqs: 'Dá pra traduzir muita coisa com 1 dólar, hein? 💵',
-    model: 'Esse modelo é mais inteligente que muito humano! 🤖',
-  };
-
   return (
     <div
       ref={barRef}

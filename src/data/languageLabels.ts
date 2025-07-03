@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface LanguageMap {
   [code: string]: string;
 }

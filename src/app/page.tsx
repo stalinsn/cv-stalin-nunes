@@ -33,7 +33,6 @@ export default function Home() {
   const [pendingLang, setPendingLang] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [usosRestantes, setUsosRestantes] = useState<number | null>(null);
   const [showLGPD, setShowLGPD] = useState(true);
   const [showPrivacy, setShowPrivacy] = useState(false);
@@ -74,7 +73,6 @@ export default function Home() {
   };
 
   const handleConfirmTranslate = async (tokenInput: string) => {
-    setToken(null);
     if (!selectedLang) return;
     const res = await fetch('/api/validate-token', {
       method: 'POST',
@@ -83,11 +81,10 @@ export default function Home() {
     });
     const result = await res.json();
     if (!result.success) {
-      setToken(result.error || 'Token inválido ou esgotado.');
+      setUsosRestantes(result.usos_restantes ?? null);
       return;
     }
     setShowConfirmModal(false);
-    setToken(tokenInput);
     setUsosRestantes(result.usos_restantes ?? null);
     await handleTranslate(selectedLang, tokenInput, 'modal');
     setSelectedLang(null);
@@ -98,10 +95,6 @@ export default function Home() {
     setShowConfirmModal(false);
     setSelectedLang(null);
   };
-
-  useEffect(() => {
-    setToken(null);
-  }, [selectedLang]);
 
   const handleAcceptFallback = async () => {
     if (pendingLang) {
@@ -310,7 +303,6 @@ export default function Home() {
       />
       <ConfirmTranslateModal
         open={showConfirmModal}
-        targetLanguage={selectedLang || ''}
         languageLabel={selectedLang ? languageLabels[selectedLang] : ''}
         onConfirm={handleConfirmTranslate}
         onCancel={handleCancelTranslate}

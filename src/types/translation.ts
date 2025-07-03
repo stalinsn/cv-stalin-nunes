@@ -1,4 +1,4 @@
 export interface TranslationResult {
-  translated: any;
+  translated: Record<string, unknown>;
   tokensUsed: number;
 }
