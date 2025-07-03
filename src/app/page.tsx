@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { labels } from "@/data/labels";
 import { languageLabels } from "@/data/languageLabels";
 import { getTranslationCache } from '@/utils/translationCache';
-import { cvData } from '@/data/cv-ptbr';
+import { cvData } from '@/data/cvData';
 
 import Navbar from "@/components/Navbar";
 import Summary from "@/components/Summary";
@@ -13,12 +13,14 @@ import Skills from "@/components/Skills";
 import Experience from "@/components/Experience";
 import Education from "@/components/Education";
 import Languages from "@/components/Languages";
+import Interests from "@/components/Interests";
 import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
 import StatusBar from "@/components/StatusBar";
 import FallbackModal from "@/components/FallbackModal";
 import ConfirmTranslateModal from "@/components/ConfirmTranslateModal";
 import PrivacyModal from '@/components/PrivacyModal';
+import Header from "@/components/Header";
 
 import '@/styles/statusbar.css';
 
@@ -39,9 +41,36 @@ function toLabelLangCode(code: string): 'pt-br' | 'en-us' | 'es-es' | 'fr-fr' | 
   }
 }
 
+function GithubProjectLink({ url, label }: { url: string; label: string }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="github-project-link"
+      style={{ fontSize: 13, color: '#1a7f37', textDecoration: 'underline', opacity: 0.7 }}
+    >
+      {label}
+    </a>
+  );
+}
+
+// Utilitário para extrair labels do idioma atual no formato esperado pelo Navbar
+function getNavbarLabels(lang: string) {
+  const code = toLabelLangCode(lang);
+  return {
+    theme: labels.toggleTheme[code],
+    language: labels.language[code], // Corrigido para usar tradução
+    mode: labels.mode[code],
+    exportPDF: labels.downloadPDF[code],
+    clearCache: labels.clearCache[code],
+    // Adicione outros campos conforme necessário
+  };
+}
+
 export default function Home() {
   const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode, translations, clearTranslations, saveTranslation } = useI18n();
-  const { theme } = useTheme(); // Removido toggleTheme não utilizado
+  const { theme } = useTheme(); // toggleTheme removido pois não é usado
   const [pendingLang, setPendingLang] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [usosRestantes, setUsosRestantes] = useState<number | null>(null);
@@ -56,6 +85,7 @@ export default function Home() {
     experience: true,
     education: true,
     languages: true,
+    interests: true,
   });
 
   // Função para toggle all
@@ -68,6 +98,7 @@ export default function Home() {
       experience: next,
       education: next,
       languages: next,
+      interests: next,
     });
   };
 
@@ -133,9 +164,9 @@ export default function Home() {
     setUserAcceptedFallback(false);
     setPendingLang(null);
   };
-  function safe<T>(value: T | undefined | null, fallback = "Não informado"): T | string {
-    return value ?? fallback;
-  }
+  // function safe<T>(value: T | undefined | null, fallback = "Não informado"): T | string {
+  //   return value ?? fallback;
+  // }
   const statusMessage = error
     ? `Erro: ${error}`
     : loading
@@ -191,36 +222,28 @@ export default function Home() {
     setTimeout(() => setCacheCleared(false), 2000);
   };
 
-  const handleModeChange = (mode: string) => {
-    setTranslationMode(mode);
-    // Se for mock, nunca abre modal
-    if (mode === 'mock') {
-      setShowConfirmModal(false);
-    }
-  };
+  // const handleModeChange = (mode: string) => {
+  //   setTranslationMode(mode);
+  //   // Se for mock, nunca abre modal
+  //   if (mode === 'mock') {
+  //     setShowConfirmModal(false);
+  //   }
+  // };
 
   return (
-    <>
-      <LoadingOverlay show={loading} />
+    <div style={{ position: 'relative' }}>
       <Navbar
-        lang={langTyped}
+        lang={lang as import("@/types/cv").Language}
         onTranslate={handleLanguageSelect}
         translationMode={translationMode}
-        onChangeTranslationMode={handleModeChange}
-        labels={{
-          theme: labels.toggleTheme[labelLangCode],
-          language: labels.language?.[labelLangCode],
-          mode: labels.mode?.[labelLangCode],
-          exportPDF: labels.downloadPDF[labelLangCode],
-          translationModeAI: labels.translationModeAI?.[labelLangCode],
-          translationModeFree: labels.translationModeFree?.[labelLangCode],
-          translationModeMock: labels.translationModeMock?.[labelLangCode],
-          clearCache: labels.clearCache?.[labelLangCode],
-        }}
+        onChangeTranslationMode={setTranslationMode}
+        labels={getNavbarLabels(lang)}
         onClearTranslations={handleClearTranslations}
         hasCache={hasCache}
         cacheCleared={cacheCleared}
+        githubProjectLink={data.githubProject ? <GithubProjectLink url={data.githubProject.url} label={data.githubProject.label} /> : undefined}
       />
+      <LoadingOverlay show={loading} />
       <StatusBar
         loading={loading}
         statusMessage={statusMessage}
@@ -235,9 +258,8 @@ export default function Home() {
         <div style={{ color: 'red', margin: '1rem' }}>Erro: {error}</div>
       )}
       <main className="wrapper">
-        <header className="card" id="header" style={{ position: 'relative' }}>
-          <h1 className="text-3xl font-bold">{safe(data?.name)}</h1>
-          <h2 className="text-lg text-accent font-medium">{safe(data?.title)}</h2>
+        <div className="card" id="header" style={{ position: 'relative' }}>
+          <Header data={data} />
           <button
             className="toggle-all-icon-btn"
             onClick={handleToggleAll}
@@ -245,7 +267,6 @@ export default function Home() {
             title={allOpen ? (labels.minimizeAll?.[langTyped] || 'Minimizar todas') : (labels.expandAll?.[langTyped] || 'Expandir todas')}
             type="button"
           >
-            {/* Seta tripla baseada nas setinhas menores */}
             <svg
               width="26" height="44" viewBox="0 0 26 44" fill="none" xmlns="http://www.w3.org/2000/svg"
               style={{
@@ -256,11 +277,10 @@ export default function Home() {
               <g>
                 <path d="M7 12L13 18L19 12" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M7 22L13 28L19 22" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M7 32L13 38L19 32" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"/>
               </g>
             </svg>
           </button>
-        </header>
+        </div>
         <Summary
           data={data}
           title={data.summaryTitle || labels.summary?.[labelLangCode] || "Resumo Profissional"}
@@ -292,25 +312,33 @@ export default function Home() {
           open={sectionsOpen.languages}
           setOpen={open => setSectionsOpen(s => ({ ...s, languages: open }))}
         />
+        <Interests
+          interests={data.interests || []}
+          open={sectionsOpen.interests ?? true}
+          setOpen={open => setSectionsOpen(s => ({ ...s, interests: open }))}
+          // Adiciona a prop title traduzida, igual aos outros componentes
+          title={data.interestsTitle || labels.interests?.[labelLangCode] || "Interesses"}
+        />
       </main>
       <Footer />
       {showLGPD && (
-        <div style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          width: '100vw',
-          background: theme === 'dark' ? '#232b22' : 'var(--accent)',
-          color: theme === 'dark' ? 'var(--accent)' : '#fff',
-          borderTop: theme === 'dark' ? '2px solid var(--accent)' : '2px solid var(--accent-hover)',
-          boxShadow: '0 -2px 12px rgba(0,0,0,0.13)',
-          padding: '1em 0.5em',
-          textAlign: 'center',
-          zIndex: 99999,
-          fontWeight: 500,
-          fontSize: '1.08em',
-          letterSpacing: '0.01em',
-        }}>
+        <div className="lgpd-bar-fixed"
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100vw',
+            background: theme === 'dark' ? '#232b22' : 'var(--accent)',
+            color: theme === 'dark' ? 'var(--accent)' : '#fff',
+            borderTop: theme === 'dark' ? '2px solid var(--accent)' : '2px solid var(--accent-hover)',
+            boxShadow: '0 -2px 12px rgba(0,0,0,0.13)',
+            padding: '1em 0.5em',
+            textAlign: 'center',
+            zIndex: 99999,
+            fontWeight: 500,
+            fontSize: '1.08em',
+            letterSpacing: '0.01em',
+          }}>
           {labels.cookiesNotice?.[labelLangCode]} <a href="#privacidade" style={{color: theme === 'dark' ? 'var(--accent)' : '#fff',textDecoration:'underline',fontWeight:600,cursor:'pointer'}} onClick={e => {e.preventDefault();setShowPrivacy(true);}}>{labels.privacyPolicy?.[labelLangCode]}</a>.
           <button
             style={{
@@ -351,6 +379,6 @@ export default function Home() {
           Cache limpo!
         </div>
       )}
-    </>
+    </div>
   );
 }

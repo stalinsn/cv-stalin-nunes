@@ -39,4 +39,9 @@ export interface CvData {
   experienceTitle?: string;
   educationTitle?: string;
   languagesTitle?: string;
+  interestsTitle?: string;
+  githubProject?: {
+    url: string;
+    label: string;
+  };
 }

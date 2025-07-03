@@ -4,6 +4,21 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
+## [1.5.0] - 2025-07-03
+### Added
+- SEO avançado: título, descrição, palavras-chave, Open Graph, Twitter Card e Schema.org JSON-LD em `src/app/head.tsx`.
+- `robots.txt` e sitemap.xml básico em `/public` para indexação por motores de busca.
+- Sitemap dinâmico com rotas estáticas e dinâmicas em `src/app/sitemap.xml/route.ts` (Next.js App Router).
+- Palavras-chave e descrição otimizadas para "Web Solutions Architect", VTEX, VTEX IO, Fast Store, Architecture, e serviços de desenvolvimento web.
+- Dados estruturados de pessoa, empresa e localização no Schema.org.
+
+### Changed
+- Atualização dos links sociais (LinkedIn, GitHub) e domínio real nos metadados.
+- Melhoria na descrição dos serviços e diferenciais no SEO.
+
+### Docs
+- Orientações sobre uso de SEO, sitemap e robots.txt adicionadas ao projeto.
+
 ## [1.4.1] - 2025-07-03
 ### Added
 - Botão "Limpar Cache" sempre visível quando houver traduções além de pt-br, com feedback visual de sucesso.

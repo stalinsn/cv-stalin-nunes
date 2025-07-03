@@ -1,4 +1,4 @@
 // src/data/cv/index.ts
 
-export { cvData } from './cv-ptbr';
+export { cvData } from './cvData';
 export { cvDataEn } from './cv-en';

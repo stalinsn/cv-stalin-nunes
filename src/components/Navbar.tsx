@@ -27,6 +27,7 @@ interface NavbarProps {
   onClearTranslations?: () => void;
   hasCache?: boolean;
   cacheCleared?: boolean;
+  githubProjectLink?: React.ReactNode;
 }
 
 export default function Navbar({
@@ -38,6 +39,7 @@ export default function Navbar({
   onClearTranslations,
   hasCache,
   cacheCleared,
+  githubProjectLink
 }: NavbarProps) {
   const handleLanguageChange = (value: string) => {
     localStorage.setItem('lastLang', value);
@@ -49,7 +51,7 @@ export default function Navbar({
   };
 
   return (
-    <NavbarContainer>
+    <NavbarContainer githubProjectLink={githubProjectLink}>
       <span className="brand">CV · Stalin Nunes</span>
       <div className="button-group">
         <div className="theme-toggle">
