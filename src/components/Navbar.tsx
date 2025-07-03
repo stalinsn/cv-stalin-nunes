@@ -26,6 +26,8 @@ interface NavbarProps {
     languageNames?: { [key: string]: string };
   };
   onClearTranslations?: () => void;
+  hasCache?: boolean;
+  cacheCleared?: boolean;
 }
 
 export default function Navbar({
@@ -35,9 +37,10 @@ export default function Navbar({
   onChangeTranslationMode,
   labels,
   onClearTranslations,
+  hasCache,
+  cacheCleared,
 }: NavbarProps) {
-  const [cacheCleared, setCacheCleared] = useState(false);
-  const [hasCache, setHasCache] = useState(false);
+  const [cacheClearedState, setCacheCleared] = useState(false);
 
   const handleLanguageChange = (value: string) => {
     localStorage.setItem('lastLang', value);
@@ -47,7 +50,6 @@ export default function Navbar({
   const handleClearCache = () => {
     clearTranslationCache();
     setCacheCleared(true);
-    setHasCache(false);
     if (onClearTranslations) onClearTranslations();
     setTimeout(() => setCacheCleared(false), 2000);
   };
@@ -76,7 +78,7 @@ export default function Navbar({
           </select>
         </div>
         <TranslationModeSelector
-          translationMode={translationMode}
+          translationMode={translationMode || 'ai'}
           onChangeTranslationMode={onChangeTranslationMode}
           labels={labels}
         />
@@ -86,7 +88,7 @@ export default function Navbar({
             <ClearCacheButton
               label={labels.clearCache || "Limpar Cache"}
               onClear={handleClearCache}
-              disabled={cacheCleared}
+              disabled={cacheClearedState}
             />
           )}
         </div>

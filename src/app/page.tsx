@@ -81,9 +81,15 @@ export default function Home() {
       setShowConfirmModal(false);
       return;
     }
-    setPendingLang(targetLang);
-    setShowConfirmModal(true);
-  }, [lang, translations, handleTranslate]);
+    if (translationMode === 'ai') {
+      setPendingLang(targetLang);
+      setShowConfirmModal(true);
+    } else {
+      // Se for mock, já traduz direto sem modal
+      handleTranslate(targetLang);
+      setShowConfirmModal(false);
+    }
+  }, [lang, translations, handleTranslate, translationMode]);
 
   // Confirmação do modal: só aqui pode chamar IA
   const handleConfirmTranslate = async (tokenInput: string) => {
@@ -172,10 +178,24 @@ export default function Home() {
     }
   }, []);
 
+  // Novo: detecta se há traduções além de pt-br
+  const hasCache = Object.keys(translations).some(k => k !== 'pt-br');
+  const [cacheCleared, setCacheCleared] = useState(false);
+
   const handleClearTranslations = () => {
     clearTranslations();
     if (typeof window !== 'undefined') {
       localStorage.setItem('lastLang', 'pt-br');
+    }
+    setCacheCleared(true);
+    setTimeout(() => setCacheCleared(false), 2000);
+  };
+
+  const handleModeChange = (mode: string) => {
+    setTranslationMode(mode);
+    // Se for mock, nunca abre modal
+    if (mode === 'mock') {
+      setShowConfirmModal(false);
     }
   };
 
@@ -186,7 +206,7 @@ export default function Home() {
         lang={langTyped}
         onTranslate={handleLanguageSelect}
         translationMode={translationMode}
-        onChangeTranslationMode={setTranslationMode}
+        onChangeTranslationMode={handleModeChange}
         labels={{
           theme: labels.toggleTheme[labelLangCode],
           language: labels.language?.[labelLangCode],
@@ -198,6 +218,8 @@ export default function Home() {
           clearCache: labels.clearCache?.[labelLangCode],
         }}
         onClearTranslations={handleClearTranslations}
+        hasCache={hasCache}
+        cacheCleared={cacheCleared}
       />
       <StatusBar
         loading={loading}
@@ -324,6 +346,11 @@ export default function Home() {
         error={tokenError}
       />
       <BackToTop label={labels.backToTop?.[labelLangCode] || "Voltar ao topo"} />
+      {cacheCleared && (
+        <div style={{ position: 'fixed', top: 16, right: 16, background: '#22c55e', color: '#fff', padding: '0.7em 1.2em', borderRadius: 8, fontWeight: 600, zIndex: 9999, boxShadow: '0 2px 8px rgba(0,0,0,0.13)' }}>
+          Cache limpo!
+        </div>
+      )}
     </>
   );
 }
