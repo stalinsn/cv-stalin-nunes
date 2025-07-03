@@ -4,6 +4,21 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] - 2025-07-03
+### Changed
+- Refatoração e padronização completa da estrutura de componentes, pastas e estilos do projeto.
+- Componentização e organização dos subcomponentes (Navbar, Header, Footer, SectionCard, StatusBar, ThemeToggle, LanguageSelector).
+- Padronização visual e responsiva do header/navbar, modais e selects.
+- Centralização e internacionalização de todos os textos fixos da interface via `labels.ts`, com tradução dinâmica para navbar, status bar, modais e aviso de cookies.
+- Ajuste do fluxo de seleção de idioma: valores do select e estado global padronizados, mas conversão automática para o formato esperado pela API de tradução IA.
+- Garantia de que a tradução IA funcione para todos os idiomas suportados, mantendo a seleção correta no select.
+- Remoção de arquivos de documentação `.md` redundantes após padronização dos componentes.
+
+### Fixed
+- Correção do fluxo de tradução IA para funcionar com os códigos de idioma esperados pela API, sem quebrar a seleção do idioma no select.
+- Correção da tradução dinâmica dos textos fixos da interface (navbar, status bar, modais, aviso de cookies, etc.) conforme o idioma selecionado.
+- Ajustes de tipagem e indexação para garantir compatibilidade com TypeScript.
+
 ## [1.3.2] - 2025-07-03
 ### Fixed
 - Translation confirmation modal now only opens by user action (select), never by side effects or loops.

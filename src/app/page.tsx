@@ -27,9 +27,21 @@ function LoadingOverlay({ show }: { show: boolean }) {
   return <div className="loading-overlay" />;
 }
 
+// Função utilitária para garantir o formato correto do código de idioma para labels
+function toLabelLangCode(code: string): 'pt-br' | 'en-us' | 'es-es' | 'fr-fr' | 'de-de' {
+  switch (code) {
+    case 'ptbr': return 'pt-br';
+    case 'en': return 'en-us';
+    case 'es': return 'es-es';
+    case 'fr': return 'fr-fr';
+    case 'de': return 'de-de';
+    default: return 'pt-br';
+  }
+}
+
 export default function Home() {
   const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode, translations, clearTranslations, saveTranslation } = useI18n();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme(); // Removido toggleTheme não utilizado
   const [pendingLang, setPendingLang] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [usosRestantes, setUsosRestantes] = useState<number | null>(null);
@@ -127,6 +139,7 @@ export default function Home() {
     : '';
 
   const langTyped = lang as import("@/types/cv").Language;
+  const labelLangCode = toLabelLangCode(langTyped);
 
   useEffect(() => {
     const savedLang = typeof window !== 'undefined' ? localStorage.getItem('lastLang') : null;
@@ -172,19 +185,17 @@ export default function Home() {
       <Navbar
         lang={langTyped}
         onTranslate={handleLanguageSelect}
-        onToggleTheme={toggleTheme}
-        theme={theme}
         translationMode={translationMode}
         onChangeTranslationMode={setTranslationMode}
         labels={{
-          theme: labels.toggleTheme[langTyped] || "Tema",
-          language: labels.language?.[langTyped] || "Idioma",
-          mode: labels.mode?.[langTyped] || "Modo",
-          exportPDF: labels.downloadPDF[langTyped] || "Exportar PDF",
-          translationModeAI: labels.translationModeAI?.[langTyped] || "IA",
-          translationModeFree: labels.translationModeFree?.[langTyped] || "Gratuito",
-          translationModeMock: labels.translationModeMock?.[langTyped] || "Mock",
-          clearCache: labels.clearCache?.[langTyped] || "Limpar cache de tradução",
+          theme: labels.toggleTheme[labelLangCode],
+          language: labels.language?.[labelLangCode],
+          mode: labels.mode?.[labelLangCode],
+          exportPDF: labels.downloadPDF[labelLangCode],
+          translationModeAI: labels.translationModeAI?.[labelLangCode],
+          translationModeFree: labels.translationModeFree?.[labelLangCode],
+          translationModeMock: labels.translationModeMock?.[labelLangCode],
+          clearCache: labels.clearCache?.[labelLangCode],
         }}
         onClearTranslations={handleClearTranslations}
       />
@@ -230,32 +241,32 @@ export default function Home() {
         </header>
         <Summary
           data={data}
-          title={data.summaryTitle || labels.summary?.[langTyped] || "Resumo Profissional"}
+          title={data.summaryTitle || labels.summary?.[labelLangCode] || "Resumo Profissional"}
           open={sectionsOpen.summary}
           setOpen={open => setSectionsOpen(s => ({ ...s, summary: open }))}
         />
         <Skills
           data={data}
-          titleMain={data.coreSkillsTitle || labels.coreSkills?.[langTyped] || "Competências Principais"}
-          titleTech={data.technicalSkillsTitle || labels.technicalSkills?.[langTyped] || "Competências Técnicas"}
+          titleMain={data.coreSkillsTitle || labels.coreSkills?.[labelLangCode] || "Competências Principais"}
+          titleTech={data.technicalSkillsTitle || labels.technicalSkills?.[labelLangCode] || "Competências Técnicas"}
           open={sectionsOpen.skills}
           setOpen={open => setSectionsOpen(s => ({ ...s, skills: open }))}
         />
         <Experience
           data={data}
-          title={data.experienceTitle || labels.experience?.[langTyped] || "Experiência Profissional"}
+          title={data.experienceTitle || labels.experience?.[labelLangCode] || "Experiência Profissional"}
           open={sectionsOpen.experience}
           setOpen={open => setSectionsOpen(s => ({ ...s, experience: open }))}
         />
         <Education
           data={data}
-          title={data.educationTitle || labels.education?.[langTyped] || "Formação Acadêmica"}
+          title={data.educationTitle || labels.education?.[labelLangCode] || "Formação Acadêmica"}
           open={sectionsOpen.education}
           setOpen={open => setSectionsOpen(s => ({ ...s, education: open }))}
         />
         <Languages
           data={data}
-          title={data.languagesTitle || labels.languages?.[langTyped] || "Idiomas"}
+          title={data.languagesTitle || labels.languages?.[labelLangCode] || "Idiomas"}
           open={sectionsOpen.languages}
           setOpen={open => setSectionsOpen(s => ({ ...s, languages: open }))}
         />
@@ -278,7 +289,7 @@ export default function Home() {
           fontSize: '1.08em',
           letterSpacing: '0.01em',
         }}>
-          {labels.cookiesNotice?.[langTyped] || 'Este site usa cookies técnicos e coleta dados de uso para proteger sua privacidade e garantir o funcionamento da tradução IA.'} <a href="#privacidade" style={{color: theme === 'dark' ? 'var(--accent)' : '#fff',textDecoration:'underline',fontWeight:600,cursor:'pointer'}} onClick={e => {e.preventDefault();setShowPrivacy(true);}}>{labels.privacyPolicy?.[langTyped] || 'Política de Privacidade'}</a>.
+          {labels.cookiesNotice?.[labelLangCode]} <a href="#privacidade" style={{color: theme === 'dark' ? 'var(--accent)' : '#fff',textDecoration:'underline',fontWeight:600,cursor:'pointer'}} onClick={e => {e.preventDefault();setShowPrivacy(true);}}>{labels.privacyPolicy?.[labelLangCode]}</a>.
           <button
             style={{
               marginLeft: 18,
@@ -295,11 +306,11 @@ export default function Home() {
             }}
             onClick={() => setShowLGPD(false)}
           >
-            {labels.cookiesOk?.[langTyped] || 'OK'}
+            {labels.cookiesOk?.[labelLangCode]}
           </button>
         </div>
       )}
-      <PrivacyModal open={showPrivacy} onClose={() => setShowPrivacy(false)} lang={langTyped} />
+      <PrivacyModal open={showPrivacy} onClose={() => setShowPrivacy(false)} lang={labelLangCode as keyof typeof labels.privacyModalTitle} />
       <FallbackModal
         open={!!(error && error.includes('Gostaria de usar a tradução padrão?'))}
         onAccept={handleAcceptFallback}
@@ -312,7 +323,7 @@ export default function Home() {
         onCancel={handleCancelTranslate}
         error={tokenError}
       />
-      <BackToTop label="Voltar ao topo" />
+      <BackToTop label={labels.backToTop?.[labelLangCode] || "Voltar ao topo"} />
     </>
   );
 }

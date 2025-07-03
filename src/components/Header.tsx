@@ -1,4 +1,7 @@
 import { CvData } from '@/types/cv';
+import HeaderTitle from './Header/HeaderTitle';
+import HeaderLocation from './Header/HeaderLocation';
+import HeaderContacts from './Header/HeaderContacts';
 
 type HeaderProps = {
   data: CvData;
@@ -7,16 +10,13 @@ type HeaderProps = {
 export default function Header({ data }: HeaderProps) {
   return (
     <header className="text-center">
-      <h1 className="text-3xl font-bold text-accent">{data.name}</h1>
-      <h2 className="text-lg text-foreground-light">{data.title}</h2>
-      <p>{data.location}</p>
-      <p className="text-sm">
-        <a href={`tel:${data.contact.phone.replace(/\D/g, '')}`}>{data.contact.phone}</a> ·{' '}
-        <a href={`mailto:${data.contact.email}`}>{data.contact.email}</a> ·{' '}
-        <a href={data.contact.linkedin} target="_blank" rel="noopener noreferrer">
-          LinkedIn
-        </a>
-      </p>
+      <HeaderTitle name={data.name} title={data.title} />
+      <HeaderLocation location={data.location} />
+      <HeaderContacts
+        phone={data.contact.phone}
+        email={data.contact.email}
+        linkedin={data.contact.linkedin}
+      />
     </header>
   );
 }
