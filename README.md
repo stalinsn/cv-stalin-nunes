@@ -4,7 +4,7 @@ Bem-vindo ao repositório do currículo interativo e multilíngue do Stalin Souz
 
 Welcome to this curriculum vitae project, feel free to translate from Portuguese to English as you wish :)
 
-![image](https://github.com/user-attachments/assets/6f4bcd87-ff79-492a-9c34-8743cdafd055)
+![image](https://github.com/user-attachments/assets/e7c34b5d-e57d-4940-8226-c52cec626c9c)
 
 
 ## 🚀 Visão Geral
