@@ -59,7 +59,7 @@ ${JSON.stringify(cvData, null, 2)}`;
   const tokensUsed = completion.usage?.total_tokens || 0;
   const modelo = process.env.NEXT_PUBLIC_OPENAI_MODEL || "gpt-3.5-turbo";
   const userAgent = req.headers.get('user-agent') || '';
-  const ip = req.headers.get('x-forwarded-for') || req.ip || '';
+  const ip = req.headers.get('x-forwarded-for') || '';
   const texto_hash = crypto.createHash('sha256').update(JSON.stringify(cvData)).digest('hex');
   let status = 'sucesso';
   try {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { labels } from '@/data/labels';
+import '@/styles/components/privacy-modal.css';
 
 interface PrivacyModalProps {
   open: boolean;
@@ -11,15 +12,15 @@ export default function PrivacyModal({ open, onClose, lang }: PrivacyModalProps)
   const langKey = lang;
   return !open ? null : (
     <div className="modal-overlay">
-      <div className="modal-card" style={{ maxWidth: 520, textAlign: 'left' }}>
-        <h2 style={{marginBottom: 16}}>{labels.privacyModalTitle?.[langKey] || 'Política de Privacidade'}</h2>
-        <p style={{marginBottom: 12}}>
+      <div className="modal-card privacy-modal-card">
+        <h2 className="privacy-modal-title">{labels.privacyModalTitle?.[langKey] || 'Política de Privacidade'}</h2>
+        <p className="privacy-modal-paragraph">
           <b>{labels.privacyModalTransparency?.[langKey] || 'Transparência é coisa séria (mas pode ser leve):'}</b>
         </p>
-        <ul style={{marginBottom: 16, paddingLeft: 20, color: 'var(--text)'}}>
+        <ul className="privacy-modal-list">
           <li>
             {labels.privacyModalList1Main?.[langKey]}{' '}
-            <span style={{ fontStyle: 'italic', color: 'var(--accent)', fontSize: '0.98em' }}>
+            <span className="privacy-modal-list-italic">
               {labels.privacyModalList1Hash?.[langKey]}
             </span>
           </li>
@@ -29,55 +30,18 @@ export default function PrivacyModal({ open, onClose, lang }: PrivacyModalProps)
           <li>{labels.privacyModalList5?.[langKey]}</li>
           <li>{labels.privacyModalList6?.[langKey]}</li>
         </ul>
-        <p style={{marginBottom: 12}}>
+        <p className="privacy-modal-summary">
           <b>Resumo:</b> {labels.privacyModalSummary?.[langKey] || 'O currículo é meu, mas sua privacidade é sua mesmo. Só queremos garantir que todo mundo possa brincar com IA sem sustos (e sem falir o dono do site 😅).'}
         </p>
-        <div style={{textAlign:'right'}}>
+        <div className="privacy-modal-footer">
           <button
-            className="btn btn-primary"
-            style={{marginTop: 8}}
+            className="btn btn-primary privacy-modal-btn"
             onClick={onClose}
           >
             {labels.privacyModalClose?.[langKey] || 'Fechar'}
           </button>
         </div>
       </div>
-      <style jsx>{`
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: rgba(0,0,0,0.4);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-        }
-        .modal-card {
-          background: var(--card-bg);
-          color: var(--text);
-          border-radius: 12px;
-          padding: 2.5rem 2.5rem 1.5rem 2.5rem;
-          box-shadow: 0 4px 32px rgba(0,0,0,0.18);
-          min-width: 340px;
-          max-width: 90vw;
-        }
-        .btn-primary {
-          background: var(--accent);
-          color: #fff;
-          border: none;
-          border-radius: 8px;
-          font-weight: 500;
-          padding: 0.7em 2.2em;
-          font-size: 1.1em;
-          cursor: pointer;
-        }
-        .btn-primary:hover {
-          background: var(--accent-hover, #0056b3);
-        }
-      `}</style>
     </div>
   );
 }

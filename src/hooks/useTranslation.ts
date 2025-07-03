@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { labels } from "./labels";
-import { cvData } from "./cvData";
+import { labels } from "../data/labels";
+import { cvData } from "../data/cvData";
 
 type Language = "pt" | "en";
 

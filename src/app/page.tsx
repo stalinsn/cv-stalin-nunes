@@ -38,16 +38,37 @@ export default function Home() {
   const [showLGPD, setShowLGPD] = useState(true);
   const [showPrivacy, setShowPrivacy] = useState(false);
 
+  // Estado global para togglers das seções
+  const [sectionsOpen, setSectionsOpen] = useState({
+    summary: true,
+    skills: true,
+    experience: true,
+    education: true,
+    languages: true,
+  });
+
+  // Função para toggle all
+  const allOpen = Object.values(sectionsOpen).every(Boolean);
+  const handleToggleAll = () => {
+    const next = !allOpen;
+    setSectionsOpen({
+      summary: next,
+      skills: next,
+      experience: next,
+      education: next,
+      languages: next,
+    });
+  };
+
+  // Lógica simplificada para o modal de confirmação de tradução
   const onTranslate = async (targetLang: string) => {
     if (targetLang === lang) return;
     if (translations[targetLang]) {
-      // Se já existe cache, só troca para o idioma
       await handleTranslate(targetLang);
       setSelectedLang(null);
       setShowConfirmModal(false);
       return;
     }
-    // Só abre modal se não houver cache
     setSelectedLang(targetLang);
     setShowConfirmModal(true);
   };
@@ -70,6 +91,12 @@ export default function Home() {
     setUsosRestantes(result.usos_restantes ?? null);
     await handleTranslate(selectedLang, tokenInput, 'modal');
     setSelectedLang(null);
+    setShowConfirmModal(false); // Garante fechamento
+  };
+
+  const handleCancelTranslate = () => {
+    setShowConfirmModal(false);
+    setSelectedLang(null);
   };
 
   useEffect(() => {
@@ -89,10 +116,6 @@ export default function Home() {
     setUserAcceptedFallback(false);
     setPendingLang(null);
   };
-  const handleCancelTranslate = () => {
-    setShowConfirmModal(false);
-    setSelectedLang(null);
-  };
   function safe<T>(value: T | undefined | null, fallback = "Não informado"): T | string {
     return value ?? fallback;
   }
@@ -104,10 +127,8 @@ export default function Home() {
     ? 'Tradução concluída com IA!'
     : '';
 
-  // Forçar lang a ser do tipo Language
   const langTyped = lang as import("@/types/cv").Language;
 
-  // Persistência do idioma selecionado
   useEffect(() => {
     const savedLang = typeof window !== 'undefined' ? localStorage.getItem('lastLang') : null;
     if (savedLang && savedLang !== lang && savedLang !== 'pt-br') {
@@ -116,7 +137,6 @@ export default function Home() {
       if (translations[savedLang]) {
         handleTranslate(savedLang);
       } else if (cached) {
-        // Carrega o cache do localStorage para o estado antes de trocar o idioma
         try {
           const parsed = JSON.parse(cached);
           saveTranslation(savedLang, parsed);
@@ -125,7 +145,6 @@ export default function Home() {
         handleTranslate(savedLang);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -134,7 +153,6 @@ export default function Home() {
     }
   }, [lang]);
 
-  // Salva o cache do português (pt-br) no localStorage ao carregar pela primeira vez
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const cacheKey = JSON.stringify(cvData);
@@ -142,10 +160,8 @@ export default function Home() {
         localStorage.setItem(`translation_pt-br_${cacheKey}`, JSON.stringify(cvData));
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Ao limpar cache, resetar idioma e localStorage
   const handleClearTranslations = () => {
     clearTranslations();
     if (typeof window !== 'undefined') {
@@ -189,19 +205,63 @@ export default function Home() {
         <div style={{ color: 'red', margin: '1rem' }}>Erro: {error}</div>
       )}
       <main className="wrapper">
-        <header className="card" id="header">
+        <header className="card" id="header" style={{ position: 'relative' }}>
           <h1 className="text-3xl font-bold">{safe(data?.name)}</h1>
           <h2 className="text-lg text-accent font-medium">{safe(data?.title)}</h2>
+          <button
+            className="toggle-all-icon-btn"
+            onClick={handleToggleAll}
+            aria-label={allOpen ? (labels.minimizeAll?.[langTyped] || 'Minimizar todas') : (labels.expandAll?.[langTyped] || 'Expandir todas')}
+            title={allOpen ? (labels.minimizeAll?.[langTyped] || 'Minimizar todas') : (labels.expandAll?.[langTyped] || 'Expandir todas')}
+            type="button"
+          >
+            {/* Seta tripla baseada nas setinhas menores */}
+            <svg
+              width="26" height="44" viewBox="0 0 26 44" fill="none" xmlns="http://www.w3.org/2000/svg"
+              style={{
+                transform: allOpen ? 'rotate(0deg)' : 'rotate(-180deg)',
+                transition: 'transform 0.38s cubic-bezier(.4,2,.6,1)'
+              }}
+            >
+              <g>
+                <path d="M7 12L13 18L19 12" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M7 22L13 28L19 22" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M7 32L13 38L19 32" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"/>
+              </g>
+            </svg>
+          </button>
         </header>
-        <Summary data={data} title={data.summaryTitle || labels.summary?.[langTyped] || "Resumo Profissional"} />
+        <Summary
+          data={data}
+          title={data.summaryTitle || labels.summary?.[langTyped] || "Resumo Profissional"}
+          open={sectionsOpen.summary}
+          setOpen={open => setSectionsOpen(s => ({ ...s, summary: open }))}
+        />
         <Skills
           data={data}
           titleMain={data.coreSkillsTitle || labels.coreSkills?.[langTyped] || "Competências Principais"}
           titleTech={data.technicalSkillsTitle || labels.technicalSkills?.[langTyped] || "Competências Técnicas"}
+          open={sectionsOpen.skills}
+          setOpen={open => setSectionsOpen(s => ({ ...s, skills: open }))}
         />
-        <Experience data={data} title={data.experienceTitle || labels.experience?.[langTyped] || "Experiência Profissional"} />
-        <Education data={data} title={data.educationTitle || labels.education?.[langTyped] || "Formação Acadêmica"} />
-        <Languages data={data} title={data.languagesTitle || labels.languages?.[langTyped] || "Idiomas"} />
+        <Experience
+          data={data}
+          title={data.experienceTitle || labels.experience?.[langTyped] || "Experiência Profissional"}
+          open={sectionsOpen.experience}
+          setOpen={open => setSectionsOpen(s => ({ ...s, experience: open }))}
+        />
+        <Education
+          data={data}
+          title={data.educationTitle || labels.education?.[langTyped] || "Formação Acadêmica"}
+          open={sectionsOpen.education}
+          setOpen={open => setSectionsOpen(s => ({ ...s, education: open }))}
+        />
+        <Languages
+          data={data}
+          title={data.languagesTitle || labels.languages?.[langTyped] || "Idiomas"}
+          open={sectionsOpen.languages}
+          setOpen={open => setSectionsOpen(s => ({ ...s, languages: open }))}
+        />
       </main>
       <Footer />
       {showLGPD && (

@@ -1,5 +1,5 @@
 import { translateWithAI } from './translateAI';
-import { translateMock } from './translateMock';
+import { translateMock, translateMockString } from './translateMock';
 
 const useAI = process.env.NEXT_PUBLIC_ENABLE_AI === 'true';
 
@@ -11,12 +11,14 @@ export async function translate(text: string, targetLang: string) {
       const translated = await translateWithAI(text, targetLang);
       return translated;
     } else {
-      return translateMock(text, targetLang);
+      const result = await translateMockString(text, targetLang);
+      return result.translated;
     }
   } catch (error) {
     console.warn(
       `[Translation Error] IA falhou. Usando Mock. Motivo: ${error}`
     );
-    return translateMock(text, targetLang);
+    const result = await translateMockString(text, targetLang);
+    return result.translated;
   }
 }

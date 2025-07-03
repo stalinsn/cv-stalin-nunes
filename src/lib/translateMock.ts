@@ -41,3 +41,11 @@ export function translateMock(cvData: CvData, targetLang: string): Promise<{ tra
   };
   return Promise.resolve({ translated: fake, tokensUsed: 0 });
 }
+
+export function translateMockString(text: string, targetLang: string): Promise<{ translated: string; tokensUsed: number }> {
+  const prefix = `[${targetLang}] `;
+  return Promise.resolve({
+    translated: prefix + text,
+    tokensUsed: text.length,
+  });
+}

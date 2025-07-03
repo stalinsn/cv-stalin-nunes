@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '@/styles/components/confirm-translate-modal.css';
 
 interface ConfirmTranslateModalProps {
   open: boolean;
@@ -32,14 +33,13 @@ export default function ConfirmTranslateModal({
           <strong>{languageLabel}</strong>
         </p>
         <input
-          className="token-input"
+          className="token-input confirm-modal-input"
           type="text"
           placeholder="Insira seu token de autorização"
           value={token}
           onChange={e => { setToken(e.target.value); setError(''); }}
-          style={{ width: '100%', padding: '0.7rem', borderRadius: 8, border: '1px solid var(--border)', marginBottom: 12, fontSize: '1.1rem', background: 'var(--bg)', color: 'var(--text)' }}
         />
-        {error && <div style={{ color: 'var(--accent)', marginBottom: 8 }}>{error}</div>}
+        {error && <div className="confirm-modal-error">{error}</div>}
         <div className="flex gap-4 justify-end">
           <button
             className="btn btn-primary"

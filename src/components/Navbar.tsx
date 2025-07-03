@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Language } from "@/types/cv";
 import { clearTranslationCache } from "@/utils/translationCache";
 import { labels as globalLabels } from '@/data/labels';
+import '@/styles/components/navbar.css';
 
 interface NavbarProps {
   lang: Language;
@@ -24,7 +25,6 @@ interface NavbarProps {
   onClearTranslations?: () => void;
 }
 
-// Gera as opções de idioma a partir do arquivo de labels
 const languageCodes = Object.keys(globalLabels.languageNames || {}) as Language[];
 
 export default function Navbar({
@@ -40,7 +40,6 @@ export default function Navbar({
   const [cacheCleared, setCacheCleared] = useState(false);
   const [hasCache, setHasCache] = useState(false);
 
-  // Salva o idioma selecionado no localStorage e chama o onTranslate
   const handleLanguageChange = (value: string) => {
     localStorage.setItem('lastLang', value);
     onTranslate(value as Language);
@@ -49,13 +48,12 @@ export default function Navbar({
   useEffect(() => {
     if (typeof window !== "undefined") {
       setHasCache(Object.keys(localStorage).some((k) => k.startsWith("translation_")));
-      // Ao montar, se houver um idioma salvo, aplica
       const savedLang = localStorage.getItem('lastLang');
       if (savedLang && savedLang !== lang) {
         onTranslate(savedLang as Language);
       }
     }
-  }, []);
+  }, [lang, onTranslate]);
 
   const handleClearCache = () => {
     clearTranslationCache();
@@ -65,12 +63,11 @@ export default function Navbar({
     setTimeout(() => setCacheCleared(false), 2000);
   };
 
-  // Usar labels.languageNames para nomes por extenso
   const languageNames = globalLabels.languageNames;
 
   return (
     <header className="topbar">
-      <div className="toolbar">
+      <div className="toolbar navbar-container">
         <span className="brand">CV · Stalin Nunes</span>
         <div className="button-group">
           <div className="theme-toggle">
@@ -88,6 +85,7 @@ export default function Navbar({
           <div className="language-selector">
             <label>{labels.language}:</label>
             <select
+              className="navbar-select"
               value={lang}
               onChange={(e) => handleLanguageChange(e.target.value)}
             >
@@ -102,6 +100,7 @@ export default function Navbar({
           <div className="translation-mode">
             <label>{labels.mode}:</label>
             <select
+              className="navbar-select"
               value={translationMode}
               onChange={(e) => onChangeTranslationMode(e.target.value)}
             >
@@ -111,19 +110,20 @@ export default function Navbar({
             </select>
           </div>
 
-          <button className="btn" onClick={() => window.print()}>
-            {labels.exportPDF}
-          </button>
-
-          {hasCache && (
-            <button
-              className="btn btn-secondary"
-              onClick={handleClearCache}
-              disabled={cacheCleared}
-            >
-              {cacheCleared ? "Cache limpo!" : labels.clearCache}
+          <div className="button-actions">
+            <button className="btn" onClick={() => window.print()}>
+              {labels.exportPDF}
             </button>
-          )}
+            {hasCache && (
+              <button
+                className="btn btn-secondary"
+                onClick={handleClearCache}
+                disabled={cacheCleared}
+              >
+                {cacheCleared ? labels.clearCache : labels.clearCache}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </header>

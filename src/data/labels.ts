@@ -30,11 +30,11 @@ export const labels: Labels = {
     'de-de': 'Drucken',
   },
   clearCache: {
-    'pt-br': 'Limpar cache de tradução',
-    'en-us': 'Clear translation cache',
-    'es-es': 'Limpiar caché de tradução',
-    'fr-fr': 'Vider le cache de traduction',
-    'de-de': 'Übersetzungscache löschen',
+    'pt-br': 'Limpar traduções',
+    'en-us': 'Clear translations',
+    'es-es': 'Limpiar traducciones',
+    'fr-fr': 'Vider les traductions',
+    'de-de': 'Übersetzungen löschen',
   },
   // Footer
   madeWith: {
@@ -83,7 +83,7 @@ export const labels: Labels = {
   privacyModalList1Main: {
     'pt-br': 'Coletamos apenas dados técnicos: IP, navegador (user agent), idioma, estatísticas de uso e um hash do texto traduzido.',
     'en-us': 'We only collect technical data: IP, browser (user agent), language, usage statistics, and a hash of the translated text.',
-    'es-es': 'Solo recopilamos dados técnicos: IP, navegador (user agent), idioma, estadísticas de uso y un hash del texto traduzido.',
+    'es-es': 'Solo recopilamos dados técnicos: IP, navegador (user agent), idioma, estadísticas de uso e un hash del texto traduzido.',
     'fr-fr': 'Nous ne collectons que des données techniques : IP, navigateur (user agent), langue, statistiques d’utilisation et un hash du texte traduit.',
     'de-de': 'Wir erfassen nur technische Daten: IP, Browser (User Agent), Sprache, Nutzungsstatistiken und einen Hash des übersetzten Textes.',
   },

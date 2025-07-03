@@ -1,0 +1,29 @@
+.privacy-modal-card {
+  max-width: 520px;
+  text-align: left;
+}
+.privacy-modal-title {
+  margin-bottom: 16px;
+}
+.privacy-modal-paragraph {
+  margin-bottom: 12px;
+}
+.privacy-modal-list {
+  margin-bottom: 16px;
+  padding-left: 20px;
+  color: var(--text);
+}
+.privacy-modal-list-italic {
+  font-style: italic;
+  color: var(--accent);
+  font-size: 0.98em;
+}
+.privacy-modal-summary {
+  margin-bottom: 12px;
+}
+.privacy-modal-footer {
+  text-align: right;
+}
+.privacy-modal-btn {
+  margin-top: 8px;
+}
