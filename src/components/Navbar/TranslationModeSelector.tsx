@@ -6,7 +6,6 @@ interface TranslationModeSelectorProps {
   labels: {
     mode?: string;
     translationModeAI?: string;
-    translationModeFree?: string;
     translationModeMock?: string;
   };
 }
@@ -21,12 +20,11 @@ export default function TranslationModeSelector({
       <label>{labels.mode}:</label>
       <select
         className="navbar-select"
-        value={translationMode}
+        value={translationMode || "ai"}
         onChange={(e) => onChangeTranslationMode(e.target.value)}
       >
-        <option value="ai">{labels.translationModeAI}</option>
-        <option value="free">{labels.translationModeFree}</option>
-        <option value="mock">{labels.translationModeMock}</option>
+        <option value="ai">{labels.translationModeAI || "IA"}</option>
+        <option value="mock">{labels.translationModeMock || "Mock"}</option>
       </select>
     </div>
   );

@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import { Language } from "@/types/cv";
-import { clearTranslationCache } from "@/utils/translationCache";
 import '@/styles/components/navbar.css';
 import '@/styles/components/theme-toggle.css';
 import NavbarContainer from "./Navbar/NavbarContainer";
@@ -26,6 +25,8 @@ interface NavbarProps {
     languageNames?: { [key: string]: string };
   };
   onClearTranslations?: () => void;
+  hasCache?: boolean;
+  cacheCleared?: boolean;
 }
 
 export default function Navbar({
@@ -35,21 +36,16 @@ export default function Navbar({
   onChangeTranslationMode,
   labels,
   onClearTranslations,
+  hasCache,
+  cacheCleared,
 }: NavbarProps) {
-  const [cacheCleared, setCacheCleared] = useState(false);
-  const [hasCache, setHasCache] = useState(false);
-
   const handleLanguageChange = (value: string) => {
     localStorage.setItem('lastLang', value);
     onTranslate(value as Language);
   };
 
   const handleClearCache = () => {
-    clearTranslationCache();
-    setCacheCleared(true);
-    setHasCache(false);
     if (onClearTranslations) onClearTranslations();
-    setTimeout(() => setCacheCleared(false), 2000);
   };
 
   return (
@@ -76,7 +72,7 @@ export default function Navbar({
           </select>
         </div>
         <TranslationModeSelector
-          translationMode={translationMode}
+          translationMode={translationMode || 'ai'}
           onChangeTranslationMode={onChangeTranslationMode}
           labels={labels}
         />
@@ -86,7 +82,7 @@ export default function Navbar({
             <ClearCacheButton
               label={labels.clearCache || "Limpar Cache"}
               onClear={handleClearCache}
-              disabled={cacheCleared}
+              disabled={!!cacheCleared}
             />
           )}
         </div>

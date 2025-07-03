@@ -97,3 +97,33 @@
   color: var(--accent, #0070f3);
   transition: transform 0.38s cubic-bezier(.4,2,.6,1);
 }
+@media (max-width: 1024px) {
+  .card > .section-toggler {
+    top: 10px;
+    right: 10px;
+  }
+}
+@media (max-width: 768px) {
+  .card > .section-toggler {
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+  }
+  .card > .section-toggler svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+@media (max-width: 500px) {
+  .card > .section-toggler {
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+  }
+  .card > .section-toggler svg {
+    width: 15px;
+    height: 15px;
+  }
+}
