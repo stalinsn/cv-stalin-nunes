@@ -4,6 +4,20 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), e este projeto adota a [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [1.3.1] - 2025-07-03
+### Added
+- Section togglers for all main sections (Summary, Skills, Experience, Education, Languages) with animated arrow buttons to expand/collapse content.
+- Triple-arrow "toggle all" button in the header, allowing all sections to be expanded or collapsed at once, with smooth rotation animation and accessible tooltips.
+- New CSS modules for each component, removing inline styles and standardizing the visual style across the app.
+- Responsive and accessible toggles, with proper aria-labels and keyboard navigation.
+- Custom SVG icons for togglers, with proportional sizing and hover effects.
+
+### Changed
+- Increased the size of all toggler arrows by 2px for better visibility.
+- Section expand/collapse animation is now slower and smoother (1.25s) for a more elegant user experience.
+- Visual consistency: all arrows now use the same minimal style, and the triple-arrow toggle-all matches the section togglers.
+- Minor CSS and SVG refinements for spacing, color, and animation.
+
 ## [1.3.0] - 2025-07-03
 ### Alterado
 - Internacionalização completa de todos os textos fixos da interface (Navbar, rodapé, botões, labels, select de idiomas, modais e política de privacidade) com labels centralizadas em `labels.ts`.
