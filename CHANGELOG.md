@@ -4,6 +4,18 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/), e este projeto adota a [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [1.3.0] - 2025-07-03
+### Alterado
+- Internacionalização completa de todos os textos fixos da interface (Navbar, rodapé, botões, labels, select de idiomas, modais e política de privacidade) com labels centralizadas em `labels.ts`.
+- Persistência do idioma selecionado via localStorage, restaurando corretamente após recarregar a página.
+- Exibição dos nomes dos idiomas por extenso, no próprio idioma e no idioma da interface.
+- Correção do fluxo de cache/localStorage: traduções sempre salvas e buscadas usando o currículo original em português como chave base.
+- Modal de confirmação de tradução/token só aparece quando realmente necessário, evitando exibição desnecessária ao recarregar.
+- Refino do modal de política de privacidade para consumir labels traduzidas, incluindo todos os itens da lista.
+- Ajustes de tipagem e normalização dos códigos de idioma em todo o app.
+- Reset do idioma padrão para 'pt-br' ao limpar cache.
+- Testes e revisões do fluxo de troca de idioma, persistência, cache e exibição de modais.
+
 ## [1.2.0] - 2025-07-02
 ### Adicionado
 - Cache local de traduções por idioma/texto (evita custo extra e requisições desnecessárias).
