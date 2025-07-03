@@ -4,6 +4,9 @@ Bem-vindo ao repositório do currículo interativo e multilíngue do Stalin Souz
 
 Welcome to this curriculum vitae project, feel free to translate from Portuguese to English as you wish :)
 
+![image](https://github.com/user-attachments/assets/6f4bcd87-ff79-492a-9c34-8743cdafd055)
+
+
 ## 🚀 Visão Geral
 Este projeto é um currículo digital moderno, responsivo e multilíngue, desenvolvido com **Next.js** e **TypeScript**. Ele permite alternar entre diferentes idiomas, exportar para PDF, imprimir, alternar temas (claro/escuro), e testar traduções automáticas via IA.
 
