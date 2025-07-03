@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { Language } from "@/types/cv";
 import { clearTranslationCache } from "@/utils/translationCache";
-import { labels as globalLabels } from '@/data/labels';
 import '@/styles/components/navbar.css';
+import '@/styles/components/theme-toggle.css';
+import NavbarContainer from "./Navbar/NavbarContainer";
+import TranslationModeSelector from "./Navbar/TranslationModeSelector";
+import ExportButton from "./Navbar/ExportButton";
+import ClearCacheButton from "./Navbar/ClearCacheButton";
+import ThemeToggle from "./ThemeToggle";
 
 interface NavbarProps {
   lang: Language;
   onTranslate: (targetLang: Language) => void;
-  onToggleTheme: () => void;
-  theme: "light" | "dark";
   translationMode: string;
   onChangeTranslationMode: (mode: string) => void;
   labels: {
@@ -25,13 +28,9 @@ interface NavbarProps {
   onClearTranslations?: () => void;
 }
 
-const languageCodes = Object.keys(globalLabels.languageNames || {}) as Language[];
-
 export default function Navbar({
   lang,
   onTranslate,
-  onToggleTheme,
-  theme,
   translationMode,
   onChangeTranslationMode,
   labels,
@@ -53,69 +52,45 @@ export default function Navbar({
     setTimeout(() => setCacheCleared(false), 2000);
   };
 
-  const languageNames = globalLabels.languageNames;
-
   return (
-    <header className="topbar">
-      <div className="toolbar navbar-container">
-        <span className="brand">CV · Stalin Nunes</span>
-        <div className="button-group">
-          <div className="theme-toggle">
-            <span className="theme-label">{labels.theme}</span>
-            <label className="switch">
-              <input
-                type="checkbox"
-                onChange={onToggleTheme}
-                checked={theme === "dark"}
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
-
-          <div className="language-selector">
-            <label>{labels.language}:</label>
-            <select
-              className="navbar-select"
-              value={lang}
-              onChange={(e) => handleLanguageChange(e.target.value)}
-            >
-              {languageCodes.map((code) => (
-                <option key={code} value={code}>
-                  {languageNames[code] || code}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="translation-mode">
-            <label>{labels.mode}:</label>
-            <select
-              className="navbar-select"
-              value={translationMode}
-              onChange={(e) => onChangeTranslationMode(e.target.value)}
-            >
-              <option value="ai">{labels.translationModeAI}</option>
-              <option value="free">{labels.translationModeFree}</option>
-              <option value="mock">{labels.translationModeMock}</option>
-            </select>
-          </div>
-
-          <div className="button-actions">
-            <button className="btn" onClick={() => window.print()}>
-              {labels.exportPDF}
-            </button>
-            {hasCache && (
-              <button
-                className="btn btn-secondary"
-                onClick={handleClearCache}
-                disabled={cacheCleared}
-              >
-                {cacheCleared ? labels.clearCache : labels.clearCache}
-              </button>
-            )}
-          </div>
+    <NavbarContainer>
+      <span className="brand">CV · Stalin Nunes</span>
+      <div className="button-group">
+        <div className="theme-toggle">
+          <span className="theme-label">{labels.theme}</span>
+          <ThemeToggle />
+        </div>
+        <div className="language-selector">
+          <label>{labels.language}:</label>
+          <select
+            className="navbar-select"
+            value={lang}
+            onChange={e => handleLanguageChange(e.target.value)}
+            title="Selecionar idioma"
+          >
+            <option value="ptbr">Português</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+        <TranslationModeSelector
+          translationMode={translationMode}
+          onChangeTranslationMode={onChangeTranslationMode}
+          labels={labels}
+        />
+        <div className="button-actions">
+          <ExportButton label={labels.exportPDF || "Exportar PDF"} />
+          {hasCache && (
+            <ClearCacheButton
+              label={labels.clearCache || "Limpar Cache"}
+              onClear={handleClearCache}
+              disabled={cacheCleared}
+            />
+          )}
         </div>
       </div>
-    </header>
+    </NavbarContainer>
   );
 }

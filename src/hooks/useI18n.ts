@@ -61,15 +61,26 @@ export function useI18n() {
     }
   }, [lang]);
 
-  // Normaliza o código do idioma para os suportados nas labels (mas não para setLang)
+  // Normaliza o código do idioma para os suportados no select/navbar
   function normalizeLangCode(code: string) {
-    if (code === 'pt-br' || code === 'en-us' || code === 'es-es' || code === 'fr-fr' || code === 'de-de') return code;
-    if (code.startsWith('pt')) return 'pt-br';
-    if (code.startsWith('en')) return 'en-us';
-    if (code.startsWith('es')) return 'es-es';
-    if (code.startsWith('fr')) return 'fr-fr';
-    if (code.startsWith('de')) return 'de-de';
+    if (code === 'ptbr' || code === 'pt-br') return 'ptbr';
+    if (code === 'en' || code === 'en-us') return 'en';
+    if (code === 'es' || code === 'es-es') return 'es';
+    if (code === 'fr' || code === 'fr-fr') return 'fr';
+    if (code === 'de' || code === 'de-de') return 'de';
     return code;
+  }
+
+  // Converte código curto para código completo esperado pela API de tradução
+  function toApiLangCode(code: string) {
+    switch (code) {
+      case 'ptbr': return 'pt-br';
+      case 'en': return 'en-us';
+      case 'es': return 'es-es';
+      case 'fr': return 'fr-fr';
+      case 'de': return 'de-de';
+      default: return code;
+    }
   }
 
   /**
@@ -99,7 +110,9 @@ export function useI18n() {
       setLoading(true);
       const start = Date.now();
       try {
-        const result = await translateWithAI(data, normalizedLang, token, origem);
+        // Usa código completo apenas na chamada da API
+        const apiLang = toApiLangCode(normalizedLang);
+        const result = await translateWithAI(data, apiLang, token, origem);
         const elapsed = Date.now() - start;
         if (!result || !result.translated) {
           throw new Error('Tradução IA não retornou resultado.');

@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import StatusBarContainer from './StatusBarContainer';
+import StatusBarHeader from './StatusBarHeader';
+import StatusBarDetails from './StatusBarDetails';
 import '@/styles/statusbar.css';
-import { statusbarFacts } from './statusbarFacts';
 import '@/styles/components/status-bar.css';
 
 interface StatusBarProps {
@@ -83,163 +85,39 @@ export default function StatusBar({
   const requisicoesPorDolar =
     costUSD > 0 ? (1 / costUSD).toFixed(0) : '∞';
 
-  // Função para converter segundos em formato amigável
-  function formatSeconds(sec: number) {
-    // Corrige se vier em milissegundos (valor muito alto)
-    if (sec > 600) sec = sec / 1000;
-    if (sec < 60) return `${sec.toFixed(2)}s`;
-    const min = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60);
-    if (min < 60) return `${min}min ${s}s`;
-    const h = Math.floor(min / 60);
-    return `${h}h ${min % 60}min ${s}s`;
-  }
-
-  // Função para sortear curiosidade
-  function randomFact(arr: string[], vars?: Record<string, string|number>) {
-    const fact = arr[Math.floor(Math.random() * arr.length)];
-    if (!vars) return fact;
-    return fact.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ''));
-  }
-
   return (
-    <div
-      ref={barRef}
-      className={`statusbar-draggable${!expanded ? ' minimized' : ''}`}
-      style={{
-        top: position.top,
-        left: position.left,
-        width: expanded ? '370px' : '230px',
-        transition: dragging ? 'none' : 'all 0.3s cubic-bezier(.4,2,.6,1)',
-        cursor: dragging ? 'grabbing' : 'default',
-      }}
+    <StatusBarContainer
+      position={position}
+      dragging={dragging}
+      barRef={barRef as React.RefObject<HTMLDivElement>}
+      expanded={expanded}
     >
       <div
         className="statusbar-header"
         onMouseDown={onMouseDown}
         style={!expanded ? { cursor: 'default', userSelect: 'auto' } : {}}
       >
-        <p className="statusbar-title" style={!expanded ? { fontSize: '1.08rem', fontWeight: 600, marginRight: 8, marginBottom: 0 } : {}}>
-          {statusMessage}
-          {usosRestantes !== undefined && usosRestantes !== null && statusMessage.includes('Tradução concluída') && (
-            <span className="statusbar-title-remaining" style={!expanded ? { color: 'var(--accent)', fontWeight: 500, marginLeft: 6 } : {}}>
-              ({usosRestantes} uso{usosRestantes === 1 ? '' : 's'} restantes)
-            </span>
-          )}
-        </p>
-        {!expanded && (
-          <button
-            className="statusbar-close-btn"
-            title="Fechar barra de status"
-            onClick={() => setVisible(false)}
-            aria-label="Fechar barra de status"
-            style={{ marginLeft: 'auto', marginRight: 0 }}
-          >
-            ×
-          </button>
-        )}
-        <div className="statusbar-flex">
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="statusbar-btn"
-            title={expanded ? 'Recolher' : 'Expandir'}
-          >
-            {expanded ? '⬆️' : '⬇️'}
-          </button>
-        </div>
+        <StatusBarHeader
+          statusMessage={statusMessage}
+          usosRestantes={usosRestantes}
+          expanded={expanded}
+          setVisible={setVisible}
+          setExpanded={setExpanded}
+        />
       </div>
-
       {expanded && (
-        <>
-          <hr className="statusbar-divider" />
-          {tokensUsed !== null && (
-            <div className="statusbar-section">
-              <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-                🧠 Tokens usados: {tokensUsed}
-                <span className="statusbar-anecdote">{randomFact(statusbarFacts.tokens)}</span>
-              </p>
-              <div className="statusbar-section-detail">
-                Tokens são blocos de texto. Exemplo: <span className="statusbar-section-monospace">[Olá] [!] [mundo] [!]</span> = 4 tokens
-              </div>
-            </div>
-          )}
-          {elapsedTime !== null && (
-            <div className="statusbar-section">
-              <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-                ⏱️ Tempo: {formatSeconds(elapsedTime)} <span className="statusbar-section-span">({Math.round(elapsedTime * 1000)} ms)</span>
-                <span className="statusbar-anecdote">{randomFact(statusbarFacts.elapsed, { ms: Math.round(elapsedTime * 1000) })}</span>
-              </p>
-              <div className="statusbar-section-detail">
-                Tempo total de processamento da tradução.
-              </div>
-            </div>
-          )}
-          {speed && (
-            <div className="statusbar-section">
-              <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-                ⚡ Velocidade: {speed} tokens/s
-                <span className="statusbar-anecdote">{randomFact(statusbarFacts.speed)}</span>
-              </p>
-              <div className="statusbar-section-detail">
-                Quanto maior, mais rápida a tradução.
-              </div>
-            </div>
-          )}
-          {payloadSize && (
-            <div className="statusbar-section">
-              <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-                📦 Payload: {payloadSize.toFixed(2)} KB
-                <span className="statusbar-anecdote">{randomFact(statusbarFacts.payload)}</span>
-              </p>
-              <div className="statusbar-section-detail">
-                Aproximadamente {Math.ceil(payloadSize/2)} páginas de texto puro.
-              </div>
-            </div>
-          )}
-          {charCount && (
-            <div className="statusbar-section">
-              <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-                📝 Caracteres: {charCount}
-                <span className="statusbar-anecdote">{randomFact(statusbarFacts.charCount)}</span>
-              </p>
-              <div className="statusbar-section-detail">
-                ≈ {Math.ceil(charCount/280)} tweets completos
-              </div>
-            </div>
-          )}
-          {costUSD > 0 && (
-            <>
-              <div className="statusbar-section">
-                <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-                  💰 Custo estimado: ${costUSD.toFixed(5)} (~R${costBRL.toFixed(5)})
-                  <span className="statusbar-anecdote">{randomFact(statusbarFacts.cost)}</span>
-                </p>
-                <div className="statusbar-section-detail">
-                  Base OpenAI, dólar = R$5,20
-                </div>
-              </div>
-              <div className="statusbar-section">
-                <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-                  🧾 Com $1 você faz aprox. {requisicoesPorDolar} requisições desse tamanho
-                  <span className="statusbar-anecdote">{randomFact(statusbarFacts.reqs)}</span>
-                </p>
-                <div className="statusbar-section-detail">
-                  Quanto menor o custo, mais traduções por dólar!
-                </div>
-              </div>
-            </>
-          )}
-          <div className="statusbar-section">
-            <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-              🤖 Modelo: {model}
-              <span className="statusbar-anecdote">{randomFact(statusbarFacts.model)}</span>
-            </p>
-            <div className="statusbar-section-detail">
-              Exemplo: gpt-3.5-turbo
-            </div>
-          </div>
-        </>
+        <StatusBarDetails
+          tokensUsed={tokensUsed}
+          elapsedTime={elapsedTime}
+          payloadSize={payloadSize}
+          charCount={charCount}
+          model={model}
+          costUSD={costUSD}
+          costBRL={costBRL}
+          speed={speed}
+          requisicoesPorDolar={requisicoesPorDolar}
+        />
       )}
-    </div>
+    </StatusBarContainer>
   );
 }

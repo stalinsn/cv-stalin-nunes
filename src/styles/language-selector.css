@@ -1,49 +1,58 @@
 .lang-selector {
   position: relative;
-  width: 220px;
+  display: inline-block;
+  width: auto;
 }
 
-.lang-selector input {
-  width: 100%;
-  padding: 0.5rem 0.6rem;
-  border: 1px solid var(--border);
+.lang-selector .btn {
+  min-width: 110px;
+  padding: 7px 14px;
+  font-size: 0.93rem;
+  border: none;
   border-radius: 6px;
-  background: var(--card-bg);
-  color: var(--text);
-  font-size: 0.9rem;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  color: #fff;
+  background: var(--accent);
+  transition: background 0.25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
 }
 
-.lang-selector input:focus {
-  outline: 1px solid var(--accent);
+.lang-selector .btn:hover,
+.lang-selector .btn:focus {
+  background: var(--accent-hover, #1db954);
+  outline: none;
 }
 
 .lang-selector .dropdown {
   position: absolute;
-  top: 100%;
+  top: 110%;
   left: 0;
   width: 100%;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
+  background: var(--card-bg, #222);
+  border: 1px solid var(--border, #333);
   border-radius: 6px;
   margin-top: 4px;
-  list-style: none;
-  padding: 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
   z-index: 999;
   max-height: 180px;
   overflow-y: auto;
+  min-width: 120px;
 }
 
-.lang-selector .dropdown li {
-  padding: 0.6rem;
+.lang-selector .dropdown-item {
+  padding: 0.6rem 1rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
+  color: var(--text, #fff);
+  background: transparent;
 }
 
-.lang-selector .dropdown li:hover {
-  background: var(--accent);
-  color: white;
+.lang-selector .dropdown-item:hover {
+  background: var(--accent, #1db954);
+  color: #fff;
 }
 
-.lang-selector .dropdown li:not(:last-child) {
-  border-bottom: 1px solid var(--border);
+.lang-selector .dropdown-item:not(:last-child) {
+  border-bottom: 1px solid var(--border, #333);
 }

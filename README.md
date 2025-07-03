@@ -8,16 +8,16 @@ Welcome to this curriculum vitae project, feel free to translate from Portuguese
 Este projeto é um currículo digital moderno, responsivo e multilíngue, desenvolvido com **Next.js** e **TypeScript**. Ele permite alternar entre diferentes idiomas, exportar para PDF, imprimir, alternar temas (claro/escuro), e testar traduções automáticas via IA.
 
 ## 📚 Documentação Técnica
-- Toda a documentação técnica do projeto está disponível em arquivos Markdown organizados por módulos.
-- Use o arquivo [DOCUMENTATION.md](DOCUMENTATION.md) como índice interativo para navegar entre componentes, hooks, utilitários, dados e tipos.
-- Todos os arquivos de documentação possuem links de retorno ao índice, facilitando a navegação em Obsidian, VS Code ou qualquer leitor Markdown.
+- Toda a documentação técnica detalhada está centralizada na pasta [`docs/`](docs/), organizada por domínio (componentes, hooks, dados, libs, estilos, tipos e utilitários).
+- Use o índice principal [`docs/README_INDEX.md`](docs/README_INDEX.md) para navegar entre os módulos e arquivos de documentação.
+- O arquivo [`DOCUMENTATION.md`](DOCUMENTATION.md) traz um resumo e instruções rápidas, mas a referência detalhada está em `docs/`.
 
 ## 🧩 Funcionalidades
 - **Internacionalização (i18n):** Suporte a português, inglês, espanhol, francês e alemão.
 - **Tradução com IA:** Integração com API de tradução, fallback para tradução mock.
 - **Navbar Dinâmica:** Navegação responsiva e troca de idioma/tema.
 - **Componentes Modulares:**
-  - `Summary`, `Skills`, `Experience`, `Education`, `Languages`, `Footer`, `BackToTop`, `StatusBar`, `FallbackModal`.
+  - `Summary`, `Skills`, `Experience`, `Education`, `Languages`, `Footer`, `BackToTop`, `StatusBar`, `FallbackModal`, `ConfirmTranslateModal`, `PrivacyModal`, `ThemeToggle`, `SectionCard` e subcomponentes organizados em pastas.
 - **Hooks Customizados:**
   - `useI18n`, `useTheme`, `useLanguage`, `useTranslation`, `useAITranslation`.
 - **Estilização:**
@@ -43,7 +43,7 @@ Este projeto é um currículo digital moderno, responsivo e multilíngue, desenv
 2. Gere uma conta de serviço e baixe o JSON de credenciais.
 3. Compartilhe sua planilha com o e-mail da conta de serviço.
 4. Configure as variáveis `GOOGLE_SERVICE_ACCOUNT_JSON` e `GOOGLE_SHEET_ID` no `.env.local`.
-5. Veja detalhes e exemplos em `DOCUMENTATION.md`.
+5. Veja detalhes e exemplos em [`docs/`](docs/).
 
 ## 🗂️ Estrutura de Pastas (atualizada)
 ```
@@ -56,27 +56,67 @@ src/
       validate-token/route.ts
     translate-test/
   components/
-    Navbar.tsx
-    StatusBar.tsx
-    ConfirmTranslateModal.tsx
-    PrivacyModal.tsx
+    Navbar/
+    StatusBar/
+    ConfirmTranslateModal/
+    PrivacyModal/
+    FallbackModal/
+    Footer/
+    Header/
+    LanguageSelector/
+    SectionCard.tsx
     ...
   data/
     cv-ptbr.ts
     cv-en.ts
+    cv-es.ts
+    cv-fr.ts
+    cv-de.ts
+    labels.ts
+    languages.ts
     ...
+  hooks/
+    useI18n.ts
+    useTheme.ts
+    useLanguage.ts
+    useTranslation.ts
+    useAITranslation.ts
+  lib/
+    exportPDF.ts
+    exportPrint.ts
+    translateAI.ts
+    translateFree.ts
+    translateMock.ts
+    translateService.ts
+    translation.ts
+    ...
+  styles/
+    components/
+    tokens/
+    ...
+  types/
+    cv.ts
+    translation.ts
+  utils/
+    PasswordModal.tsx
+    translate.ts
+    translationCache.ts
+public/
+  images/
+docs/
+  components/
+  data/
   hooks/
   lib/
   styles/
   types/
   utils/
-public/
-  images/
+  README_INDEX.md
 .env.local
 ```
 
 ## ℹ️ Mais detalhes
-- Consulte o arquivo `DOCUMENTATION.md` para documentação técnica, exemplos de integração, troubleshooting e dicas de uso avançado.
+- Consulte o índice [`docs/README_INDEX.md`](docs/README_INDEX.md) para documentação técnica detalhada, exemplos de integração, troubleshooting e dicas de uso avançado.
 
 ## 🛠️ Tecnologias & Práticas
 - **Next.js** (App Router)
