@@ -4,6 +4,11 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
+## [1.5.1] - 2025-07-03
+### Changed
+- Favicon personalizado: substituição do favicon padrão do Next.js por um favicon minimalista com as iniciais "SN" e as cores do tema do site (`#0a0d0a` e `#22c55e`).
+- Inclusão de favicon em SVG e fallback para .ico em `/public`.
+
 ## [1.5.0] - 2025-07-03
 ### Added
 - SEO avançado: título, descrição, palavras-chave, Open Graph, Twitter Card e Schema.org JSON-LD em `src/app/head.tsx`.
