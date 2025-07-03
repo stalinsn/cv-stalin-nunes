@@ -8,7 +8,7 @@ export const cvData = {
     email: "stalinsn@hotmail.com",
     linkedin: "https://linkedin.com/in/stalinsn",
   },
-  summary: `Desenvolvedor Web Sênior, especialista em <strong>VTEX IO, ReactJS e TypeScript</strong>, com mais de <strong>10 anos de experiência</strong> em projetos de <strong>e-commerce, arquitetura de soluções e desenvolvimento full-cycle</strong>. Atuo desde o levantamento de requisitos, arquitetura, desenvolvimento e integração até deploy e evolução contínua.<br><br>Tenho forte atuação como <strong>líder técnico</strong>, mentorando times, definindo padrões de código, arquitetura escalável e estratégias que impulsionam <strong>performance, conversão e governança técnica</strong> nas plataformas. Apaixonado por tecnologia, com mentalidade orientada a resultados e excelência técnica.`,
+  summary: `<strong>Desenvolvedor Web Sênior</strong>, especialista em <strong>VTEX IO, ReactJS e TypeScript</strong>, com mais de <strong>10 anos de experiência</strong> em projetos de <strong>e-commerce, arquitetura de soluções e desenvolvimento full-cycle</strong>.<br><br>Atuo como <strong>referência técnica</strong>, promovendo ambientes colaborativos, estáveis e produtivos, onde o crescimento do time e a entrega de valor são prioridades.<br><br>Minha trajetória é marcada pela busca constante de <strong>inovação</strong>, integração de novas tecnologias e mentalidade orientada a resultados. Encaro desafios como oportunidades de evolução, transformando esforço em conquistas concretas para o negócio e para as pessoas ao meu redor.`,
 
   coreSkills: [
     "Arquitetura de E-commerce (Headless, VTEX IO, API-First)",

@@ -12,18 +12,27 @@
   }
 
   body {
-    margin: 0.7cm 1.2cm 0.7cm 0.3cm !important; /* topo, direita, baixo, esquerda */
-    padding: 0 !important;
-    width: auto;
-    min-width: 0;
-    max-width: 100vw;
+    margin: 0 1.2cm 0.7cm 0.3cm !important; /* topo, direita, baixo, esquerda */
+    padding: 0 20px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 900px !important;
+    box-sizing: border-box;
+    page-break-after:auto;
+
   }
 
-  main {
+  main,
+  .wrapper,
+  .container,
+  .content {
     margin: 0 auto !important;
     padding: 0 !important;
     width: 100% !important;
+    max-width: 900px !important;
+    min-width: 0 !important;
     box-sizing: border-box;
+    /* Removido page-break-after/break-after para não forçar quebra após cada container */
   }
 
   .card {
@@ -33,6 +42,9 @@
     box-shadow: none !important;
     page-break-inside: avoid !important;
     font-size: 0.97em !important;
+    max-width: 900px !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
   }
 
   .tag {
@@ -55,7 +67,31 @@
   .modal,
   .loading-overlay,
   .lgpd-bar,
+  .lgpd-bar-fixed,
+  .privacy-bar,
+  .policy-bar,
+  .cookie-bar,
+  .cookies-bar,
+  .cookie-consent,
+  .cookie-notice,
+  .cookie-banner,
+  .section-toggler,
+  .toggle-all-icon-btn,
+  .card > .section-toggler,
+  .card > .section-toggler svg,
   [style*="position: fixed"][style*="bottom: 0"] {
+    display: none !important;
+  }
+
+  /* Esconde setas/minimizar por data-attribute ou aria-label se necessário */
+  [aria-label*="minimizar"],
+  [aria-label*="expandir"],
+  [title*="minimizar"],
+  [title*="expandir"],
+  [id*="lgpd"],
+  [id*="policy"],
+  [id*="privacy"],
+  [id*="cookie"] {
     display: none !important;
   }
 }

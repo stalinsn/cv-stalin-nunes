@@ -9,6 +9,9 @@
 @import './print.css';
 @import './language-selector.css';
 
+footer{
+  text-align: center;
+}
 .modal-overlay {
   position: fixed;
   inset: 0;

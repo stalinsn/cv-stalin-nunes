@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { labels } from '@/data/labels';
-import { cvData } from '@/data/cv-ptbr';
+import { cvData } from '@/data';
 import { cvDataEn } from '@/data/cv-en';
 import { cvDataEs } from '@/data/cv-es';
 import { cvDataFr } from '@/data/cv-fr';

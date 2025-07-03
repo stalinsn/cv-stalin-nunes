@@ -236,4 +236,11 @@ export const labels: Labels = {
     'fr-fr': 'OK',
     'de-de': 'OK',
   },
+  interests: {
+    'pt-br': 'Interesses',
+    'en-us': 'Interests',
+    'es-es': 'Intereses',
+    'fr-fr': 'Intérêts',
+    'de-de': 'Interessen',
+  },
 };

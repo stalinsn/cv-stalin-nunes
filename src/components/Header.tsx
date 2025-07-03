@@ -10,7 +10,11 @@ type HeaderProps = {
 export default function Header({ data }: HeaderProps) {
   return (
     <header className="text-center">
-      <HeaderTitle name={data.name} title={data.title} />
+      <HeaderTitle
+        name={data.name}
+        title={data.title}
+        githubProject={data.githubProject}
+      />
       <HeaderLocation location={data.location} />
       <HeaderContacts
         phone={data.contact.phone}
