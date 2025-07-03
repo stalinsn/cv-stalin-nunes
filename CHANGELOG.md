@@ -4,6 +4,21 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
+## [1.4.1] - 2025-07-03
+### Added
+- Botão "Limpar Cache" sempre visível quando houver traduções além de pt-br, com feedback visual de sucesso.
+- Feedback visual temporário ao limpar cache.
+
+### Changed
+- Lógica do modal de confirmação de tradução: só aparece no modo IA, nunca no modo mock.
+- Troca de idioma no modo mock aplica tradução mock direto, sem modal.
+- Reset global de traduções e idioma ao limpar cache, prevenindo bloqueio de traduções IA por sobrescrita do mock.
+- Melhor UX para alternância entre modos e idiomas.
+
+### Fixed
+- Previne que traduções mock sobrescrevam permanentemente a possibilidade de tradução IA para o mesmo idioma.
+- Correção de exibição do botão de limpar cache e reset de estado global/localStorage.
+
 ## [1.4.0] - 2025-07-03
 ### Changed
 - Refatoração e padronização completa da estrutura de componentes, pastas e estilos do projeto.
