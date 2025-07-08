@@ -77,6 +77,7 @@ export default function Home() {
   const [showLGPD, setShowLGPD] = useState(true);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [tokenError, setTokenError] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
   // Estado global para togglers das seções
   const [sectionsOpen, setSectionsOpen] = useState({
@@ -179,6 +180,8 @@ export default function Home() {
   const labelLangCode = toLabelLangCode(langTyped);
 
   useEffect(() => {
+    if (initialized) return;
+    setInitialized(true);
     const savedLang = typeof window !== 'undefined' ? localStorage.getItem('lastLang') : null;
     if (savedLang && savedLang !== lang && savedLang !== 'pt-br') {
       const cacheKey = JSON.stringify(cvData);
@@ -192,7 +195,7 @@ export default function Home() {
         } catch {}
       } // Nunca chama IA automaticamente
     }
-  }, [handleTranslate, lang, saveTranslation, translations]);
+  }, [handleTranslate, lang, saveTranslation, translations, initialized]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -221,14 +224,6 @@ export default function Home() {
     setCacheCleared(true);
     setTimeout(() => setCacheCleared(false), 2000);
   };
-
-  // const handleModeChange = (mode: string) => {
-  //   setTranslationMode(mode);
-  //   // Se for mock, nunca abre modal
-  //   if (mode === 'mock') {
-  //     setShowConfirmModal(false);
-  //   }
-  // };
 
   return (
     <div style={{ position: 'relative' }}>

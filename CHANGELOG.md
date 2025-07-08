@@ -4,9 +4,9 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
-## [1.5.2] - 2025-07-03
-### Docs
-- Guia detalhado de integração segura com Google Sheets e Service Account adicionado ao `DOCUMENTATION.md`, incluindo exemplos de variáveis de ambiente, dicas de segurança e passo a passo completo.
+## [1.5.2] - 2025-07-08
+### Fixed
+- Corrigido bug que fazia duas requisições de tradução IA ao trocar de idioma rapidamente ou ao restaurar o idioma salvo. Agora a tradução só é requisitada uma vez por troca de idioma.
 
 ## [1.5.1] - 2025-07-03
 ### Changed
