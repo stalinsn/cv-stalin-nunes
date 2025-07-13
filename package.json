@@ -1,7 +1,9 @@
 {
   "name": "cv-stalin-nunes",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "private": true,
+  "description": "Currículo multilíngue com tradução IA, controle de tokens e exportação PDF.",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

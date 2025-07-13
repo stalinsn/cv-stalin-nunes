@@ -4,6 +4,12 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
+## [1.5.3] - 2025-07-13
+### Hotfix
+- Corrigido consumo duplo de token na tradução IA: agora o decremento ocorre apenas na rota `/api/translate`, nunca na validação.
+- Removidos todos os `console.log` de debug do projeto.
+- Build validado e fluxo de tradução revisado.
+
 ## [1.5.2] - 2025-07-08
 ### Fixed
 - Corrigido bug que fazia duas requisições de tradução IA ao trocar de idioma rapidamente ou ao restaurar o idioma salvo. Agora a tradução só é requisitada uma vez por troca de idioma.

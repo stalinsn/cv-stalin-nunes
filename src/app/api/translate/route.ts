@@ -32,6 +32,11 @@ export async function POST(req: NextRequest) {
   if (!validateJson.success) {
     return NextResponse.json({ error: 'Token inválido ou esgotado.' }, { status: 401 });
   }
+  // Decrementa usos_restantes do token
+  const usosRestantes = typeof validateJson.usos_restantes === 'number' ? validateJson.usos_restantes : 0;
+  if (usosRestantes > 0) {
+    await updateTokenRow({ token, update: { usos_restantes: usosRestantes - 1 } });
+  }
 
   const langName = languageNames[targetLang] || targetLang;
 

@@ -69,7 +69,7 @@ function getNavbarLabels(lang: string) {
 }
 
 export default function Home() {
-  const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode, translations, clearTranslations, saveTranslation } = useI18n();
+  const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode, translations, clearTranslations, saveTranslation, switchLang } = useI18n();
   const { theme } = useTheme(); // toggleTheme removido pois não é usado
   const [pendingLang, setPendingLang] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -109,7 +109,7 @@ export default function Home() {
     setTokenError(null); // Limpa erro ao abrir modal
     if (targetLang === lang) return;
     if (translations[targetLang]) {
-      handleTranslate(targetLang);
+      if (typeof switchLang === 'function') switchLang(targetLang);
       setShowConfirmModal(false);
       return;
     }
@@ -121,7 +121,7 @@ export default function Home() {
       handleTranslate(targetLang);
       setShowConfirmModal(false);
     }
-  }, [lang, translations, handleTranslate, translationMode]);
+  }, [lang, translations, handleTranslate, translationMode, switchLang]);
 
   // Confirmação do modal: só aqui pode chamar IA
   const handleConfirmTranslate = async (tokenInput: string) => {
@@ -179,8 +179,17 @@ export default function Home() {
   const langTyped = lang as import("@/types/cv").Language;
   const labelLangCode = toLabelLangCode(langTyped);
 
+  // Flag para evitar chamada duplicada de tradução
+  const [langChangedManually, setLangChangedManually] = useState(false);
+
+  // Sempre que trocar idioma pelo select, marca como manual
   useEffect(() => {
-    if (initialized) return;
+    if (langChangedManually) return;
+    setLangChangedManually(true);
+  }, [lang, langChangedManually]);
+
+  useEffect(() => {
+    if (initialized || langChangedManually) return;
     setInitialized(true);
     const savedLang = typeof window !== 'undefined' ? localStorage.getItem('lastLang') : null;
     if (savedLang && savedLang !== lang && savedLang !== 'pt-br') {
@@ -195,7 +204,7 @@ export default function Home() {
         } catch {}
       } // Nunca chama IA automaticamente
     }
-  }, [handleTranslate, lang, saveTranslation, translations, initialized]);
+  }, [handleTranslate, lang, saveTranslation, translations, initialized, langChangedManually]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

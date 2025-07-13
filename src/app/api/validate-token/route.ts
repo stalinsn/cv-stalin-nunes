@@ -45,15 +45,8 @@ export async function POST(req: NextRequest) {
     if (sheetToken === token && ativo === 'TRUE' && Number(usos) > 0) {
       // Reset tentativas ao sucesso
       ipAttempts[ip] = { count: 0, last: now };
-      // Decrementa usos_restantes
-      const newUsos = Number(usos) - 1;
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: SHEET_ID,
-        range: `${SHEET_NAME}!B${i + 2}`,
-        valueInputOption: 'RAW',
-        requestBody: { values: [[newUsos.toString()]] },
-      });
-      return NextResponse.json({ success: true, usos_restantes: newUsos });
+      // Apenas valida, não decrementa usos
+      return NextResponse.json({ success: true, usos_restantes: Number(usos) });
     }
   }
   // Falha: incrementa tentativas
