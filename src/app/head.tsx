@@ -1,6 +1,21 @@
+import Script from 'next/script';
+
 export default function Head() {
   return (
     <>
+      {/* Google tag (gtag.js) */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-WW68MDPDVP"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-WW68MDPDVP');
+        `}
+      </Script>
       <title>Stalin Souza Nunes - Web Solutions Architect | VTEX, VTEX IO, Fast Store, Architecture</title>
       <meta name="description" content="Currículo, experiências e serviços de Stalin Souza Nunes, Web Solutions Architect especialista em VTEX, VTEX IO, Fast Store, arquitetura de soluções web, e-commerce e desenvolvimento sob medida. Atendendo empresas de todo o Brasil." />
       <meta name="keywords" content="Stalin Souza Nunes, Web Solutions Architect, VTEX, VTEX IO, Fast Store, Architecture, E-commerce, Frontend, Backend, React, Next.js, Node.js, Portfólio, Currículo, Desenvolvimento Web, Serviços, Consultoria, Artmeta, São Paulo, Brasil" />
