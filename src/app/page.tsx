@@ -5,6 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { labels } from "@/data/labels";
 import { languageLabels } from "@/data/languageLabels";
 import { getTranslationCache } from '@/utils/translationCache';
+import { normalizeLangCode } from '@/utils/languageUtils';
 import { cvData } from '@/data/cvData';
 
 import Navbar from "@/components/Navbar";
@@ -193,14 +194,15 @@ export default function Home() {
     setInitialized(true);
     const savedLang = typeof window !== 'undefined' ? localStorage.getItem('lastLang') : null;
     if (savedLang && savedLang !== lang && savedLang !== 'pt-br') {
+      const normalizedLang = normalizeLangCode(savedLang);
       const cacheKey = JSON.stringify(cvData);
-      const cached = getTranslationCache(cacheKey, savedLang);
-      if (translations[savedLang]) {
-        handleTranslate(savedLang); // Só troca idioma se já existe tradução
+      const cached = getTranslationCache(cacheKey, normalizedLang);
+      if (translations[normalizedLang]) {
+        handleTranslate(normalizedLang); // Só troca idioma se já existe tradução
       } else if (cached) {
         try {
           const parsed = JSON.parse(cached);
-          saveTranslation(savedLang, parsed);
+          saveTranslation(normalizedLang, parsed);
         } catch {}
       } // Nunca chama IA automaticamente
     }

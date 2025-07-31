@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { cvData } from '@/data';
 import { cvDataEn } from '@/data/cv-en';
 import { cvDataEs } from '@/data/cv-es';
@@ -8,118 +8,142 @@ import { cvDataFr } from '@/data/cv-fr';
 import { cvDataDe } from '@/data/cv-de';
 import { translateWithAI } from '@/lib/translateService';
 import { CvData } from '@/types/cv';
+import { TranslationStatus, TranslationMode, TranslationCache } from '@/types/translation';
 import { getTranslationCache, setTranslationCache } from '@/utils/translationCache';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { 
+  SUPPORTED_LANGUAGES, 
+  SupportedLanguage, 
+  DEFAULT_LANGUAGE 
+} from '@/constants/languages';
+import { 
+  normalizeLangCode, 
+  toApiLangCode, 
+  isValidLanguage 
+} from '@/utils/languageUtils';
 
-const mockMap: Record<string, CvData> = {
-  ptbr: cvData,
-  pt: cvData,
-  en: cvDataEn,
-  es: cvDataEs,
-  fr: cvDataFr,
-  de: cvDataDe,
+// Dados mockados por idioma
+const MOCK_DATA: Record<SupportedLanguage, CvData> = {
+  [SUPPORTED_LANGUAGES.PTBR]: cvData,
+  [SUPPORTED_LANGUAGES.EN]: cvDataEn,
+  [SUPPORTED_LANGUAGES.ES]: cvDataEs,
+  [SUPPORTED_LANGUAGES.FR]: cvDataFr,
+  [SUPPORTED_LANGUAGES.DE]: cvDataDe,
+};
+
+const INITIAL_STATUS: TranslationStatus = {
+  tokensUsed: null,
+  elapsedTime: null,
+  payloadSize: null,
+  charCount: null,
+  model: '',
 };
 
 export function useI18n() {
-  // Corrigido: valor inicial de lang e translations para 'pt-br'
-  const [lang, setLang] = useState<string>('pt-br');
+  // Estados principais
+  const [lang, setLang] = useState<SupportedLanguage>(DEFAULT_LANGUAGE);
   const [data, setData] = useState<CvData>(cvData);
-  const [translations, setTranslations] = useState<Record<string, CvData>>({
-    'pt-br': cvData,
+  const [translations, setTranslations] = useState<TranslationCache>({
+    [DEFAULT_LANGUAGE]: cvData,
   });
+  
+  // Estados da tradução
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [translationMode, setTranslationMode] = useState<'ai' | 'mock'>('ai');
+  const [translationMode, setTranslationMode] = useState<TranslationMode>('ai');
   const [userAcceptedFallback, setUserAcceptedFallback] = useState(false);
-
-  // Adiciona estado para status da tradução
-  const [status, setStatus] = useState({
-    tokensUsed: null as number | null,
-    elapsedTime: null as number | null,
-    payloadSize: null as number | null,
-    charCount: null as number | null,
-    model: '',
-  });
-
-  // Se o cvData base mudar, limpa cache de traduções
+  const [status, setStatus] = useState<TranslationStatus>(INITIAL_STATUS);
+  
+  // LocalStorage com SSR
+  const [lastLang, setLastLang] = useLocalStorage<SupportedLanguage>('lastLang', DEFAULT_LANGUAGE);
+  
+  // Inicializa idioma do localStorage
   useEffect(() => {
-    setTranslations({ 'pt-br': cvData });
-    setLang('pt-br');
-    setData(cvData);
-  }, []);
-
-  // Persistir idioma no localStorage sempre que mudar
-  useEffect(() => {
-    if (typeof window !== 'undefined' && lang) {
-      localStorage.setItem('lastLang', lang);
+    if (isValidLanguage(lastLang) && lastLang !== lang) {
+      setLang(lastLang);
+      if (translations[lastLang]) {
+        setData(translations[lastLang]);
+      }
     }
-  }, [lang]);
+  }, [lastLang, lang, translations]);
 
-  // Sempre normaliza o lang ao trocar
-  useEffect(() => {
-    if (lang && normalizeLangCode(lang) !== lang) {
-      setLang(normalizeLangCode(lang));
-    }
-  }, [lang]);
-
-  // Normaliza o código do idioma para os suportados no select/navbar
-  function normalizeLangCode(code: string) {
-    if (code === 'ptbr' || code === 'pt-br') return 'ptbr';
-    if (code === 'en' || code === 'en-us') return 'en';
-    if (code === 'es' || code === 'es-es') return 'es';
-    if (code === 'fr' || code === 'fr-fr') return 'fr';
-    if (code === 'de' || code === 'de-de') return 'de';
-    return code;
-  }
-
-  // Converte código curto para código completo esperado pela API de tradução
-  function toApiLangCode(code: string) {
-    switch (code) {
-      case 'ptbr': return 'pt-br';
-      case 'en': return 'en-us';
-      case 'es': return 'es-es';
-      case 'fr': return 'fr-fr';
-      case 'de': return 'de-de';
-      default: return code;
-    }
-  }
-
-  /**
-   * Faz a tradução usando IA ou Mock
-   */
-  const handleTranslate = async (targetLang: string, token?: string, origem?: string) => {
-    setError(null);
+  // Função para trocar idioma (com cache)
+  const switchLang = useCallback((targetLang: string) => {
     const normalizedLang = normalizeLangCode(targetLang);
     if (lang === normalizedLang) return;
 
-    // Tenta cache local antes de tudo
+    if (translations[normalizedLang]) {
+      setLang(normalizedLang);
+      setData(translations[normalizedLang]);
+      setLastLang(normalizedLang);
+      setError(null);
+    }
+  }, [lang, translations, setLastLang]);
+
+  // Função para salvar tradução
+  const saveTranslation = useCallback((targetLang: SupportedLanguage, translatedData: CvData) => {
+    setTranslations(prev => ({
+      ...prev,
+      [targetLang]: translatedData,
+    }));
+    setLang(targetLang);
+    setData(translatedData);
+    setLastLang(targetLang);
+    setError(null);
+  }, [setLastLang]);
+
+  // Função principal de tradução
+  const handleTranslate = useCallback(async (
+    targetLang: string, 
+    token?: string, 
+    origem?: string
+  ) => {
+    setError(null);
+    const normalizedLang = normalizeLangCode(targetLang);
+    
+    if (lang === normalizedLang) return;
+
+    // 1. Verifica cache local
     const cached = getTranslationCache(JSON.stringify(data), normalizedLang);
     if (cached) {
       try {
-        const parsed = JSON.parse(cached);
+        const parsed = JSON.parse(cached) as CvData;
         saveTranslation(normalizedLang, parsed);
         return;
-      } catch {}
+      } catch (error) {
+        console.warn('Erro ao parsear cache:', error);
+      }
     }
 
+    // 2. Verifica cache em memória
     if (translations[normalizedLang]) {
       switchLang(normalizedLang);
       return;
     }
 
+    // 3. Tradução por IA
     if (translationMode === 'ai') {
       setLoading(true);
       const start = Date.now();
+      
       try {
-        // Usa código completo apenas na chamada da API
         const apiLang = toApiLangCode(normalizedLang);
         const result = await translateWithAI(data, apiLang, token, origem);
         const elapsed = Date.now() - start;
-        if (!result || !result.translated) {
-          throw new Error('Tradução IA não retornou resultado.');
+        
+        if (!result?.translated) {
+          throw new Error('Tradução IA não retornou resultado válido.');
         }
+        
+        // Salva nos caches
         saveTranslation(normalizedLang, result.translated);
-        setTranslationCache(JSON.stringify(data), normalizedLang, JSON.stringify(result.translated));
-        // Atualiza estatísticas para StatusBar
+        setTranslationCache(
+          JSON.stringify(data), 
+          normalizedLang, 
+          JSON.stringify(result.translated)
+        );
+        
+        // Atualiza estatísticas
         setStatus({
           tokensUsed: result.tokensUsed || null,
           elapsedTime: elapsed,
@@ -127,84 +151,72 @@ export function useI18n() {
           charCount: JSON.stringify(result.translated).length,
           model: process.env.NEXT_PUBLIC_OPENAI_MODEL || 'gpt-3.5-turbo',
         });
-      } catch {
+        
+      } catch (error) {
+        console.error('Erro na tradução IA:', error);
         setError('A tradução com IA está indisponível no momento. Gostaria de usar a tradução padrão?');
-        setStatus({ tokensUsed: null, elapsedTime: null, payloadSize: null, charCount: null, model: '' });
+        setStatus(INITIAL_STATUS);
       } finally {
         setLoading(false);
       }
       return;
     }
 
+    // 4. Fallback para mock
     if (translationMode === 'mock' || (error && userAcceptedFallback)) {
-      if (mockMap[normalizedLang]) {
-        saveTranslation(normalizedLang, mockMap[normalizedLang]);
-        setError(null);
+      const mockData = MOCK_DATA[normalizedLang];
+      if (mockData) {
+        saveTranslation(normalizedLang, mockData);
       } else {
-        setError('Tradução mock não disponível para este idioma.');
+        setError('Tradução padrão não disponível para este idioma.');
       }
       return;
     }
-  };
+  }, [
+    lang, 
+    data, 
+    translations, 
+    translationMode, 
+    error, 
+    userAcceptedFallback,
+    saveTranslation,
+    switchLang
+  ]);
 
-  /**
-   * Troca para idioma já existente no cache
-   */
-  const switchLang = (targetLang: string) => {
-    const normalizedLang = normalizeLangCode(targetLang);
-    if (translations[normalizedLang]) {
-      setLang(normalizedLang); // força atualização do idioma da interface
-      setData(translations[normalizedLang]);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('lastLang', normalizedLang);
-      }
-      return;
-    }
-  };
-
-  /**
-   * Salva uma tradução nova no cache e aplica
-   */
-  const saveTranslation = (targetLang: string, translatedData: CvData) => {
-    const normalizedLang = normalizeLangCode(targetLang);
-    setTranslations((prev) => ({
-      ...prev,
-      [normalizedLang]: translatedData,
-    }));
-    setLang(normalizedLang);
-    setData(translatedData);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('lastLang', normalizedLang);
-    }
-  };
-
-  /**
-   * Limpa todas as traduções do cache (exceto pt-br)
-   */
-  const clearTranslations = () => {
-    setTranslations({ 'pt-br': cvData });
-    setLang('pt-br');
+  // Função para limpar traduções
+  const clearTranslations = useCallback(() => {
+    setTranslations({ [DEFAULT_LANGUAGE]: cvData });
+    setLang(DEFAULT_LANGUAGE);
     setData(cvData);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('lastLang', 'pt-br');
-    }
-  };
+    setLastLang(DEFAULT_LANGUAGE);
+    setError(null);
+    setStatus(INITIAL_STATUS);
+  }, [setLastLang]);
 
-  // Adiciona exportação de translationMode no hook
+  // Função wrapper para mudança de modo de tradução
+  const changeTranslationMode = useCallback((mode: string) => {
+    setTranslationMode(mode as TranslationMode);
+  }, []);
+
   return {
+    // Estados principais
     lang,
     data,
+    translations,
+    
+    // Estados da tradução
     loading,
     error,
-    translations,
+    translationMode,
+    userAcceptedFallback,
+    status,
+    
+    // Funções
     handleTranslate,
     switchLang,
     saveTranslation,
     clearTranslations,
-    setTranslationMode: (mode: string) => setTranslationMode(mode as 'ai' | 'mock'),
-    userAcceptedFallback,
+    setTranslationMode: changeTranslationMode,
     setUserAcceptedFallback,
-    status,
-    translationMode,
   };
 }

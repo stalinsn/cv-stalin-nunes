@@ -2,27 +2,47 @@
 
 [⬅ Voltar ao Índice](../README_INDEX.md)
 
-Esta pasta contém funções utilitárias e serviços para exportação, tradução e integração com APIs.
+Esta pasta contém serviços core, utilitários e integrações para funcionalidades essenciais do sistema.
 
 ---
 
-## Arquivos Documentados
+## 🔄 Sistema de Tradução
 
-- [exportPDF.ts](exportPDF.md) `[!ESTÁVEL]`
-  - Exporta o currículo em formato PDF.
-- [exportPrint.ts](exportPrint.md) `[!ESTÁVEL]`
-  - Exporta o currículo para impressão.
-- [translateAI.ts](translateAI.md) `[!ESTÁVEL]`
-  - Tradução automática via IA.
-- [translateFree.ts](translateFree.md) `[!ESTÁVEL]`
-  - Tradução gratuita alternativa.
-- [translateMock.ts](translateMock.md) `[!ESTÁVEL]`
-  - Tradução mock para fallback.
-- [translateService.ts](translateService.md) `[!ESTÁVEL]`
-  - Serviço central de tradução.
-- [translation.ts](translation.md) `[!ESTÁVEL]`
-  - Tipos e helpers para tradução.
+### Arquivos Ativos
+- [translateService.ts](translateService.md) `[CORE]`
+  - **Interface principal** para tradução via API de IA
+- [translateMock.ts](translateMock.md) `[FALLBACK]`
+  - Tradução simulada para desenvolvimento e fallback
+- [translateFree.ts](translateFree.md) `[ALTERNATIVE]`
+  - Serviço de tradução gratuita (LibreTranslate)
+
+### ⚠️ Arquivos Removidos na Refatoração
+- ~~`translateAI.ts`~~ → Consolidado em `translateService.ts`
+- ~~`translation.ts`~~ → Lógica movida para hooks e constantes
 
 ---
 
-Cada arquivo possui um escopo funcional para apoiar a lógica do projeto.
+## 📄 Exportação e Utilitários
+
+- [exportPDF.ts](exportPDF.md) `[UTILS]`
+  - Exportação do currículo em formato PDF
+- [exportPrint.ts](exportPrint.md) `[UTILS]`
+  - Otimização para impressão do currículo
+
+---
+
+## 🏗️ Arquitetura do Sistema de Tradução
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   useI18n()     │───▶│ translateService │───▶│ /api/translate  │
+│   (Frontend)    │    │     (Client)     │    │   (Backend)     │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│ Cache + Storage │    │ Error Handling   │    │ OpenAI + Auth   │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+Cada arquivo possui escopo específico e responsabilidade única.
