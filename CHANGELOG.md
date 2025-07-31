@@ -1,3 +1,10 @@
+## [2.0.0] - 2025-07-31
+
+### refactor
+- enhance translation system with improved architecture and documentation
+  
+  Major refactoring with centralized configuration, modular hooks, enhanced error handling, and comprehensive documentation
+
 ## [1.6.2] - 2025-07-31
 
 ### refactor

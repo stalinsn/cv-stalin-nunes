@@ -11,6 +11,13 @@ Bem-vindo à documentação técnica do projeto! Após refatoração completa do
 
 ---
 
+## 🤖 Automação e Workflow
+
+- **[Git Flow Automation](GIT_AUTOMATION.md)** `[NOVO]`
+  - Sistema automatizado de commits, versionamento e releases
+
+---
+
 ## 📦 Documentação por Módulo
 
 ### **Core System**

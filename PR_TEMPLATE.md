@@ -1,17 +1,17 @@
-# 🚀 Pull Request: refactor(i18n): simplify translation system and remove duplicated files
+# 🚀 Pull Request: refactor(i18n): enhance translation system with improved architecture and documentation!
 
 ## 📋 Descrição
-simplify translation system and remove duplicated files
+enhance translation system with improved architecture and documentation
 
-Major refactoring of the translation system to eliminate code duplication and improve maintainability by removing 6 duplicate files and creating 4 optimized modules with centralized configuration
+Major refactoring with centralized configuration, modular hooks, enhanced error handling, and comprehensive documentation
 
 ## 🔄 Tipo de Mudança
 - [x] refactor: Refatoração
 
 ## 📊 Impacto
-- **Versão**: 1.6.1 → 1.6.2
-- **Breaking Change**: ✅ NÃO
-
+- **Versão**: 1.6.2 → 2.0.0
+- **Breaking Change**: ⚠️ SIM
+- **Breaking Change Details**: Removed 6 duplicate translation files that may break projects importing them directly
 
 ## 🧪 Como Testar
 1. Fazer checkout da branch `refactor/i18n-simplify-translation-system-and-remove-duplicated-files`
@@ -31,7 +31,7 @@ Major refactoring of the translation system to eliminate code duplication and im
 ## 🖥️ Plataforma de Desenvolvimento
 - **OS**: windows
 - **Branch**: refactor/i18n-simplify-translation-system-and-remove-duplicated-files
-- **Commit**: ffd517d
+- **Commit**: 38718bc
 
 ---
 *PR gerado automaticamente pelo Git Flow v2.0* 🤖

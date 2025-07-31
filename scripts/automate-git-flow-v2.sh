@@ -161,14 +161,27 @@ generate_branch_name() {
     local scope=$2
     local description=$3
     
-    # Sanitizar descrição (remover espaços, caracteres especiais)
-    local clean_description=$(echo "$description" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
+    # Pegar apenas as primeiras 3-4 palavras da descrição
+    local short_description=$(echo "$description" | cut -d' ' -f1-3 | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
     
+    # Limitar tamanho máximo (tipo + escopo + descrição ≤ 50 chars)
     if [[ -n "$scope" ]]; then
-        echo "${type}/${scope}-${clean_description}"
+        local full_name="${type}/${scope}-${short_description}"
     else
-        echo "${type}/${clean_description}"
+        local full_name="${type}/${short_description}"
     fi
+    
+    # Se ainda estiver muito longo, cortar mais
+    if [[ ${#full_name} -gt 50 ]]; then
+        local words_description=$(echo "$description" | cut -d' ' -f1-2 | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
+        if [[ -n "$scope" ]]; then
+            full_name="${type}/${scope}-${words_description}"
+        else
+            full_name="${type}/${words_description}"
+        fi
+    fi
+    
+    echo "$full_name"
 }
 
 # Verificar se estamos na main/master
@@ -561,15 +574,16 @@ if [[ -n "$repo_owner" && -n "$repo_name" ]]; then
     echo
 fi
 
-echo -e "${CYAN}🚀 Próximos passos:${NC}"
-echo "1. ✅ Verificar o PR template gerado: PR_TEMPLATE.md"
+echo -e "${CYAN}� Recursos Gerados:${NC}"
+echo "• ✅ PR Template: PR_TEMPLATE.md"
+echo "• 🏷️  Tag de Release: v$new_version"
+echo "• � Changelog atualizado"
+
 if [[ -n "$pr_url" ]]; then
-    echo "2. 🔄 Criar Pull Request: $pr_url"
-else
-    echo "2. 🔄 Criar Pull Request no GitHub/GitLab"
+    echo
+    echo -e "${CYAN}🔄 Criar Pull Request:${NC}"
+    echo "$pr_url"
 fi
-if [[ "$current_branch" != "main" && "$current_branch" != "master" ]]; then
-    echo "3. 🧹 Após merge, deletar branch: git branch -d $current_branch"
-fi
+
 echo
 echo -e "${GREEN}🎉 Happy coding!${NC}"
