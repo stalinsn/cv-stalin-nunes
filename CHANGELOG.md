@@ -4,6 +4,28 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### ✨ Adicionado
+- 🚀 Sistema completo de automação Git Flow
+- 📋 Templates inteligentes de Pull Request
+- 🔄 Conventional commits com guia interativo
+- 📝 Geração automática de CHANGELOG
+- 🏷️ Versionamento semântico automático
+- 🎯 Detecção automática de componentes afetados
+- 🛠️ Scripts NPM para automação completa
+- 🤝 Guia de contribuição completo
+- 📄 Código de conduta
+- 📋 Templates de Issue (bug report, feature request, documentation)
+
+### ♻️ Refatorado
+- 🔐 Migração de autenticação Google Sheets para variáveis de ambiente
+- 📚 Estrutura de documentação e templates de contribuição
+
+### 🔒 Segurança
+- 🔐 Eliminação de arquivos de credenciais do repositório
+- 🛡️ Centralização de credenciais em variáveis de ambiente
+
 ## [1.6.0] - 2025-07-31
 ### Added
 - **MOTD (Message of the Day)**: Nova rota `/motd` com gerador inteligente de frases motivacionais
