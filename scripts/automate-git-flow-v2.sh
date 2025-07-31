@@ -253,7 +253,7 @@ log_info "Mensagem de commit construída:"
 echo -e "${CYAN}${commit_message}${NC}"
 
 # =============================================================================
-# 6. DETERMINAR NOVO VERSIONAMENTO
+# 6. DETERMINAR NOVO VERSIONAMENTO (MANUAL + AUTOMÁTICO)
 # =============================================================================
 log_step "Determinando versionamento..."
 
@@ -270,32 +270,54 @@ get_package_version() {
 current_version=$(get_package_version)
 log_info "Versão atual: $current_version"
 
-# Determinar tipo de bump
+# Determinar sugestão de versionamento
 case $commit_type in
     "feat")
         if [[ "$breaking_change" == true ]]; then
-            version_bump="major"
+            suggested_bump="major"
         else
-            version_bump="minor"
+            suggested_bump="minor"
         fi
         ;;
     "fix"|"security"|"perf")
         if [[ "$breaking_change" == true ]]; then
-            version_bump="major"
+            suggested_bump="major"
         else
-            version_bump="patch"
+            suggested_bump="patch"
         fi
         ;;
     *)
         if [[ "$breaking_change" == true ]]; then
-            version_bump="major"
+            suggested_bump="major"
         else
-            version_bump="patch"
+            suggested_bump="patch"
         fi
         ;;
 esac
 
-log_info "Tipo de versionamento: $version_bump"
+# Permitir override manual do versionamento
+echo -e "${CYAN}Tipo de versionamento sugerido: ${YELLOW}$suggested_bump${NC}"
+if [[ "$breaking_change" == true ]]; then
+    echo -e "${RED}⚠️  BREAKING CHANGE detectado! Considere major version.${NC}"
+fi
+
+echo -e "${CYAN}Selecione o tipo de versionamento:${NC}"
+echo "1) 🔴 major - Mudanças incompatíveis (1.0.0 → 2.0.0)"
+echo "2) 🟡 minor - Nova funcionalidade compatível (1.0.0 → 1.1.0)"
+echo "3) 🟢 patch - Correção compatível (1.0.0 → 1.0.1)"
+echo "4) 📋 usar sugestão ($suggested_bump)"
+
+read -p "Digite o número (1-4): " version_choice
+
+case $version_choice in
+    1) version_bump="major" ;;
+    2) version_bump="minor" ;;
+    3) version_bump="patch" ;;
+    4|"") version_bump="$suggested_bump" ;;
+    *) log_error "Opção inválida!"; exit 1 ;;
+esac
+
+log_info "Tipo de versionamento selecionado: $version_bump"
 
 # Calcular nova versão
 IFS='.' read -ra VERSION_PARTS <<< "$current_version"
@@ -401,8 +423,28 @@ generate_changelog() {
 generate_changelog "$new_version"
 
 # =============================================================================
-# 9. FAZER PUSH E CRIAR PR TEMPLATE
+# 9. ALERTA DE SEGURANÇA E PUSH
 # =============================================================================
+log_step "Preparando para push..."
+
+echo -e "${RED}💣 ATENÇÃO! ${NC}"
+echo -e "${YELLOW}A partir daqui você irá:${NC}"
+echo "• 🚀 Fazer push da branch: $current_branch"
+echo "• 🏷️  Criar tag: v$new_version"
+echo "• 📤 Enviar para o repositório remoto"
+echo "• 📋 Gerar template de PR"
+echo ""
+echo -e "${RED}⚠️  Isso não pode ser desfeito facilmente!${NC}"
+echo ""
+read -p "Tem certeza que deseja continuar? (y/N): " -n 1 -r confirm_push
+echo
+
+if [[ ! $confirm_push =~ ^[Yy]$ ]]; then
+    log_warning "Operação cancelada pelo usuário."
+    log_info "Seu commit local foi realizado, mas não foi enviado ao repositório."
+    exit 0
+fi
+
 log_step "Fazendo push e preparando PR..."
 
 # Push da branch e tags
@@ -471,9 +513,32 @@ EOF
 generate_pr_template
 
 # =============================================================================
-# 10. RESUMO FINAL
+# 10. RESUMO FINAL COM LINKS
 # =============================================================================
 log_step "Resumo da Operação"
+
+# Detectar repositório remoto
+remote_url=$(git config --get remote.origin.url 2>/dev/null || echo "")
+repo_owner=""
+repo_name=""
+
+if [[ -n "$remote_url" ]]; then
+    if [[ $remote_url =~ github\.com[:/]([^/]+)/([^/\.]+) ]]; then
+        repo_owner="${BASH_REMATCH[1]}"
+        repo_name="${BASH_REMATCH[2]}"
+        base_url="https://github.com/$repo_owner/$repo_name"
+        branch_url="$base_url/tree/$current_branch"
+        pr_url="$base_url/compare/$current_branch?expand=1"
+        releases_url="$base_url/releases"
+    elif [[ $remote_url =~ gitlab\.com[:/]([^/]+)/([^/\.]+) ]]; then
+        repo_owner="${BASH_REMATCH[1]}"
+        repo_name="${BASH_REMATCH[2]}"
+        base_url="https://gitlab.com/$repo_owner/$repo_name"
+        branch_url="$base_url/-/tree/$current_branch"
+        pr_url="$base_url/-/merge_requests/new?merge_request[source_branch]=$current_branch"
+        releases_url="$base_url/-/releases"
+    fi
+fi
 
 echo -e "${GREEN}✅ Automação concluída com sucesso!${NC}"
 echo
@@ -485,11 +550,26 @@ echo "• Versão: $current_version → $new_version"
 echo "• Tag: v$new_version"
 echo "• Breaking Change: $(if [[ "$breaking_change" == true ]]; then echo "SIM"; else echo "NÃO"; fi)"
 echo
+
+# Links diretos se repositório for detectado
+if [[ -n "$repo_owner" && -n "$repo_name" ]]; then
+    echo -e "${CYAN}🔗 Links Diretos:${NC}"
+    echo -e "${YELLOW}👆 CLIQUE AQUI PARA CONTINUAR:${NC}"
+    echo "• 🌿 Ver Branch: $branch_url"
+    echo "• 🔄 Criar PR: $pr_url"
+    echo "• 🏷️  Ver Releases: $releases_url"
+    echo
+fi
+
 echo -e "${CYAN}🚀 Próximos passos:${NC}"
-echo "1. Verificar o PR template gerado: PR_TEMPLATE.md"
-echo "2. Criar Pull Request no GitHub/GitLab"
+echo "1. ✅ Verificar o PR template gerado: PR_TEMPLATE.md"
+if [[ -n "$pr_url" ]]; then
+    echo "2. 🔄 Criar Pull Request: $pr_url"
+else
+    echo "2. 🔄 Criar Pull Request no GitHub/GitLab"
+fi
 if [[ "$current_branch" != "main" && "$current_branch" != "master" ]]; then
-    echo "3. Após merge, deletar branch: git branch -d $current_branch"
+    echo "3. 🧹 Após merge, deletar branch: git branch -d $current_branch"
 fi
 echo
 echo -e "${GREEN}🎉 Happy coding!${NC}"

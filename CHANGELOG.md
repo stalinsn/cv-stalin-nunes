@@ -1,3 +1,10 @@
+## [1.6.2] - 2025-07-31
+
+### refactor
+- simplify translation system and remove duplicated files
+  
+  Major refactoring of the translation system to eliminate code duplication and improve maintainability by removing 6 duplicate files and creating 4 optimized modules with centralized configuration
+
 ﻿# Changelog
 
 Todas as mudanÃ§as notÃ¡veis deste projeto serÃ£o documentadas neste arquivo.
