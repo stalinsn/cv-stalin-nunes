@@ -20,7 +20,7 @@
   --motd-text-muted: #a0a0a0;
   --motd-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --motd-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --motd-accent-rgb: 34, 197, 94; /* Para usar em rgba() */
+  --motd-accent-rgb: 34, 197, 94; /* For use in rgba() */
 }
 
 [data-theme='light'] {
