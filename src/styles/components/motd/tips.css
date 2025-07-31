@@ -5,10 +5,10 @@
 .motd-tip {
   margin: 0;
   padding: var(--space-lg);
-  background: var(--bg);
-  border-top: 1px solid var(--border);
+  background: var(--motd-bg);
+  border-top: 1px solid var(--motd-border);
   font-size: var(--font-size-sm);
-  color: var(--text-light);
+  color: var(--motd-text-muted);
   line-height: var(--line-height-loose);
   flex-shrink: 0;
 }
@@ -46,10 +46,11 @@
 
 /* Tooltip interativo */
 .tip-toggle {
-  cursor: help;
-  border-bottom: 1px dotted var(--text-light);
+  cursor: pointer;
+  border-bottom: 1px dotted var(--motd-text-muted);
   transition: color var(--transition-normal);
   position: relative;
+  user-select: none;
 }
 
 .tip-toggle:hover {
@@ -63,6 +64,18 @@
   font-size: var(--font-size-xs);
   opacity: 0.8;
   line-height: var(--line-height-relaxed);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 0.8;
+    transform: translateY(0);
+  }
 }
 
 .tip-details strong {

@@ -6,8 +6,8 @@
   position: relative;
   margin: 0;
   padding: var(--space-md);
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--border);
+  background: var(--motd-card-bg);
+  border-bottom: 1px solid var(--motd-border);
   width: 100%;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -16,9 +16,9 @@
 .search-input {
   width: 100%;
   padding: var(--space-sm) 0.8rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--motd-border);
   border-radius: var(--radius);
-  background: var(--bg);
+  background: var(--motd-bg);
   color: var(--text);
   font-size: var(--font-size-sm);
   transition: border-color var(--transition-normal);
@@ -33,7 +33,7 @@
 }
 
 .search-input::placeholder {
-  color: var(--text-light);
+  color: var(--motd-text-muted);
 }
 
 .clear-search {
@@ -43,7 +43,7 @@
   transform: translateY(-50%);
   background: transparent;
   border: none;
-  color: var(--text-light);
+  color: var(--motd-text-muted);
   cursor: pointer;
   font-size: var(--font-size-sm);
   padding: var(--space-xs);
@@ -53,5 +53,5 @@
 
 .clear-search:hover {
   color: var(--text);
-  background: var(--border);
+  background: var(--motd-border);
 }

@@ -15,7 +15,7 @@
 }
 
 .motd-main:hover {
-  background: var(--card-bg);
+  background: var(--motd-card-bg);
 }
 
 /* Frase principal */
@@ -62,7 +62,7 @@
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
   cursor: pointer;
-  box-shadow: var(--shadow);
+  box-shadow: var(--motd-shadow);
   transition: all var(--transition-normal);
   display: flex;
   align-items: center;
@@ -70,9 +70,9 @@
 }
 
 .motd-button.primary:hover {
-  background: var(--primary-light);
+  background: var(--accent-hover);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--motd-shadow-lg);
 }
 
 .motd-button.primary:active {

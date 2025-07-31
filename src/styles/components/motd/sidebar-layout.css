@@ -4,12 +4,12 @@
 
 .motd-sidebar {
   flex: 1;
-  background: var(--card-bg);
-  border-left: 1px solid var(--border);
+  background: var(--motd-card-bg);
+  border-left: 1px solid var(--motd-border);
   overflow: hidden;
   min-width: var(--sidebar-min-width);
   max-width: var(--sidebar-width);
-  box-shadow: var(--shadow);
+  box-shadow: var(--motd-shadow);
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -17,8 +17,8 @@
 
 /* Header da sidebar */
 .sidebar-header {
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  background: var(--motd-bg);
+  border-bottom: 1px solid var(--motd-border);
   padding: 0;
   margin: 0;
   display: flex;
@@ -32,8 +32,8 @@
     max-width: none;
     width: 100%;
     border-left: none;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--motd-border);
     height: 50vh;
-    box-shadow: var(--shadow);
+    box-shadow: var(--motd-shadow);
   }
 }

@@ -7,15 +7,15 @@
   justify-content: flex-end;
   gap: var(--space-sm);
   padding: 0.75rem var(--space-md);
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  background: var(--motd-bg);
+  border-bottom: 1px solid var(--motd-border);
   flex-shrink: 0;
 }
 
 .clear-button, 
 .clear-all-button {
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--motd-border);
   border-radius: var(--radius);
   padding: var(--space-sm) 0.75rem;
   cursor: pointer;
@@ -29,7 +29,7 @@
 }
 
 .clear-button:hover {
-  background: var(--bg);
+  background: var(--motd-bg);
   border-color: var(--accent);
   transform: translateY(-1px);
 }

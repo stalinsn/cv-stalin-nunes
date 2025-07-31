@@ -12,8 +12,8 @@
 .stat-item {
   text-align: center;
   padding: var(--space-sm) var(--space-md);
-  background: var(--card-bg);
-  border: 1px solid var(--border);
+  background: var(--motd-card-bg);
+  border: 1px solid var(--motd-border);
   border-radius: var(--radius-lg);
   min-width: 60px;
   transition: all var(--transition-normal);
