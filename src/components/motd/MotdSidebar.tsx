@@ -179,7 +179,7 @@ export default function MotdSidebar({
               <br />
               💥 <strong>Reset total:</strong> limpa histórico, favoritas e estatísticas
               <br />
-              🚀 <strong>Sistema avançado:</strong> +24.000 combinações únicas
+              🚀 <strong>Sistema avançado:</strong> +35.000 combinações únicas (agora com humor!)
               <br />
               🔍 <strong>Busca inteligente:</strong> pesquise em tempo real
               <br />
@@ -190,6 +190,8 @@ export default function MotdSidebar({
               💾 <strong>Persistência:</strong> dados salvos no navegador
               <br />
               🎨 <strong>Temas:</strong> interface adaptativa claro/escuro
+              <br />
+              😄 <strong>Novidade:</strong> frases motivacionais com pitadas de humor
             </div>
           )}
         </div>

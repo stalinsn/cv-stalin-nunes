@@ -1,4 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
+import { 
+  VOCABULARIO_MOTIVACIONAL, 
+  VOCABULARIO_HUMOR, 
+  VOCABULARIO_REFLEXIVO, 
+  VOCABULARIO_COMPARTILHADO,
+  FRASES_MOTIVACIONAIS,
+  FRASES_HUMOR
+} from '@/data';
 
 // =====================================================================
 // SISTEMA AVANÇADO DE GERAÇÃO DE FRASES MOTIVACIONAIS
@@ -6,22 +14,22 @@ import { useState, useEffect, useCallback } from 'react';
 
 // Estruturas gramaticais inteligentes
 const TEMPLATES = {
-  // Template motivacional: contexto + ação + foco + motivação
+  // Template motivacional: crescimento e inspiração
   MOTIVACIONAL: {
     pattern: "{{contexto}} {{acao}} {{foco}}, {{motivacao}}",
     categoria: 'motivacional' as const
   },
   
-  // Template humor: contexto + ação + foco + motivação (com vocabulário engraçado)
-  HUMOR: {
-    pattern: "{{contexto}}, {{acao}} {{foco}}, {{motivacao}}",
-    categoria: 'humor' as const
+  // Template reflexivo: momentos contemplativos e profundos
+  REFLEXIVO: {
+    pattern: "{{contexto}}, {{acao}} {{foco}} {{motivacao}}",
+    categoria: 'reflexivo' as const
   },
   
-  // Template mix: contexto + ação + foco + motivação (equilibrado)
-  MIX: {
-    pattern: "{{contexto}} {{acao}} {{foco}}, {{motivacao}}",
-    categoria: 'mix' as const
+  // Template humor: situações engraçadas e leveza
+  HUMOR: {
+    pattern: "{{contexto}}, {{acao}} {{foco}} {{motivacao}}",
+    categoria: 'humor' as const
   },
   
   // Template condicional (usa vocabulário compartilhado)
@@ -32,166 +40,20 @@ const TEMPLATES = {
 };
 
 // =====================================================================
-// VOCABULÁRIO INTELIGENTE CATEGORIZADO POR TOM
+// VOCABULÁRIO INTELIGENTE EXPANDIDO
 // =====================================================================
 
 const VOCABULARIO = {
-  // === MOTIVACIONAL ===
-  motivacional: {
-    contexto: [
-      "Hoje é um ótimo dia para",
-      "Neste momento, vale a pena", 
-      "Este é o momento perfeito para",
-      "A cada novo dia, procure",
-      "Em cada projeto, lembre de",
-      "Durante os desafios, é importante"
-    ],
-    acao: [
-      "celebrar", "compartilhar", "cultivar a", "fortalecer a",
-      "praticar a", "desenvolver a", "valorizar a", "investir em"
-    ],
-    foco: [
-      "colaboração", "comunicação", "resiliência", "empatia",
-      "crescimento pessoal", "trabalho em equipe", "melhoria contínua",
-      "bem-estar do time", "aprendizado contínuo", "qualidade"
-    ],
-    motivacao: [
-      "porque juntos somos mais fortes",
-      "pois cada passo conta na jornada", 
-      "já que o crescimento é contínuo",
-      "porque a colaboração multiplica resultados",
-      "pois cada desafio nos torna resilientes"
-    ]
-  },
-
-  // === HUMOR ===
-  humor: {
-    contexto: [
-      "Antes que o café acabe",
-      "Entre um bug e outro", 
-      "Enquanto o deploy roda",
-      "Depois de resolver aquele bug chato",
-      "No intervalo entre reuniões",
-      "Quando a internet finalmente voltar"
-    ],
-    acao: [
-      "abraçar o caos da", "fazer as pazes com", "negociar com",
-      "domesticar a", "sobreviver à", "domar a", "conviver com"
-    ],
-    foco: [
-      "arte do rubber duck debugging", "diplomacia com CSS rebelde",
-      "zen da documentação", "filosofia do console.log",
-      "mistério dos bugs fantasmas", "magia do 'funciona na minha máquina'",
-      "paciência com merge conflicts", "sabedoria do Stack Overflow"
-    ],
-    motivacao: [
-      "porque programar é resolver quebra-cabeças pagos",
-      "já que todo mundo passou por isso (e sobreviveu)",
-      "pois café + código = fórmula mágica",
-      "porque amanhã você vai rir disso",
-      "já que até os ninjas começaram do zero"
-    ]
-  },
-
-  // === MIX (Motivação + Humor) ===
-  mix: {
-    contexto: [
-      "No meio da correria, não esqueça de",
-      "Quando as coisas ficam intensas",
-      "Entre commits e deploys",
-      "Durante a sprint, lembre de"
-    ],
-    acao: [
-      "celebrar com humor", "equilibrar", "manter a", "cultivar"
-    ],
-    foco: [
-      "leveza no trabalho pesado", "harmonia entre front e back",
-      "paz interior durante code reviews", "alegria nas entregas",
-      "equilíbrio vida-código", "diversão em equipe"
-    ],
-    motivacao: [
-      "porque debuggar é ser detetive do século XXI",
-      "pois cada bug resolvido é uma vitória épica",
-      "já que programar é arte disfarçada de lógica"
-    ]
-  },
-
-  // === VOCABULÁRIO COMPARTILHADO ===
-  compartilhado: {
-    condicional: [
-      "Se o desafio parecer grande", "Quando o prazo apertar",
-      "Se as ideias não fluírem", "Quando a pressão aumentar",
-      "Se der aquele medo", "Quando tudo parecer impossível"
-    ],
-    conselho: [
-      "respire fundo e divida o problema",
-      "peça ajuda sem hesitar", 
-      "confie no processo",
-      "foque no próximo passo",
-      "lembre que o time está junto"
-    ],
-    resultado: [
-      "e você vai se surpreender com o resultado",
-      "e o time todo vai se beneficiar",
-      "e a solução vai aparecer mais clara",
-      "e o progresso vai ser consistente"
-    ]
-  }
+  motivacional: VOCABULARIO_MOTIVACIONAL,
+  reflexivo: VOCABULARIO_REFLEXIVO,
+  humor: VOCABULARIO_HUMOR,
+  compartilhado: VOCABULARIO_COMPARTILHADO
 };
 
-// Frases prontas organizadas por categoria
+// Frases prontas com foco na qualidade motivacional e humor inteligente
 const FRASES_PRONTAS = [
-  // === MOTIVACIONAL PURO ===
-  "Se chegamos até aqui, já vale um parabéns — cada passo conta!",
-  "Nem sempre a estrada é fácil, mas juntos a gente transforma o caminho em conquista.",
-  "Todo mundo erra, mas só quem compartilha aprende de verdade. Bora crescer juntos?",
-  "A entrega é importante, mas ninguém precisa carregar o peso sozinho. Pode chamar!",
-  "Não subestime o poder de uma boa dúvida: ela pode ser o início da nossa próxima solução.",
-  "O resultado de hoje é mérito do esforço coletivo — e amanhã tem mais.",
-  "Cada bug resolvido é uma pequena vitória que merece ser comemorada.",
-  "O melhor código é aquele escrito em colaboração — duas cabeças pensam melhor que uma.",
-  "Não existe pergunta boba quando o objetivo é aprender e crescer juntos.",
-  "O deadline é importante, mas a saúde mental e o bem-estar do time são prioridade.",
-  "Lembra quando isso parecia impossível? Pois é, você chegou aqui. Continue!",
-  "O erro de hoje é a experiência de amanhã — aproveite cada oportunidade de aprender.",
-  "Seu código pode não estar perfeito, mas sua dedicação e esforço são impecáveis.",
-  "O segredo não é acertar na primeira, é persistir até encontrar a solução certa.",
-  "Cada commit é um passo à frente, cada pull request é uma chance de melhorar.",
-  "O que importa não é a velocidade, mas a consistência e a qualidade da jornada.",
-  
-  // === HUMOR PURO ===
-  "Programar é 10% inspiração, 20% cafeína e 70% tentar entender o código que você escreveu ontem.",
-  "Todo desenvolvedor tem três versões: 'funciona na minha máquina', 'deveria funcionar' e 'não sei por que funciona'.",
-  "O melhor debugger do mundo ainda é o console.log estrategicamente posicionado.",
-  "A diferença entre um dev júnior e sênior? O sênior sabe onde procurar no Google.",
-  "Erro 404: motivação não encontrada. Reiniciando com café...",
-  "Se você nunca teve que explicar seu código para um pato de borracha, você não é um dev de verdade.",
-  "Commit message: 'Fixed everything' - a esperança eterna de todo programador.",
-  "Tem dia que o CSS coopera, tem dia que ele resolve trollar. Hoje parece um dia de trollagem.",
-  "A única constante na programação são as mudanças... e os bugs que aparecem do nada.",
-  "Não é bug, é uma funcionalidade não documentada esperando pelo momento certo de brilhar!",
-  "Git commit -m 'isso vai funcionar' - famosas últimas palavras antes do rollback.",
-  "Seu código funcionar na primeira tentativa é como ganhar na loteria: teoricamente possível, praticamente improvável.",
-  "Stack Overflow é tipo Google, mas para pessoas que sabem o que estão procurando... mais ou menos.",
-  "Documentação é como a academia: todo mundo sabe que deveria fazer, mas sempre deixa para depois.",
-  "99 little bugs in the code, 99 little bugs... take one down, patch it around, 117 little bugs in the code.",
-  
-  // === MOTIVACIONAL + HUMOR (MIX) ===
-  "O código compila mais rápido quando a gente comemora cada avanço — não esqueça de celebrar!",
-  "Aqui, cada vitória é do time todo. E cada dificuldade também. Vamos virar esse jogo juntos.",
-  "Às vezes, a melhor sprint é aquela em que todo mundo termina sorrindo.",
-  "Se está difícil agora, é porque estamos no meio do caminho. O final dessa história a gente escreve juntos.",
-  "Se o código funciona, não mexa. Se não funciona, também não mexa... brincadeira, pode mexer!",
-  "Lembre-se: até o Stack Overflow começou com uma pergunta boba de alguém.",
-  "Seu código hoje pode não ser perfeito, mas é infinitamente melhor que o código que você não escreveu.",
-  "Cada deploy bem-sucedido é uma pequena vitória que merece pelo menos um café comemorativo.",
-  "O bug mais difícil de hoje vai ser a história engraçada de amanhã — e você vai ter orgulho de ter resolvido.",
-  "Entre um merge conflict e outro, lembre-se: você está construindo algo incrível.",
-  "Todo código que funciona é um pequeno milagre disfarçado de lógica — celebre isso!",
-  "Quando o CSS finalmente cooperar, você vai saber que é hora de fazer backup de tudo.",
-  "Debuggar é como resolver um mistério: frustrante no começo, satisfatório no final.",
-  "Se o código não funcionou na primeira, parabéns! Você está oficialmente no clube dos 99% dos desenvolvedores.",
-  "Entre um bug e uma funcionalidade nova, sempre sobra tempo para um bom café e uma risada com o time."
+  ...FRASES_MOTIVACIONAIS,
+  ...FRASES_HUMOR
 ];
 
 // =====================================================================
@@ -248,13 +110,13 @@ class GeradorFrases {
     const tipoRandom = Math.random();
     let templateEscolhido: keyof typeof TEMPLATES;
     
-    // 40% motivacional, 30% humor, 20% mix, 10% condicional
+    // 40% motivacional, 30% reflexivo, 20% humor, 10% condicional
     if (tipoRandom < 0.4) {
       templateEscolhido = 'MOTIVACIONAL';
     } else if (tipoRandom < 0.7) {
-      templateEscolhido = 'HUMOR';
+      templateEscolhido = 'REFLEXIVO';
     } else if (tipoRandom < 0.9) {
-      templateEscolhido = 'MIX';
+      templateEscolhido = 'HUMOR';
     } else {
       templateEscolhido = 'CONDICIONAL';
     }
@@ -304,8 +166,8 @@ class GeradorFrases {
       frasesPronestas: number;
       templates: {
         motivacional: number;
+        reflexivo: number;
         humor: number;
-        mix: number;
         condicional: number;
         total: number;
       };
@@ -317,8 +179,8 @@ class GeradorFrases {
     
     // Calcula combinações por categoria de template
     const motivacional = VOCABULARIO.motivacional;
+    const reflexivo = VOCABULARIO.reflexivo;
     const humor = VOCABULARIO.humor;
-    const mix = VOCABULARIO.mix;
     const compartilhado = VOCABULARIO.compartilhado;
     
     // Multiplicação das possibilidades por template
@@ -328,32 +190,32 @@ class GeradorFrases {
       motivacional.foco.length * 
       motivacional.motivacao.length;
       
+    const combinacoesReflexivo = 
+      reflexivo.contexto.length * 
+      reflexivo.acao.length * 
+      reflexivo.foco.length * 
+      reflexivo.motivacao.length;
+      
     const combinacoesHumor = 
       humor.contexto.length * 
       humor.acao.length * 
       humor.foco.length * 
       humor.motivacao.length;
       
-    const combinacoesMix = 
-      mix.contexto.length * 
-      mix.acao.length * 
-      mix.foco.length * 
-      mix.motivacao.length;
-      
     const combinacoesCondicional = 
       compartilhado.condicional.length * 
       compartilhado.conselho.length * 
       compartilhado.resultado.length;
     
-    const totalTemplates = combinacoesMotivacional + combinacoesHumor + combinacoesMix + combinacoesCondicional;
+    const totalTemplates = combinacoesMotivacional + combinacoesReflexivo + combinacoesHumor + combinacoesCondicional;
     totalCombinations += totalTemplates;
     
     const breakdown = {
       frasesPronestas: FRASES_PRONTAS.length,
       templates: {
         motivacional: combinacoesMotivacional,
+        reflexivo: combinacoesReflexivo,
         humor: combinacoesHumor, 
-        mix: combinacoesMix,
         condicional: combinacoesCondicional,
         total: totalTemplates
       },
@@ -373,9 +235,6 @@ class GeradorFrases {
 // =====================================================================
 
 const gerador = new GeradorFrases();
-
-// Log das estatísticas para debug
-console.log('🎯 ESTATÍSTICAS MOTD:', gerador.getStats());
 
 // Resto do código do hook mantido igual...
 const KEY = 'frasesMotivacionaisExibidasV4'; // Versão atualizada
