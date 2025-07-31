@@ -184,43 +184,48 @@ generate_branch_name() {
     echo "$full_name"
 }
 
-# Verificar se estamos na main/master
-if [[ "$current_branch" == "main" || "$current_branch" == "master" ]]; then
-    log_info "Você está na branch principal ($current_branch)"
-    
-    # Gerar nome da nova branch
-    new_branch=$(generate_branch_name "$commit_type" "$commit_scope" "$commit_description")
-    
-    echo -e "${CYAN}Opções de branch:${NC}"
-    echo "1) 🌿 Criar nova branch: $new_branch"
-    echo "2) 📝 Especificar nome customizado"
-    echo "3) 🚀 Continuar na branch atual ($current_branch)"
-    
-    read -p "Escolha uma opção (1-3): " branch_option
-    
-    case $branch_option in
-        1)
-            log_info "Criando nova branch: $new_branch"
-            git checkout -b "$new_branch"
-            current_branch="$new_branch"
-            ;;
-        2)
-            read -p "🌿 Nome da nova branch: " custom_branch
-            log_info "Criando nova branch: $custom_branch"
-            git checkout -b "$custom_branch"
-            current_branch="$custom_branch"
-            ;;
-        3)
-            log_warning "Continuando na branch principal. Certifique-se de que isso é intencional!"
-            ;;
-        *)
-            log_error "Opção inválida!"
-            exit 1
-            ;;
-    esac
-else
-    log_info "Continuando na branch atual: $current_branch"
-fi
+# =============================================================================
+# 4. GERENCIAMENTO DE BRANCH (MELHORADO)
+# =============================================================================
+log_step "Gerenciando branch de desenvolvimento..."
+
+# Gerar nome sugerido para nova branch
+suggested_branch=$(generate_branch_name "$commit_type" "$commit_scope" "$commit_description")
+
+# Sempre oferecer opções de branch
+log_info "Branch atual: $current_branch"
+
+echo -e "${CYAN}Opções de branch:${NC}"
+echo "1) 🌿 Criar nova branch: $suggested_branch"
+echo "2) 📝 Especificar nome customizado"
+echo "3) 🚀 Continuar na branch atual ($current_branch)"
+
+read -p "Escolha uma opção (1-3): " branch_option
+
+case $branch_option in
+    1)
+        log_info "Criando nova branch: $suggested_branch"
+        git checkout -b "$suggested_branch"
+        current_branch="$suggested_branch"
+        ;;
+    2)
+        read -p "🌿 Nome da nova branch: " custom_branch
+        log_info "Criando nova branch: $custom_branch"
+        git checkout -b "$custom_branch"
+        current_branch="$custom_branch"
+        ;;
+    3)
+        if [[ "$current_branch" == "main" || "$current_branch" == "master" ]]; then
+            log_warning "⚠️  Continuando na branch principal! Certifique-se de que isso é intencional!"
+        else
+            log_info "Continuando na branch atual: $current_branch"
+        fi
+        ;;
+    *)
+        log_error "Opção inválida!"
+        exit 1
+        ;;
+esac
 
 # =============================================================================
 # 5. CONSTRUIR MENSAGEM DE COMMIT
