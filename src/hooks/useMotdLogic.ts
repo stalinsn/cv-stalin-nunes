@@ -4,239 +4,150 @@ import { useState, useEffect, useCallback } from 'react';
 // SISTEMA AVANÇADO DE GERAÇÃO DE FRASES MOTIVACIONAIS
 // =====================================================================
 
-// Estruturas gramaticais coerentes
+// Estruturas gramaticais inteligentes
 const TEMPLATES = {
-  // Template: [CONTEXTO] + [AÇÃO] + [OBJETO/FOCO] + [MOTIVAÇÃO]
-  CONTEXTO_ACAO_FOCO: {
+  // Template motivacional: contexto + ação + foco + motivação
+  MOTIVACIONAL: {
     pattern: "{{contexto}} {{acao}} {{foco}}, {{motivacao}}",
-    description: "Contexto + Ação + Foco + Motivação"
+    categoria: 'motivacional' as const
   },
   
-  // Template: [CONDICIONAL] + [CONSELHO] + [RESULTADO]
-  CONDICIONAL_CONSELHO: {
-    pattern: "{{condicional}} {{conselho}}, {{resultado}}",
-    description: "Situação condicional + Conselho + Resultado esperado"
+  // Template humor: contexto + ação + foco + motivação (com vocabulário engraçado)
+  HUMOR: {
+    pattern: "{{contexto}}, {{acao}} {{foco}}, {{motivacao}}",
+    categoria: 'humor' as const
   },
   
-  // Template: [REFLEXAO] + [ACAO_POSITIVA] + [IMPACTO]
-  REFLEXAO_ACAO: {
-    pattern: "{{reflexao}} {{acao_positiva}} {{impacto}}",
-    description: "Reflexão + Ação positiva + Impacto"
+  // Template mix: contexto + ação + foco + motivação (equilibrado)
+  MIX: {
+    pattern: "{{contexto}} {{acao}} {{foco}}, {{motivacao}}",
+    categoria: 'mix' as const
   },
   
-  // Template: [MOMENTO] + [OPORTUNIDADE] + [BENEFICIO]
-  MOMENTO_OPORTUNIDADE: {
-    pattern: "{{momento}} {{oportunidade}} {{beneficio}}",
-    description: "Momento + Oportunidade + Benefício"
+  // Template condicional (usa vocabulário compartilhado)
+  CONDICIONAL: {
+    pattern: "{{condicional}}, {{conselho}}, {{resultado}}",
+    categoria: 'compartilhado' as const
   }
 };
 
 // =====================================================================
-// VOCABULÁRIO EXPANDIDO E CATEGORIZADO
+// VOCABULÁRIO INTELIGENTE CATEGORIZADO POR TOM
 // =====================================================================
 
 const VOCABULARIO = {
-  // CONTEXTOS (quando/onde aplicar)
-  contexto: [
-    "Hoje é um ótimo dia para",
-    "Neste momento, vale a pena",
-    "Agora é a hora ideal para",
-    "Este é o momento perfeito para",
-    "Sempre que possível, tente",
-    "A cada novo dia, procure",
-    "Em cada projeto, lembre de",
-    "Durante os desafios, é importante",
-    "No meio da correria, não esqueça de",
-    "Quando as coisas ficam intensas, tente"
-  ],
+  // === MOTIVACIONAL ===
+  motivacional: {
+    contexto: [
+      "Hoje é um ótimo dia para",
+      "Neste momento, vale a pena", 
+      "Este é o momento perfeito para",
+      "A cada novo dia, procure",
+      "Em cada projeto, lembre de",
+      "Durante os desafios, é importante"
+    ],
+    acao: [
+      "celebrar", "compartilhar", "cultivar a", "fortalecer a",
+      "praticar a", "desenvolver a", "valorizar a", "investir em"
+    ],
+    foco: [
+      "colaboração", "comunicação", "resiliência", "empatia",
+      "crescimento pessoal", "trabalho em equipe", "melhoria contínua",
+      "bem-estar do time", "aprendizado contínuo", "qualidade"
+    ],
+    motivacao: [
+      "porque juntos somos mais fortes",
+      "pois cada passo conta na jornada", 
+      "já que o crescimento é contínuo",
+      "porque a colaboração multiplica resultados",
+      "pois cada desafio nos torna resilientes"
+    ]
+  },
 
-  // CONDICIONAIS (situações específicas)
-  condicional: [
-    "Se o desafio parecer grande demais",
-    "Quando o bug aparecer",
-    "Se a motivação estiver em baixa",
-    "Quando o prazo apertar",
-    "Se der aquele medo de não conseguir",
-    "Quando tudo parecer impossível",
-    "Se a solução não vier rapidamente",
-    "Quando o time estiver sobrecarregado",
-    "Se parecer que não vai dar tempo",
-    "Quando a pressão aumentar",
-    "Se o código não cooperar",
-    "Quando as ideias não fluírem"
-  ],
+  // === HUMOR ===
+  humor: {
+    contexto: [
+      "Antes que o café acabe",
+      "Entre um bug e outro", 
+      "Enquanto o deploy roda",
+      "Depois de resolver aquele bug chato",
+      "No intervalo entre reuniões",
+      "Quando a internet finalmente voltar"
+    ],
+    acao: [
+      "abraçar o caos da", "fazer as pazes com", "negociar com",
+      "domesticar a", "sobreviver à", "domar a", "conviver com"
+    ],
+    foco: [
+      "arte do rubber duck debugging", "diplomacia com CSS rebelde",
+      "zen da documentação", "filosofia do console.log",
+      "mistério dos bugs fantasmas", "magia do 'funciona na minha máquina'",
+      "paciência com merge conflicts", "sabedoria do Stack Overflow"
+    ],
+    motivacao: [
+      "porque programar é resolver quebra-cabeças pagos",
+      "já que todo mundo passou por isso (e sobreviveu)",
+      "pois café + código = fórmula mágica",
+      "porque amanhã você vai rir disso",
+      "já que até os ninjas começaram do zero"
+    ]
+  },
 
-  // AÇÕES POSITIVAS (o que fazer)
-  acao: [
-    "celebrar",
-    "compartilhar",
-    "colaborar em",
-    "investir tempo em",
-    "focar na",
-    "cultivar a",
-    "praticar a",
-    "desenvolver a",
-    "exercitar a",
-    "fortalecer a",
-    "aprimorar a",
-    "valorizar a"
-  ],
+  // === MIX (Motivação + Humor) ===
+  mix: {
+    contexto: [
+      "No meio da correria, não esqueça de",
+      "Quando as coisas ficam intensas",
+      "Entre commits e deploys",
+      "Durante a sprint, lembre de"
+    ],
+    acao: [
+      "celebrar com humor", "equilibrar", "manter a", "cultivar"
+    ],
+    foco: [
+      "leveza no trabalho pesado", "harmonia entre front e back",
+      "paz interior durante code reviews", "alegria nas entregas",
+      "equilíbrio vida-código", "diversão em equipe"
+    ],
+    motivacao: [
+      "porque debuggar é ser detetive do século XXI",
+      "pois cada bug resolvido é uma vitória épica",
+      "já que programar é arte disfarçada de lógica"
+    ]
+  },
 
-  acao_positiva: [
-    "celebre cada pequena vitória",
-    "compartilhe suas dúvidas com o time",
-    "peça ajuda sem hesitar",
-    "divida o conhecimento",
-    "reconheça o progresso já feito",
-    "agradeça pelo suporte recebido",
-    "valorize o esforço coletivo",
-    "aprenda com cada erro",
-    "mantenha o foco no objetivo",
-    "confie no processo",
-    "respire e reorganize as ideias",
-    "lembre-se de suas conquistas anteriores"
-  ],
-
-  // CONSELHOS (sugestões práticas)
-  conselho: [
-    "respire fundo e divida o problema em partes menores",
-    "lembre que cada erro é um aprendizado valioso",
-    "peça ajuda - ninguém precisa resolver tudo sozinho",
-    "celebre cada pequeno avanço do caminho",
-    "confie no processo e no seu potencial",
-    "foque no próximo passo, não no problema inteiro",
-    "lembre que o time está junto nessa jornada",
-    "veja isso como uma oportunidade de crescimento",
-    "mantenha a curiosidade e a vontade de aprender",
-    "valorize o progresso, mesmo que pareça pequeno"
-  ],
-
-  // FOCOS/OBJETOS (em que concentrar energia)
-  foco: [
-    "colaboração",
-    "comunicação",
-    "criatividade",
-    "aprendizado contínuo",
-    "resiliência",
-    "empatia",
-    "inovação",
-    "qualidade",
-    "eficiência",
-    "bem-estar do time",
-    "crescimento pessoal",
-    "melhoria contínua",
-    "solução de problemas",
-    "trabalho em equipe",
-    "desenvolvimento técnico",
-    "mentoria",
-    "feedback construtivo",
-    "organização"
-  ],
-
-  // REFLEXÕES (pensamentos motivacionais)
-  reflexao: [
-    "Lembre-se:",
-    "É importante saber que",
-    "Nunca esqueça que",
-    "Uma coisa é certa:",
-    "O mais importante é que",
-    "Vale sempre lembrar que",
-    "A verdade é que",
-    "Não há dúvida de que"
-  ],
-
-  // MOMENTOS (timing/oportunidades)
-  momento: [
-    "Este é o momento ideal para",
-    "Agora é uma ótima hora para",
-    "Hoje vale a pena",
-    "Esta semana, tente",
-    "Neste projeto, procure",
-    "Durante esta sprint, foque em",
-    "Ao longo do dia, lembre de",
-    "Em cada tarefa, busque"
-  ],
-
-  // OPORTUNIDADES (o que aproveitar)
-  oportunidade: [
-    "aprender algo novo com a equipe",
-    "compartilhar conhecimento",
-    "fortalecer os laços do time",
-    "melhorar um processo",
-    "experimentar uma abordagem diferente",
-    "pedir feedback sobre seu trabalho",
-    "ajudar um colega com suas dificuldades",
-    "documentar uma solução interessante",
-    "celebrar uma conquista coletiva",
-    "refletir sobre o crescimento alcançado"
-  ],
-
-  // MOTIVAÇÕES/RESULTADOS (por que vale a pena)
-  motivacao: [
-    "porque juntos somos mais fortes",
-    "pois cada passo conta na jornada",
-    "já que o crescimento é um processo contínuo",
-    "porque a colaboração multiplica resultados",
-    "pois cada desafio nos torna mais resilientes",
-    "já que o aprendizado nunca para",
-    "porque pequenas melhorias geram grandes impactos",
-    "pois a qualidade se constrói no dia a dia",
-    "já que a experiência é o melhor professor",
-    "porque o time cresce quando todos crescem"
-  ],
-
-  resultado: [
-    "e você vai ver como as coisas se encaixam",
-    "e a solução vai aparecer mais clara",
-    "e o caminho vai ficar mais nítido",
-    "e você vai se surpreender com o resultado",
-    "e o time todo vai se beneficiar",
-    "e o progresso vai ser mais consistente",
-    "e a motivação vai se renovar",
-    "e o aprendizado vai ser mais profundo",
-    "e a confiança vai aumentar naturalmente",
-    "e o processo vai fluir melhor"
-  ],
-
-  beneficio: [
-    "e fortalecer ainda mais o time",
-    "e acelerar o desenvolvimento de todos",
-    "e criar um ambiente mais colaborativo",
-    "e gerar soluções mais criativas",
-    "e aumentar a satisfação no trabalho",
-    "e melhorar a qualidade das entregas",
-    "e construir relacionamentos mais sólidos",
-    "e desenvolver novas habilidades",
-    "e aumentar a confiança coletiva",
-    "e criar momentum para novos desafios"
-  ],
-
-  impacto: [
-    "e isso fará toda a diferença no resultado final",
-    "e você verá como isso transforma o ambiente",
-    "e o impacto positivo será sentido por todos",
-    "e isso criará um ciclo virtuoso de crescimento",
-    "e a equipe toda se beneficiará dessa atitude",
-    "e isso fortalecerá a cultura de colaboração",
-    "e o efeito multiplicador será impressionante",
-    "e isso contribuirá para um ambiente mais saudável",
-    "e o resultado será muito além do esperado",
-    "e isso inspirará outros a fazerem o mesmo"
-  ]
+  // === VOCABULÁRIO COMPARTILHADO ===
+  compartilhado: {
+    condicional: [
+      "Se o desafio parecer grande", "Quando o prazo apertar",
+      "Se as ideias não fluírem", "Quando a pressão aumentar",
+      "Se der aquele medo", "Quando tudo parecer impossível"
+    ],
+    conselho: [
+      "respire fundo e divida o problema",
+      "peça ajuda sem hesitar", 
+      "confie no processo",
+      "foque no próximo passo",
+      "lembre que o time está junto"
+    ],
+    resultado: [
+      "e você vai se surpreender com o resultado",
+      "e o time todo vai se beneficiar",
+      "e a solução vai aparecer mais clara",
+      "e o progresso vai ser consistente"
+    ]
+  }
 };
 
-// Frases prontas (mantidas para diversidade)
+// Frases prontas organizadas por categoria
 const FRASES_PRONTAS = [
+  // === MOTIVACIONAL PURO ===
   "Se chegamos até aqui, já vale um parabéns — cada passo conta!",
   "Nem sempre a estrada é fácil, mas juntos a gente transforma o caminho em conquista.",
   "Todo mundo erra, mas só quem compartilha aprende de verdade. Bora crescer juntos?",
   "A entrega é importante, mas ninguém precisa carregar o peso sozinho. Pode chamar!",
   "Não subestime o poder de uma boa dúvida: ela pode ser o início da nossa próxima solução.",
-  "O código compila mais rápido quando a gente comemora cada avanço — não esqueça de celebrar!",
-  "Aqui, cada vitória é do time todo. E cada dificuldade também. Vamos virar esse jogo juntos.",
   "O resultado de hoje é mérito do esforço coletivo — e amanhã tem mais.",
-  "Às vezes, a melhor sprint é aquela em que todo mundo termina sorrindo.",
-  "Se está difícil agora, é porque estamos no meio do caminho. O final dessa história a gente escreve juntos.",
   "Cada bug resolvido é uma pequena vitória que merece ser comemorada.",
   "O melhor código é aquele escrito em colaboração — duas cabeças pensam melhor que uma.",
   "Não existe pergunta boba quando o objetivo é aprender e crescer juntos.",
@@ -246,7 +157,41 @@ const FRASES_PRONTAS = [
   "Seu código pode não estar perfeito, mas sua dedicação e esforço são impecáveis.",
   "O segredo não é acertar na primeira, é persistir até encontrar a solução certa.",
   "Cada commit é um passo à frente, cada pull request é uma chance de melhorar.",
-  "O que importa não é a velocidade, mas a consistência e a qualidade da jornada."
+  "O que importa não é a velocidade, mas a consistência e a qualidade da jornada.",
+  
+  // === HUMOR PURO ===
+  "Programar é 10% inspiração, 20% cafeína e 70% tentar entender o código que você escreveu ontem.",
+  "Todo desenvolvedor tem três versões: 'funciona na minha máquina', 'deveria funcionar' e 'não sei por que funciona'.",
+  "O melhor debugger do mundo ainda é o console.log estrategicamente posicionado.",
+  "A diferença entre um dev júnior e sênior? O sênior sabe onde procurar no Google.",
+  "Erro 404: motivação não encontrada. Reiniciando com café...",
+  "Se você nunca teve que explicar seu código para um pato de borracha, você não é um dev de verdade.",
+  "Commit message: 'Fixed everything' - a esperança eterna de todo programador.",
+  "Tem dia que o CSS coopera, tem dia que ele resolve trollar. Hoje parece um dia de trollagem.",
+  "A única constante na programação são as mudanças... e os bugs que aparecem do nada.",
+  "Não é bug, é uma funcionalidade não documentada esperando pelo momento certo de brilhar!",
+  "Git commit -m 'isso vai funcionar' - famosas últimas palavras antes do rollback.",
+  "Seu código funcionar na primeira tentativa é como ganhar na loteria: teoricamente possível, praticamente improvável.",
+  "Stack Overflow é tipo Google, mas para pessoas que sabem o que estão procurando... mais ou menos.",
+  "Documentação é como a academia: todo mundo sabe que deveria fazer, mas sempre deixa para depois.",
+  "99 little bugs in the code, 99 little bugs... take one down, patch it around, 117 little bugs in the code.",
+  
+  // === MOTIVACIONAL + HUMOR (MIX) ===
+  "O código compila mais rápido quando a gente comemora cada avanço — não esqueça de celebrar!",
+  "Aqui, cada vitória é do time todo. E cada dificuldade também. Vamos virar esse jogo juntos.",
+  "Às vezes, a melhor sprint é aquela em que todo mundo termina sorrindo.",
+  "Se está difícil agora, é porque estamos no meio do caminho. O final dessa história a gente escreve juntos.",
+  "Se o código funciona, não mexa. Se não funciona, também não mexa... brincadeira, pode mexer!",
+  "Lembre-se: até o Stack Overflow começou com uma pergunta boba de alguém.",
+  "Seu código hoje pode não ser perfeito, mas é infinitamente melhor que o código que você não escreveu.",
+  "Cada deploy bem-sucedido é uma pequena vitória que merece pelo menos um café comemorativo.",
+  "O bug mais difícil de hoje vai ser a história engraçada de amanhã — e você vai ter orgulho de ter resolvido.",
+  "Entre um merge conflict e outro, lembre-se: você está construindo algo incrível.",
+  "Todo código que funciona é um pequeno milagre disfarçado de lógica — celebre isso!",
+  "Quando o CSS finalmente cooperar, você vai saber que é hora de fazer backup de tudo.",
+  "Debuggar é como resolver um mistério: frustrante no começo, satisfatório no final.",
+  "Se o código não funcionou na primeira, parabéns! Você está oficialmente no clube dos 99% dos desenvolvedores.",
+  "Entre um bug e uma funcionalidade nova, sempre sobra tempo para um bom café e uma risada com o time."
 ];
 
 // =====================================================================
@@ -264,22 +209,27 @@ class GeradorFrases {
     const template = TEMPLATES[templateKey];
     let frase = template.pattern;
     
+    // Seleciona o vocabulário baseado na categoria do template
+    const categoria = template.categoria;
+    const vocabularioEscolhido = VOCABULARIO[categoria];
+    
     // Substitui cada placeholder pelo vocabulário correspondente
     const placeholders = frase.match(/\{\{(\w+)\}\}/g);
     
     if (!placeholders) return frase;
     
     placeholders.forEach(placeholder => {
-      const key = placeholder.replace(/[{}]/g, '') as keyof typeof VOCABULARIO;
-      if (VOCABULARIO[key]) {
-        const palavra = this.getRandomElement(VOCABULARIO[key]);
+      const key = placeholder.replace(/[{}]/g, '');
+      if (vocabularioEscolhido && key in vocabularioEscolhido) {
+        const palavras = vocabularioEscolhido[key as keyof typeof vocabularioEscolhido] as string[];
+        const palavra = this.getRandomElement(palavras);
         frase = frase.replace(placeholder, palavra);
       }
     });
     
     return frase;
   }
-  
+
   private createCombinationId(frase: string): string {
     // Cria um ID baseado nas palavras-chave da frase para evitar repetições similares
     const palavrasChave = frase
@@ -292,15 +242,25 @@ class GeradorFrases {
     
     return `GEN-${palavrasChave}`;
   }
-  
+
   public gerarFrase(): string {
-    const tipoFrase = Math.random();
+    // Define que tipo de frase será gerada
+    const tipoRandom = Math.random();
+    let templateEscolhido: keyof typeof TEMPLATES;
     
-    // 60% - Frases geradas por template
-    if (tipoFrase < 0.6) {
-      const templateKeys = Object.keys(TEMPLATES) as Array<keyof typeof TEMPLATES>;
-      const templateEscolhido = this.getRandomElement(templateKeys);
-      
+    // 40% motivacional, 30% humor, 20% mix, 10% condicional
+    if (tipoRandom < 0.4) {
+      templateEscolhido = 'MOTIVACIONAL';
+    } else if (tipoRandom < 0.7) {
+      templateEscolhido = 'HUMOR';
+    } else if (tipoRandom < 0.9) {
+      templateEscolhido = 'MIX';
+    } else {
+      templateEscolhido = 'CONDICIONAL';
+    }
+
+    // 70% - Frases geradas por template
+    if (Math.random() < 0.7) {
       let tentativas = 0;
       let frase: string;
       let id: string;
@@ -317,7 +277,7 @@ class GeradorFrases {
       }
     }
     
-    // 40% - Frases prontas
+    // 30% - Frases prontas
     const frasesDisponiveis = FRASES_PRONTAS.filter(frase => 
       !this.usedCombinations.has(`FIXED-${frase.substring(0, 20)}`)
     );
@@ -337,19 +297,73 @@ class GeradorFrases {
     this.usedCombinations.clear();
   }
   
-  public getStats(): { totalCombinations: number; usedCombinations: number } {
-    // Calcula o número teórico de combinações possíveis
-    const templateCount = Object.keys(TEMPLATES).length;
+  public getStats(): { 
+    totalCombinations: number; 
+    usedCombinations: number; 
+    breakdown: {
+      frasesPronestas: number;
+      templates: {
+        motivacional: number;
+        humor: number;
+        mix: number;
+        condicional: number;
+        total: number;
+      };
+      grandTotal: number;
+    }
+  } {
+    // Calcula as combinações reais possíveis
     let totalCombinations = FRASES_PRONTAS.length;
     
-    // Estima combinações por template (aproximação)
-    Object.values(VOCABULARIO).forEach(categoria => {
-      totalCombinations += categoria.length;
-    });
+    // Calcula combinações por categoria de template
+    const motivacional = VOCABULARIO.motivacional;
+    const humor = VOCABULARIO.humor;
+    const mix = VOCABULARIO.mix;
+    const compartilhado = VOCABULARIO.compartilhado;
+    
+    // Multiplicação das possibilidades por template
+    const combinacoesMotivacional = 
+      motivacional.contexto.length * 
+      motivacional.acao.length * 
+      motivacional.foco.length * 
+      motivacional.motivacao.length;
+      
+    const combinacoesHumor = 
+      humor.contexto.length * 
+      humor.acao.length * 
+      humor.foco.length * 
+      humor.motivacao.length;
+      
+    const combinacoesMix = 
+      mix.contexto.length * 
+      mix.acao.length * 
+      mix.foco.length * 
+      mix.motivacao.length;
+      
+    const combinacoesCondicional = 
+      compartilhado.condicional.length * 
+      compartilhado.conselho.length * 
+      compartilhado.resultado.length;
+    
+    const totalTemplates = combinacoesMotivacional + combinacoesHumor + combinacoesMix + combinacoesCondicional;
+    totalCombinations += totalTemplates;
+    
+    const breakdown = {
+      frasesPronestas: FRASES_PRONTAS.length,
+      templates: {
+        motivacional: combinacoesMotivacional,
+        humor: combinacoesHumor, 
+        mix: combinacoesMix,
+        condicional: combinacoesCondicional,
+        total: totalTemplates
+      },
+      grandTotal: totalCombinations
+    };
     
     return {
-      totalCombinations: totalCombinations * templateCount,
-      usedCombinations: this.usedCombinations.size
+      totalCombinations,
+      usedCombinations: this.usedCombinations.size,
+      breakdown
     };
   }
 }
@@ -359,6 +373,9 @@ class GeradorFrases {
 // =====================================================================
 
 const gerador = new GeradorFrases();
+
+// Log das estatísticas para debug
+console.log('🎯 ESTATÍSTICAS MOTD:', gerador.getStats());
 
 // Resto do código do hook mantido igual...
 const KEY = 'frasesMotivacionaisExibidasV4'; // Versão atualizada
