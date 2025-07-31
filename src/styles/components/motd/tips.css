@@ -1,0 +1,70 @@
+/* =====================================================================
+   DICAS E TOOLTIPS - TIPS SECTION
+   ===================================================================== */
+
+.motd-tip {
+  margin: 0;
+  padding: var(--space-lg);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  font-size: var(--font-size-sm);
+  color: var(--text-light);
+  line-height: var(--line-height-loose);
+  flex-shrink: 0;
+}
+
+.tip-section {
+  margin-bottom: var(--space-md);
+}
+
+.tip-section:last-child {
+  margin-bottom: 0;
+}
+
+.motd-tip strong {
+  color: var(--text);
+  margin-bottom: var(--space-sm);
+  display: inline-block;
+  font-weight: var(--font-weight-semibold);
+}
+
+.motd-tip br {
+  margin-bottom: 4px;
+}
+
+.motd-tip kbd {
+  background: var(--accent);
+  color: white;
+  padding: 0.25rem var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow);
+  margin: 0 var(--space-xs);
+  display: inline-block;
+}
+
+/* Tooltip interativo */
+.tip-toggle {
+  cursor: help;
+  border-bottom: 1px dotted var(--text-light);
+  transition: color var(--transition-normal);
+  position: relative;
+}
+
+.tip-toggle:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tip-details {
+  margin-top: var(--space-sm);
+  padding-left: var(--space-md);
+  font-size: var(--font-size-xs);
+  opacity: 0.8;
+  line-height: var(--line-height-relaxed);
+}
+
+.tip-details strong {
+  margin-bottom: var(--space-xs);
+}

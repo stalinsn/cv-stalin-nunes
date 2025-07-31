@@ -4,6 +4,38 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
+## [1.6.0] - 2025-07-31
+### Added
+- **MOTD (Message of the Day)**: Nova rota `/motd` com gerador inteligente de frases motivacionais
+  - Sistema avançado de geração com 24.560+ combinações gramaticalmente coerentes
+  - Templates baseados em estruturas linguísticas variadas
+  - Vocabulário categorizado (contextos, ações, focos, motivações)
+  - Tabs estilo Chrome para navegação entre Histórico e Favoritas
+  - Sistema de busca em tempo real
+  - Estatísticas de uso (total, hoje, streak)
+  - Favoritos com preservação inteligente
+  - Atalhos de teclado (Espaço, F, C, S)
+  - Funcionalidades de cópia e compartilhamento
+  - Sistema de limpeza inteligente que preserva favoritas
+  - Design responsivo com sidebar colapsável
+
+### Changed
+- **CSS Modularizado**: Reestruturação completa do sistema de estilos
+  - Migração de arquivo monolítico (650+ linhas) para sistema modular
+  - Criação de design system com tokens centralizados
+  - 11 arquivos CSS focados por componente
+  - Integração com tokens de cores existentes do site
+  - Classes utilitárias reutilizáveis
+  - Variáveis CSS padronizadas
+  - Documentação completa da estrutura
+
+### Technical
+- Componentização React com TypeScript
+- Hook customizado `useMotdLogic` para lógica de estado
+- localStorage para persistência de dados
+- Sistema anti-repetição para frases
+- Tooltips informativos em botões e ações
+
 ## [1.5.3] - 2025-07-13
 ### Hotfix
 - Corrigido consumo duplo de token na tradução IA: agora o decremento ocorre apenas na rota `/api/translate`, nunca na validação.
