@@ -1,68 +1,127 @@
-# Changelog
+﻿# Changelog
 
-Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
+Todas as mudanÃ§as notÃ¡veis deste projeto serÃ£o documentadas neste arquivo.
 
-O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
+O formato Ã© baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
+
+## [Unreleased]
+## [1.6.1] - 2025-07-31
+
+### Documentacao
+
+- teste de versionamento
+
+### âœ¨ Adicionado
+- ðŸš€ Sistema completo de automaÃ§Ã£o Git Flow
+- ðŸ“‹ Templates inteligentes de Pull Request
+- ðŸ”„ Conventional commits com guia interativo
+- ðŸ“ GeraÃ§Ã£o automÃ¡tica de CHANGELOG
+- ðŸ·ï¸ Versionamento semÃ¢ntico automÃ¡tico
+- ðŸŽ¯ DetecÃ§Ã£o automÃ¡tica de componentes afetados
+- ðŸ› ï¸ Scripts NPM para automaÃ§Ã£o completa
+- ðŸ¤ Guia de contribuiÃ§Ã£o completo
+- ðŸ“„ CÃ³digo de conduta
+- ðŸ“‹ Templates de Issue (bug report, feature request, documentation)
+
+### â™»ï¸ Refatorado
+- ðŸ” MigraÃ§Ã£o de autenticaÃ§Ã£o Google Sheets para variÃ¡veis de ambiente
+- ðŸ“š Estrutura de documentaÃ§Ã£o e templates de contribuiÃ§Ã£o
+
+### ðŸ”’ SeguranÃ§a
+- ðŸ” EliminaÃ§Ã£o de arquivos de credenciais do repositÃ³rio
+- ðŸ›¡ï¸ CentralizaÃ§Ã£o de credenciais em variÃ¡veis de ambiente
+
+## [1.6.0] - 2025-07-31
+### Added
+- **MOTD (Message of the Day)**: Nova rota `/motd` com gerador inteligente de frases motivacionais
+  - Sistema avanÃ§ado de geraÃ§Ã£o com 24.560+ combinaÃ§Ãµes gramaticalmente coerentes
+  - Templates baseados em estruturas linguÃ­sticas variadas
+  - VocabulÃ¡rio categorizado (contextos, aÃ§Ãµes, focos, motivaÃ§Ãµes)
+  - Tabs estilo Chrome para navegaÃ§Ã£o entre HistÃ³rico e Favoritas
+  - Sistema de busca em tempo real
+  - EstatÃ­sticas de uso (total, hoje, streak)
+  - Favoritos com preservaÃ§Ã£o inteligente
+  - Atalhos de teclado (EspaÃ§o, F, C, S)
+  - Funcionalidades de cÃ³pia e compartilhamento
+  - Sistema de limpeza inteligente que preserva favoritas
+  - Design responsivo com sidebar colapsÃ¡vel
+
+### Changed
+- **CSS Modularizado**: ReestruturaÃ§Ã£o completa do sistema de estilos
+  - MigraÃ§Ã£o de arquivo monolÃ­tico (650+ linhas) para sistema modular
+  - CriaÃ§Ã£o de design system com tokens centralizados
+  - 11 arquivos CSS focados por componente
+  - IntegraÃ§Ã£o com tokens de cores existentes do site
+  - Classes utilitÃ¡rias reutilizÃ¡veis
+  - VariÃ¡veis CSS padronizadas
+  - DocumentaÃ§Ã£o completa da estrutura
+
+### Technical
+- ComponentizaÃ§Ã£o React com TypeScript
+- Hook customizado `useMotdLogic` para lÃ³gica de estado
+- localStorage para persistÃªncia de dados
+- Sistema anti-repetiÃ§Ã£o para frases
+- Tooltips informativos em botÃµes e aÃ§Ãµes
 
 ## [1.5.3] - 2025-07-13
 ### Hotfix
-- Corrigido consumo duplo de token na tradução IA: agora o decremento ocorre apenas na rota `/api/translate`, nunca na validação.
+- Corrigido consumo duplo de token na traduÃ§Ã£o IA: agora o decremento ocorre apenas na rota `/api/translate`, nunca na validaÃ§Ã£o.
 - Removidos todos os `console.log` de debug do projeto.
-- Build validado e fluxo de tradução revisado.
+- Build validado e fluxo de traduÃ§Ã£o revisado.
 
 ## [1.5.2] - 2025-07-08
 ### Fixed
-- Corrigido bug que fazia duas requisições de tradução IA ao trocar de idioma rapidamente ou ao restaurar o idioma salvo. Agora a tradução só é requisitada uma vez por troca de idioma.
+- Corrigido bug que fazia duas requisiÃ§Ãµes de traduÃ§Ã£o IA ao trocar de idioma rapidamente ou ao restaurar o idioma salvo. Agora a traduÃ§Ã£o sÃ³ Ã© requisitada uma vez por troca de idioma.
 
 ## [1.5.1] - 2025-07-03
 ### Changed
-- Favicon personalizado: substituição do favicon padrão do Next.js por um favicon minimalista com as iniciais "SN" e as cores do tema do site (`#0a0d0a` e `#22c55e`).
-- Inclusão de favicon em SVG e fallback para .ico em `/public`.
+- Favicon personalizado: substituiÃ§Ã£o do favicon padrÃ£o do Next.js por um favicon minimalista com as iniciais "SN" e as cores do tema do site (`#0a0d0a` e `#22c55e`).
+- InclusÃ£o de favicon em SVG e fallback para .ico em `/public`.
 
 ## [1.5.0] - 2025-07-03
 ### Added
-- SEO avançado: título, descrição, palavras-chave, Open Graph, Twitter Card e Schema.org JSON-LD em `src/app/head.tsx`.
-- `robots.txt` e sitemap.xml básico em `/public` para indexação por motores de busca.
-- Sitemap dinâmico com rotas estáticas e dinâmicas em `src/app/sitemap.xml/route.ts` (Next.js App Router).
-- Palavras-chave e descrição otimizadas para "Web Solutions Architect", VTEX, VTEX IO, Fast Store, Architecture, e serviços de desenvolvimento web.
-- Dados estruturados de pessoa, empresa e localização no Schema.org.
+- SEO avanÃ§ado: tÃ­tulo, descriÃ§Ã£o, palavras-chave, Open Graph, Twitter Card e Schema.org JSON-LD em `src/app/head.tsx`.
+- `robots.txt` e sitemap.xml bÃ¡sico em `/public` para indexaÃ§Ã£o por motores de busca.
+- Sitemap dinÃ¢mico com rotas estÃ¡ticas e dinÃ¢micas em `src/app/sitemap.xml/route.ts` (Next.js App Router).
+- Palavras-chave e descriÃ§Ã£o otimizadas para "Web Solutions Architect", VTEX, VTEX IO, Fast Store, Architecture, e serviÃ§os de desenvolvimento web.
+- Dados estruturados de pessoa, empresa e localizaÃ§Ã£o no Schema.org.
 
 ### Changed
-- Atualização dos links sociais (LinkedIn, GitHub) e domínio real nos metadados.
-- Melhoria na descrição dos serviços e diferenciais no SEO.
+- AtualizaÃ§Ã£o dos links sociais (LinkedIn, GitHub) e domÃ­nio real nos metadados.
+- Melhoria na descriÃ§Ã£o dos serviÃ§os e diferenciais no SEO.
 
 ### Docs
-- Orientações sobre uso de SEO, sitemap e robots.txt adicionadas ao projeto.
+- OrientaÃ§Ãµes sobre uso de SEO, sitemap e robots.txt adicionadas ao projeto.
 
 ## [1.4.1] - 2025-07-03
 ### Added
-- Botão "Limpar Cache" sempre visível quando houver traduções além de pt-br, com feedback visual de sucesso.
-- Feedback visual temporário ao limpar cache.
+- BotÃ£o "Limpar Cache" sempre visÃ­vel quando houver traduÃ§Ãµes alÃ©m de pt-br, com feedback visual de sucesso.
+- Feedback visual temporÃ¡rio ao limpar cache.
 
 ### Changed
-- Lógica do modal de confirmação de tradução: só aparece no modo IA, nunca no modo mock.
-- Troca de idioma no modo mock aplica tradução mock direto, sem modal.
-- Reset global de traduções e idioma ao limpar cache, prevenindo bloqueio de traduções IA por sobrescrita do mock.
-- Melhor UX para alternância entre modos e idiomas.
+- LÃ³gica do modal de confirmaÃ§Ã£o de traduÃ§Ã£o: sÃ³ aparece no modo IA, nunca no modo mock.
+- Troca de idioma no modo mock aplica traduÃ§Ã£o mock direto, sem modal.
+- Reset global de traduÃ§Ãµes e idioma ao limpar cache, prevenindo bloqueio de traduÃ§Ãµes IA por sobrescrita do mock.
+- Melhor UX para alternÃ¢ncia entre modos e idiomas.
 
 ### Fixed
-- Previne que traduções mock sobrescrevam permanentemente a possibilidade de tradução IA para o mesmo idioma.
-- Correção de exibição do botão de limpar cache e reset de estado global/localStorage.
+- Previne que traduÃ§Ãµes mock sobrescrevam permanentemente a possibilidade de traduÃ§Ã£o IA para o mesmo idioma.
+- CorreÃ§Ã£o de exibiÃ§Ã£o do botÃ£o de limpar cache e reset de estado global/localStorage.
 
 ## [1.4.0] - 2025-07-03
 ### Changed
-- Refatoração e padronização completa da estrutura de componentes, pastas e estilos do projeto.
-- Componentização e organização dos subcomponentes (Navbar, Header, Footer, SectionCard, StatusBar, ThemeToggle, LanguageSelector).
-- Padronização visual e responsiva do header/navbar, modais e selects.
-- Centralização e internacionalização de todos os textos fixos da interface via `labels.ts`, com tradução dinâmica para navbar, status bar, modais e aviso de cookies.
-- Ajuste do fluxo de seleção de idioma: valores do select e estado global padronizados, mas conversão automática para o formato esperado pela API de tradução IA.
-- Garantia de que a tradução IA funcione para todos os idiomas suportados, mantendo a seleção correta no select.
-- Remoção de arquivos de documentação `.md` redundantes após padronização dos componentes.
+- RefatoraÃ§Ã£o e padronizaÃ§Ã£o completa da estrutura de componentes, pastas e estilos do projeto.
+- ComponentizaÃ§Ã£o e organizaÃ§Ã£o dos subcomponentes (Navbar, Header, Footer, SectionCard, StatusBar, ThemeToggle, LanguageSelector).
+- PadronizaÃ§Ã£o visual e responsiva do header/navbar, modais e selects.
+- CentralizaÃ§Ã£o e internacionalizaÃ§Ã£o de todos os textos fixos da interface via `labels.ts`, com traduÃ§Ã£o dinÃ¢mica para navbar, status bar, modais e aviso de cookies.
+- Ajuste do fluxo de seleÃ§Ã£o de idioma: valores do select e estado global padronizados, mas conversÃ£o automÃ¡tica para o formato esperado pela API de traduÃ§Ã£o IA.
+- Garantia de que a traduÃ§Ã£o IA funcione para todos os idiomas suportados, mantendo a seleÃ§Ã£o correta no select.
+- RemoÃ§Ã£o de arquivos de documentaÃ§Ã£o `.md` redundantes apÃ³s padronizaÃ§Ã£o dos componentes.
 
 ### Fixed
-- Correção do fluxo de tradução IA para funcionar com os códigos de idioma esperados pela API, sem quebrar a seleção do idioma no select.
-- Correção da tradução dinâmica dos textos fixos da interface (navbar, status bar, modais, aviso de cookies, etc.) conforme o idioma selecionado.
-- Ajustes de tipagem e indexação para garantir compatibilidade com TypeScript.
+- CorreÃ§Ã£o do fluxo de traduÃ§Ã£o IA para funcionar com os cÃ³digos de idioma esperados pela API, sem quebrar a seleÃ§Ã£o do idioma no select.
+- CorreÃ§Ã£o da traduÃ§Ã£o dinÃ¢mica dos textos fixos da interface (navbar, status bar, modais, aviso de cookies, etc.) conforme o idioma selecionado.
+- Ajustes de tipagem e indexaÃ§Ã£o para garantir compatibilidade com TypeScript.
 
 ## [1.3.2] - 2025-07-03
 ### Fixed
@@ -78,15 +137,15 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [1.1.2] - 2025-07-03
 ### Fixed
-- Modal de confirmação de tradução agora só abre por ação do usuário (select), sem loops ou reabertura indesejada.
-- Feedback visual claro para token inválido no modal de autenticação.
-- Modal de política de privacidade agora segue o tema (fundo, cor, borda, sombra).
-- Isolamento total do fluxo dos modais: botão "Não" só fecha, botão "Sim" só executa ação após validação.
-- Removido qualquer efeito colateral de abertura automática de modal.
+- Modal de confirmaÃ§Ã£o de traduÃ§Ã£o agora sÃ³ abre por aÃ§Ã£o do usuÃ¡rio (select), sem loops ou reabertura indesejada.
+- Feedback visual claro para token invÃ¡lido no modal de autenticaÃ§Ã£o.
+- Modal de polÃ­tica de privacidade agora segue o tema (fundo, cor, borda, sombra).
+- Isolamento total do fluxo dos modais: botÃ£o "NÃ£o" sÃ³ fecha, botÃ£o "Sim" sÃ³ executa aÃ§Ã£o apÃ³s validaÃ§Ã£o.
+- Removido qualquer efeito colateral de abertura automÃ¡tica de modal.
 
 ### Changed
 - Refino de UX e acessibilidade dos modais.
-- Padronização do controle de estado dos modais e feedbacks.
+- PadronizaÃ§Ã£o do controle de estado dos modais e feedbacks.
 
 ## [1.3.1] - 2025-07-03
 ### Added
@@ -104,65 +163,66 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [1.3.0] - 2025-07-03
 ### Alterado
-- Internacionalização completa de todos os textos fixos da interface (Navbar, rodapé, botões, labels, select de idiomas, modais e política de privacidade) com labels centralizadas em `labels.ts`.
-- Persistência do idioma selecionado via localStorage, restaurando corretamente após recarregar a página.
-- Exibição dos nomes dos idiomas por extenso, no próprio idioma e no idioma da interface.
-- Correção do fluxo de cache/localStorage: traduções sempre salvas e buscadas usando o currículo original em português como chave base.
-- Modal de confirmação de tradução/token só aparece quando realmente necessário, evitando exibição desnecessária ao recarregar.
-- Refino do modal de política de privacidade para consumir labels traduzidas, incluindo todos os itens da lista.
-- Ajustes de tipagem e normalização dos códigos de idioma em todo o app.
-- Reset do idioma padrão para 'pt-br' ao limpar cache.
-- Testes e revisões do fluxo de troca de idioma, persistência, cache e exibição de modais.
+- InternacionalizaÃ§Ã£o completa de todos os textos fixos da interface (Navbar, rodapÃ©, botÃµes, labels, select de idiomas, modais e polÃ­tica de privacidade) com labels centralizadas em `labels.ts`.
+- PersistÃªncia do idioma selecionado via localStorage, restaurando corretamente apÃ³s recarregar a pÃ¡gina.
+- ExibiÃ§Ã£o dos nomes dos idiomas por extenso, no prÃ³prio idioma e no idioma da interface.
+- CorreÃ§Ã£o do fluxo de cache/localStorage: traduÃ§Ãµes sempre salvas e buscadas usando o currÃ­culo original em portuguÃªs como chave base.
+- Modal de confirmaÃ§Ã£o de traduÃ§Ã£o/token sÃ³ aparece quando realmente necessÃ¡rio, evitando exibiÃ§Ã£o desnecessÃ¡ria ao recarregar.
+- Refino do modal de polÃ­tica de privacidade para consumir labels traduzidas, incluindo todos os itens da lista.
+- Ajustes de tipagem e normalizaÃ§Ã£o dos cÃ³digos de idioma em todo o app.
+- Reset do idioma padrÃ£o para 'pt-br' ao limpar cache.
+- Testes e revisÃµes do fluxo de troca de idioma, persistÃªncia, cache e exibiÃ§Ã£o de modais.
 
 ## [1.2.0] - 2025-07-02
 ### Adicionado
-- Cache local de traduções por idioma/texto (evita custo extra e requisições desnecessárias).
-- Botão "Limpar cache de traduções" na Navbar, com feedback visual.
-- Estrutura de README atualizada, com instruções modernas, estrutura real de pastas e integração Google Sheets.
-- Documentação detalhada de integração, configuração e uso no `DOCUMENTATION.md`.
+- Cache local de traduÃ§Ãµes por idioma/texto (evita custo extra e requisiÃ§Ãµes desnecessÃ¡rias).
+- BotÃ£o "Limpar cache de traduÃ§Ãµes" na Navbar, com feedback visual.
+- Estrutura de README atualizada, com instruÃ§Ãµes modernas, estrutura real de pastas e integraÃ§Ã£o Google Sheets.
+- DocumentaÃ§Ã£o detalhada de integraÃ§Ã£o, configuraÃ§Ã£o e uso no `DOCUMENTATION.md`.
 
 ### Alterado
-- StatusBar agora sempre visível e com drag & drop preservando posição.
-- Layout e espaçamento refinados em todas as seções para visual mais elegante e responsivo.
-- Modal de confirmação de tradução só aparece quando necessário (não exibe para idiomas já traduzidos).
-- Código limpo: remoção de comentários, variáveis e anotações desnecessárias.
+- StatusBar agora sempre visÃ­vel e com drag & drop preservando posiÃ§Ã£o.
+- Layout e espaÃ§amento refinados em todas as seÃ§Ãµes para visual mais elegante e responsivo.
+- Modal de confirmaÃ§Ã£o de traduÃ§Ã£o sÃ³ aparece quando necessÃ¡rio (nÃ£o exibe para idiomas jÃ¡ traduzidos).
+- CÃ³digo limpo: remoÃ§Ã£o de comentÃ¡rios, variÃ¡veis e anotaÃ§Ãµes desnecessÃ¡rias.
 
 ### Corrigido
-- Problemas de proporção e alinhamento entre cards/seções.
-- Problemas de sumiço da StatusBar ao trocar de idioma ou durante tradução.
+- Problemas de proporÃ§Ã£o e alinhamento entre cards/seÃ§Ãµes.
+- Problemas de sumiÃ§o da StatusBar ao trocar de idioma ou durante traduÃ§Ã£o.
 - Pequenos bugs de UX e warnings/lint.
 
 ## [1.1.1] - 2025-07-02
 ### Alterado
-- Modal de confirmação de tradução agora segue o tema global (tokens CSS), respeitando claro/escuro.
-- StatusBar com drag & drop suave e preciso (atualização direta no DOM, sem lag).
-- Correção de hooks e return condicional para evitar warnings do React.
-- Ajuste visual e uso consistente de tokens nos botões, overlays e modais.
-- Refino de responsividade, acessibilidade e experiência de loading.
-- Pequenas correções de lint e remoção de código morto.
+- Modal de confirmaÃ§Ã£o de traduÃ§Ã£o agora segue o tema global (tokens CSS), respeitando claro/escuro.
+- StatusBar com drag & drop suave e preciso (atualizaÃ§Ã£o direta no DOM, sem lag).
+- CorreÃ§Ã£o de hooks e return condicional para evitar warnings do React.
+- Ajuste visual e uso consistente de tokens nos botÃµes, overlays e modais.
+- Refino de responsividade, acessibilidade e experiÃªncia de loading.
+- Pequenas correÃ§Ãµes de lint e remoÃ§Ã£o de cÃ³digo morto.
 
 ## [1.1.0] - 2025-07-01
 ### Adicionado
-- Documentação detalhada para todos os componentes, hooks, utilitários, dados e tipos, em arquivos Markdown individuais.
-- Índice interativo `DOCUMENTATION.md` na raiz do projeto, com links para toda a documentação técnica.
-- Links de navegação "Voltar ao Índice" em todos os arquivos de documentação detalhada.
-- Estrutura de documentação compatível com Obsidian, VS Code e leitores Markdown.
-- Padronização de navegação e organização para facilitar onboarding e manutenção.
+- DocumentaÃ§Ã£o detalhada para todos os componentes, hooks, utilitÃ¡rios, dados e tipos, em arquivos Markdown individuais.
+- Ãndice interativo `DOCUMENTATION.md` na raiz do projeto, com links para toda a documentaÃ§Ã£o tÃ©cnica.
+- Links de navegaÃ§Ã£o "Voltar ao Ãndice" em todos os arquivos de documentaÃ§Ã£o detalhada.
+- Estrutura de documentaÃ§Ã£o compatÃ­vel com Obsidian, VS Code e leitores Markdown.
+- PadronizaÃ§Ã£o de navegaÃ§Ã£o e organizaÃ§Ã£o para facilitar onboarding e manutenÃ§Ã£o.
 
 ### Alterado
-- README principal atualizado para destacar a documentação técnica e navegação facilitada.
+- README principal atualizado para destacar a documentaÃ§Ã£o tÃ©cnica e navegaÃ§Ã£o facilitada.
 
 ## [1.0.0] - 2025-07-01
 ### Adicionado
 - Estrutura inicial do projeto Next.js com TypeScript
-- Suporte a múltiplos idiomas (pt-br, en, es, fr, de)
+- Suporte a mÃºltiplos idiomas (pt-br, en, es, fr, de)
 - Navbar interativa e responsiva
-- Componente de tradução com fallback para mock
+- Componente de traduÃ§Ã£o com fallback para mock
 - Componentes: Summary, Skills, Experience, Education, Languages, Footer, BackToTop, StatusBar, FallbackModal
-- Hooks customizados para internacionalização, tema e tradução
-- Estilização modular com CSS customizado e tokens
-- Exportação para PDF e impressão
-- Teste de tradução via rota /translate-test
-- Tipagem forte para dados do currículo
+- Hooks customizados para internacionalizaÃ§Ã£o, tema e traduÃ§Ã£o
+- EstilizaÃ§Ã£o modular com CSS customizado e tokens
+- ExportaÃ§Ã£o para PDF e impressÃ£o
+- Teste de traduÃ§Ã£o via rota /translate-test
+- Tipagem forte para dados do currÃ­culo
 - Estrutura de dados separada por idioma
-- Integração com API de tradução
+- IntegraÃ§Ã£o com API de traduÃ§Ã£o
+

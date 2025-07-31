@@ -19,7 +19,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-br" data-theme="light">
-      <body className={plusJakarta.className}>{children}</body>
+      <body className={plusJakarta.className}>
+        {children}
+      </body>
     </html>
   );
 }

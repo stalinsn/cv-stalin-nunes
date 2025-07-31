@@ -1,6 +1,6 @@
 {
   "name": "cv-stalin-nunes",
-  "version": "1.5.3",
+  "version": "1.6.1",
   "private": true,
   "description": "Currículo multilíngue com tradução IA, controle de tokens e exportação PDF.",
   "license": "MIT",
@@ -8,7 +8,11 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "git:flow": "bash ./scripts/automate-git-flow.sh",
+    "git:flow:win": "powershell -ExecutionPolicy Bypass -File ./scripts/automate-git-flow.ps1",
+    "changelog": "bash ./scripts/generate-changelog.sh",
+    "pr:data": "bash ./scripts/generate-pr-data.sh"
   },
   "dependencies": {
     "googleapis": "^150.0.1",

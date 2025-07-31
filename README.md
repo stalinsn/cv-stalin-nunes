@@ -171,8 +171,43 @@ Para uma melhor experiência de desenvolvimento, utilize as seguintes extensões
 
 Para instalar todas de uma vez, basta abrir o VS Code e aceitar as recomendações ou instalar manualmente pelo Marketplace.
 
+## 🤝 Contribuindo
+
+Adoramos contribuições! Este projeto está aberto para melhorias e novas funcionalidades.
+
+### 🚀 Como Contribuir
+1. **Fork** este repositório
+2. **Clone** seu fork localmente
+3. **Configure** o ambiente (veja `CONTRIBUTING.md`)
+4. **Crie** uma branch para sua feature/fix
+5. **Faça** suas mudanças seguindo nossos padrões
+6. **Teste** localmente
+7. **Abra** um Pull Request
+
+### 📋 Áreas para Contribuição
+- 🌍 **Tradução**: Melhorar sistema de tradução ou adicionar idiomas
+- 🎭 **MOTD**: Adicionar frases motivacionais ou melhorar algoritmo
+- 🔐 **Segurança**: Otimizar autenticação e sistema de tokens
+- 🎨 **UI/UX**: Melhorar interface e responsividade
+- 📊 **Analytics**: Implementar métricas e monitoramento
+- 📝 **Documentação**: Melhorar guias e documentação técnica
+
+### 📚 Guias
+- 📖 **[Guia de Contribuição](CONTRIBUTING.md)** - Instruções detalhadas
+- 🐛 **[Report de Bugs](/.github/ISSUE_TEMPLATE/bug_report.md)** - Template para bugs
+- ✨ **[Feature Request](/.github/ISSUE_TEMPLATE/feature_request.md)** - Template para funcionalidades
+- 📝 **[Documentação](/.github/ISSUE_TEMPLATE/documentation.md)** - Template para docs
+
+### 🎯 Commits e PRs
+- Use [Conventional Commits](https://www.conventionalcommits.org/)
+- Use nosso template de Pull Request
+- Teste suas mudanças localmente
+- Mantenha documentação atualizada
+
+**Toda contribuição é bem-vinda! 🎉**
+
 ## 📄 Licença
-Este projeto é open-source, licenciado sob GPL v3. Qualquer modificação ou redistribuição deve manter o código aberto e sob a mesma licença.
+Este projeto é open-source, licenciado sob GPL v3. Qualquer modificação ou redistribuição deve manter o código aberto e sob a mesma licença. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
 

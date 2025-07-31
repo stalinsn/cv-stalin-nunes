@@ -18,24 +18,37 @@ const languageNames: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-  const { cvData, targetLang, token, origem } = await req.json();
-  if (!token) {
-    return NextResponse.json({ error: 'Token de autorização obrigatório.' }, { status: 401 });
+  const { cvData, targetLang, token, password, origem } = await req.json();
+  
+  // Verificação de senha se fornecida
+  if (password) {
+    const correctPassword = process.env.AI_TRANSLATE_PASSWORD;
+    if (correctPassword && password === correctPassword) {
+      // Senha correta, prosseguir sem validação de token
+    } else {
+      return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 });
+    }
+  } else if (!token) {
+    return NextResponse.json({ error: 'Token de autorização ou senha obrigatório.' }, { status: 401 });
   }
-  // Validação do token via chamada interna
-  const validateRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/validate-token`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token })
-  });
-  const validateJson = await validateRes.json();
-  if (!validateJson.success) {
-    return NextResponse.json({ error: 'Token inválido ou esgotado.' }, { status: 401 });
-  }
-  // Decrementa usos_restantes do token
-  const usosRestantes = typeof validateJson.usos_restantes === 'number' ? validateJson.usos_restantes : 0;
-  if (usosRestantes > 0) {
-    await updateTokenRow({ token, update: { usos_restantes: usosRestantes - 1 } });
+  
+  // Validação do token via chamada interna (apenas se não foi autenticado por senha)
+  if (!password && token) {
+    const validateRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/validate-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    const validateJson = await validateRes.json();
+    if (!validateJson.success) {
+      return NextResponse.json({ error: 'Token inválido ou esgotado.' }, { status: 401 });
+    }
+    
+    // Decrementa usos_restantes do token
+    const usosRestantes = typeof validateJson.usos_restantes === 'number' ? validateJson.usos_restantes : 0;
+    if (usosRestantes > 0) {
+      await updateTokenRow({ token, update: { usos_restantes: usosRestantes - 1 } });
+    }
   }
 
   const langName = languageNames[targetLang] || targetLang;
