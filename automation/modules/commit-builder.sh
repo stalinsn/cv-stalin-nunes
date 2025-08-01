@@ -164,6 +164,11 @@ commit_get_description() {
     echo "$COMMIT_DESCRIPTION"
 }
 
+# Obter escopo do commit
+commit_get_scope() {
+    echo "$COMMIT_SCOPE"
+}
+
 # Obter corpo do commit
 commit_get_body() {
     echo "$COMMIT_BODY"

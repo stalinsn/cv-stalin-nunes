@@ -91,12 +91,12 @@ git_suggest_jira_url() {
 
 # Sugerir nome do workspace baseado na branch
 git_suggest_workspace_name() {
-    if [[ -n "$BRANCH_TYPE" && -n "$BRANCH_TASK_CODE" ]]; then
-        # Para E-commerce: usar tipo + código (ex: feature-ccl-2025)
-        echo "$BRANCH_TYPE-$BRANCH_TASK_CODE"
+    if [[ -n "$BRANCH_TASK_CODE" ]]; then
+        # Para VTEX workspace: só código da tarefa, sem hífens, só letras e números
+        echo "$BRANCH_TASK_CODE" | sed 's/[^a-zA-Z0-9]//g' | tr '[:upper:]' '[:lower:]'
     elif [[ -n "$CURRENT_BRANCH" ]]; then
-        # Fallback: usar a branch atual (sanitizada)
-        echo "$CURRENT_BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g'
+        # Fallback: usar a branch atual (sanitizada para VTEX)
+        echo "$CURRENT_BRANCH" | sed 's/[^a-zA-Z0-9]//g' | tr '[:upper:]' '[:lower:]'
     else
         echo ""
     fi
@@ -138,46 +138,87 @@ git_execute_commit() {
     git add .
     git commit -m "$COMMIT_MESSAGE"
     
+    # Obter hash do commit criado
+    local commit_hash=$(git rev-parse HEAD)
+    
     log_success "Commit realizado!"
     log_info "Mensagem: $COMMIT_TITLE"
+    log_info "Hash: $commit_hash"
+    
+    echo "$commit_hash"
 }
 
 # Criar tag
 git_create_tag() {
     local version=$1
     local message=${2:-"Release version $version"}
+    local tag_name="v$version"
     
-    git tag -a "v$version" -m "$message"
-    log_success "Tag v$version criada!"
+    git tag -a "$tag_name" -m "$message"
+    rollback_register_tag "$tag_name"
+    log_success "Tag $tag_name criada!"
 }
 
 # Push interativo
 git_interactive_push() {
     log_step "Preparando para push..."
     
-    echo -e "${RED}🚨 ATENÇÃO! ${NC}"
+    echo -e "${RED}🚨 ÚLTIMA ETAPA! ${NC}"
     echo -e "${YELLOW}A partir daqui você irá:${NC}"
     echo "• 📤 Push da branch: $CURRENT_BRANCH"
     echo "• 🏷️  Criar tag: v$NEW_VERSION"
     echo "• 🌐 Enviar para repositório remoto"
     echo ""
-    echo -e "${RED}⚠️  Isso não pode ser desfeito facilmente!${NC}"
+    echo -e "${RED}⚠️  Isso não pode ser desfeito facilmente depois do push!${NC}"
     echo ""
-    read -p "Continuar? (y/N): " -n 1 -r confirm_push
+    
+    # Verificar se há mudanças para rollback
+    if rollback_has_changes; then
+        echo -e "${CYAN}📋 Opções disponíveis:${NC}"
+        echo "• ${GREEN}y${NC} - Continuar e fazer push"
+        echo "• ${RED}n${NC} - Cancelar e desfazer automação (SEU CÓDIGO fica intacto!)"
+        echo "• ${YELLOW}p${NC} - Cancelar push mas manter tudo local"
+        echo ""
+        echo -e "${BLUE}ℹ️  IMPORTANTE: Opção 'n' só desfaz commits de versionamento/changelog${NC}"
+        echo -e "${BLUE}   Seus arquivos de código (.js, .ts, etc.) são PRESERVADOS!${NC}"
+        echo ""
+        rollback_show_summary
+        echo ""
+        read -p "Sua escolha (y/n/p): " -n 1 -r confirm_push
+    else
+        read -p "Continuar? (y/N): " -n 1 -r confirm_push
+    fi
+    
     echo
 
-    if [[ ! $confirm_push =~ ^[Yy]$ ]]; then
-        log_warning "Operação cancelada."
-        log_info "Commit local realizado, mas não enviado."
-        exit 0
-    fi
-
-    log_step "Fazendo push..."
-    
-    git push origin "$CURRENT_BRANCH"
-    git push origin "v$NEW_VERSION"
-    
-    log_success "Push realizado com sucesso!"
+    case "$confirm_push" in
+        [Yy])
+            log_step "Fazendo push..."
+            git push origin "$CURRENT_BRANCH"
+            git push origin "v$NEW_VERSION"
+            log_success "Push realizado com sucesso!"
+            
+            # Limpar backups após sucesso
+            rollback_cleanup
+            ;;
+        [Nn])
+            log_warning "❌ Push cancelado - executando rollback completo..."
+            rollback_execute
+            exit 0
+            ;;
+        [Pp])
+            log_warning "⏸️  Push cancelado - mantendo alterações locais"
+            log_info "💡 Seus commits e alterações foram preservados"
+            log_info "   Para fazer push mais tarde: git push origin $CURRENT_BRANCH"
+            rollback_cleanup
+            exit 0
+            ;;
+        *)
+            log_warning "❌ Operação cancelada - executando rollback completo..."
+            rollback_execute
+            exit 0
+            ;;
+    esac
 }
 
 # Obter URL base do repositório

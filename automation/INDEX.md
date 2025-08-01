@@ -2,28 +2,29 @@
 
 ## 🚀 **Start Aqui**
 - **[⚡ QUICK-START.md](QUICK-START.md)** - Guia de 30 segundos para começar
-- **[🎉 AUTOMATION-SUMMARY.md](AUTOMATION-SUMMARY.md)** - Resumo completo do sistema
+- **[📖 README.md](README.md)** - Introdução e visão geral
 
 ## 🧠 **Recursos Inteligentes**
 - **[🔍 BRANCH-DETECTION.md](BRANCH-DETECTION.md)** - Como funciona a detecção automática
-- **[🧪 BRANCH-DETECTION-TEST.md](BRANCH-DETECTION-TEST.md)** - Testes e exemplos práticos
-- **[🧠 CONDITIONAL-LOGIC.md](CONDITIONAL-LOGIC.md)** - Lógica condicional por template
+- **[🔄 ROLLBACK-SYSTEM-TEST.md](ROLLBACK-SYSTEM-TEST.md)** - Sistema de reversão e testes
 
 ## 🌐 **Workspace & Templates**
 - **[🌐 WORKSPACE-EXAMPLES.md](WORKSPACE-EXAMPLES.md)** - Exemplos completos de workspace
-- **[📝 templates/](templates/)** - Templates de PR disponíveis
+- **[🏷️ WORKSPACE-VTEX-RULES.md](WORKSPACE-VTEX-RULES.md)** - Regras específicas do VTEX
+- **[📝 TEMPLATES.md](TEMPLATES.md)** - Guia de templates disponíveis
+- **[📁 templates/](templates/)** - Templates de PR
   - `default.md` - Template GitHub padrão
   - `enterprise.md` - Template corporativo
   - `ecommerce.md` - Template e-commerce
   - `minimal.md` - Template minimalista
 
-## ⚙️ **Configuração**
-- **[📋 config/pr-templates.conf](config/pr-templates.conf)** - Configuração principal
-- **[🔧 modules/](modules/)** - Módulos do sistema
+## 🛡️ **Segurança & Rollback**
+- **[🔒 CODIGO-SEGURO-ROLLBACK.md](CODIGO-SEGURO-ROLLBACK.md)** - Garantias de segurança do código
 
-## 📖 **Documentação de Desenvolvimento**
-- **[📖 README.md](../README.md)** - Documentação principal do projeto
-- **[📝 CHANGELOG.md](../CHANGELOG.md)** - Histórico de mudanças
+## ⚙️ **Configuração & Exportação**
+- **[📋 config/pr-templates.conf](config/pr-templates.conf)** - Configuração principal
+- **[� EXPORT-GUIDE.md](EXPORT-GUIDE.md)** - Como exportar para outros projetos
+- **[� modules/](modules/)** - Módulos do sistema
 
 ---
 

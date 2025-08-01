@@ -27,7 +27,7 @@ npm run gitflow
 💡 Detectado da branch: ABC-3022
 📋 Código da tarefa: [Enter para ABC-3022]
 🔗 URL JIRA: [Y para usar sugerida] 
-🏷️  Workspace: [Enter para feature-abc-3022]
+🏷️  Workspace: [Enter para abc3022]
 🏪 Loja: minhaloja
 ```
 
@@ -85,8 +85,8 @@ yarn gitflow
 
 ### **✅ O que sugere automaticamente:**
 - **JIRA URL**: `https://empresa.atlassian.net/browse/ABC-3022`
-- **Workspace**: `feature-abc-3022` 
-- **URL Final**: `https://feature-abc-3022--minhaloja.myvtex.com`
+- **Workspace**: `abc3022` (só letras/números, sem hífens)
+- **URL Final**: `https://abc3022--minhaloja.myvtex.com`
 
 ---
 
@@ -111,7 +111,7 @@ AUTO_WORKSPACE_DOMAIN="myvtex.com"
 ### **🎯 Para máxima velocidade:**
 - Use branches com código JIRA: `feature/abc-3022`
 - Escolha template E-commerce para projetos de loja
-- Aperte Enter para aceitar sugestões
+- Aperte Enter para aceitar sugestões (workspace fica `abc3022`)
 
 ### **🛠️ Para debugar:**
 ```bash
@@ -145,13 +145,19 @@ ls automation/templates/
 ### **Não detecta código JIRA:**
 ```bash
 # Certifique-se que branch segue padrão:
-feature/abc-3022     ✅
+feature/abc-3022     ✅ → workspace: abc3022
 feature-abc-3022     ❌
 abc-3022             ❌
 ```
 
 ### **URL workspace incorreta:**
 ```bash
+# Workspace VTEX: só letras e números
+abc3022              ✅
+abc-3022             ❌  
+feature-abc-3022     ❌
+ABC-3022             ❌ (use minúsculas)
+
 # Verifique configuração:
 AUTO_WORKSPACE_DOMAIN="myvtex.com"  ✅
 AUTO_WORKSPACE_DOMAIN="vtex.com"    ❌
@@ -165,4 +171,4 @@ JIRA_BASE_URL="https://suaempresa.atlassian.net/browse"
 
 ---
 
-**🎯 TL;DR**: Crie branch `feature/abc-3022`, rode `yarn gitflow`, escolha template 3, aperte Enter nas sugestões, digite nome da loja. Pronto! 🚀
+**🎯 TL;DR**: Crie branch `feature/abc-3022`, rode `yarn gitflow`, escolha template 3, aperte Enter nas sugestões (workspace fica `abc3022`), digite nome da loja. Pronto! 🚀

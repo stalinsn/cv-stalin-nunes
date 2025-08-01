@@ -39,7 +39,7 @@ Branch atual: feature/abc-3022-novo-carrinho
 ├── 🛒 Template E-commerce pergunta:
 │   ├── 📋 Código da tarefa: (ABC-3022) ✅ PRÉ-PREENCHIDO
 │   ├── 🔗 URL JIRA: https://suaempresa.atlassian.net/browse/ABC-3022 ✅ SUGERIDA
-│   ├── 🏷️  Workspace: feature-abc-3022 ✅ SUGERIDO
+│   ├── 🏷️  Workspace: abc3022 ✅ SUGERIDO (VTEX válido)
 │   └── 🏪 Loja: (pergunta normalmente)
 │
 └── ✅ Resultado: Máxima automação!
@@ -75,7 +75,7 @@ Branch atual: release/v2.1.0-abc-3455
 ├── 🛒 Template E-commerce pergunta:
 │   ├── 📋 Código da tarefa: (ABC-3455) ✅ PRÉ-PREENCHIDO  
 │   ├── 🔗 URL JIRA: https://suaempresa.atlassian.net/browse/ABC-3455 ✅ SUGERIDA
-│   ├── 🏷️  Workspace: release-abc-3455 ✅ SUGERIDO
+│   ├── 🏷️  Workspace: abc3455 ✅ SUGERIDO (VTEX válido)
 │   └── 🏪 Loja: (pergunta para teste da release)
 │
 └── ✅ Resultado: Release rastreável com workspace!
@@ -110,7 +110,7 @@ Branch: feature/abc-2025-nova-feature
 ├── 📋 Pré-preenche: ABC-2025
 ├── 🔗 Sugere: https://suaempresa.atlassian.net/browse/ABC-2025
 ├── 📚 Pergunta: documentação
-├── 🏷️  Sugere workspace: feature-abc-2025
+├── 🏷️  Sugere workspace: abc2025 (sem hífens)
 └── 🏪 Pergunta: nome da loja
 ```
 
@@ -168,9 +168,9 @@ yarn gitflow
 ├── 🛒 Escolher template E-commerce
 ├── 📋 Sistema sugere: ABC-3022 (só apertar Enter)
 ├── 🔗 Sistema sugere URL completa (só apertar Y)  
-├── 🏷️  Sistema sugere: feature-abc-3022 (só apertar Enter)
+├── 🏷️  Sistema sugere: abc3022 (só apertar Enter)
 ├── 🏪 Digitar: minhaloja
-└── ✅ URL construída: https://feature-abc-3022--minhaloja.myvtex.com
+└── ✅ URL construída: https://abc3022--minhaloja.myvtex.com
 
 # Resultado: 90% automático!
 ```

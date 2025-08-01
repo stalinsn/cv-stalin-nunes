@@ -50,9 +50,9 @@ Branch atual: feature/abc-3022-novo-checkout
 🛒 Template E-commerce sugere:
 ├── 📋 Código da tarefa: ABC-3022 (detectado ✅)
 ├── 🔗 URL JIRA: https://suaempresa.atlassian.net/browse/ABC-3022 (sugerida ✅)  
-├── 🏷️  Workspace: feature-abc-3022 (sugerido ✅)
+├── 🏷️  Workspace: abc3022 (sugerido ✅ - VTEX válido: só letras/números)
 ├── 🏪 Loja: minhaloja (digitar)
-└── ✅ URL final: https://feature-abc-3022--minhaloja.myvtex.com
+└── ✅ URL final: https://abc3022--minhaloja.myvtex.com
 ```
 
 ### Exemplo 2: Release Branch (E-commerce)
@@ -67,9 +67,9 @@ Branch atual: release/v2.1.0-xyz-1234
 🛒 Template E-commerce sugere:
 ├── 📋 Código da tarefa: XYZ-1234 (detectado ✅)
 ├── 🔗 URL JIRA: https://suaempresa.atlassian.net/browse/XYZ-1234 (sugerida ✅)
-├── 🏷️  Workspace: release-xyz-1234 (sugerido ✅)  
+├── 🏷️  Workspace: xyz1234 (sugerido ✅ - VTEX válido: sem hífens)  
 ├── 🏪 Loja: lojaexemplo (digitar)
-└── ✅ URL final: https://release-xyz-1234--lojaexemplo.myvtex.com
+└── ✅ URL final: https://xyz1234--lojaexemplo.myvtex.com
 ```
 
 ### Exemplo 3: Branch Corporativa (Enterprise)

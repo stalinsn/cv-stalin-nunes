@@ -17,19 +17,37 @@ WORKSPACE_STORE_NAME=""
 WORKSPACE_DOMAIN=""
 WORKSPACE_URL=""
 
+# Variáveis de configuração de templates (globais)
+declare -a TEMPLATES=()
+DEFAULT_TEMPLATE=""
+CUSTOM_TEMPLATE_FILE=""  # Para rastrear templates customizados criados
+
 # Carregar configuração de templates
 template_load_config() {
     local config_file="$SCRIPT_DIR/config/pr-templates.conf"
     
+    # Inicializar variáveis globais
+    TEMPLATES=()
+    DEFAULT_TEMPLATE="default"
+    
     if [[ -f "$config_file" ]]; then
         source "$config_file"
         log_info "Configuração de templates carregada"
+        
+        # Verificar se TEMPLATES foi carregado corretamente
+        if [[ ${#TEMPLATES[@]} -eq 0 ]]; then
+            log_warning "Array TEMPLATES vazio, usando configuração padrão"
+            DEFAULT_TEMPLATE="default"
+            TEMPLATES=("default:default.md:🎯 Padrão GitHub:github")
+        fi
     else
         log_warning "Arquivo de configuração de templates não encontrado"
         # Usar configuração padrão
         DEFAULT_TEMPLATE="default"
-        TEMPLATES=("default:default.md:🎯 Padrão GitHub:false")
+        TEMPLATES=("default:default.md:🎯 Padrão GitHub:github")
     fi
+    
+    log_info "Templates carregados: ${#TEMPLATES[@]} templates"
 }
 
 # Seleção interativa de template
@@ -38,7 +56,8 @@ template_interactive_select() {
     
     template_load_config
     
-    echo -e "${CYAN}Templates disponíveis:${NC}"
+    echo -e "${CYAN}🎯 Templates de PR disponíveis:${NC}"
+    echo ""
     local i=1
     local template_options=()
     
@@ -47,25 +66,39 @@ template_interactive_select() {
         local name="${TEMPLATE_PARTS[0]}"
         local description="${TEMPLATE_PARTS[2]}"
         local example="${TEMPLATE_PARTS[3]}"
+        local type="${TEMPLATE_PARTS[4]}"
         
-        echo "$i) $description"
-        echo "   💡 $example"
+        echo -e "${GREEN}$i) $description${NC}"
+        echo "   💡 Exemplo: $example"
+        
+        # Mostrar informações específicas do tipo
+        case "$type" in
+            "github"|"minimal")
+                echo -e "   📝 ${CYAN}Simples - sem campos extras${NC}"
+                ;;
+            "enterprise")
+                echo -e "   🏢 ${YELLOW}Corporativo - apenas JIRA${NC}"
+                ;;
+            "ecommerce")
+                echo -e "   🛒 ${MAGENTA}E-commerce - JIRA + Workspace${NC}"
+                ;;
+        esac
         echo ""
         template_options+=("$name")
         ((i++))
     done
     
-    echo "$i) 🔧 Customizar template existente"
-    echo "$((i+1))) ⚙️ Usar configuração padrão ($DEFAULT_TEMPLATE)"
+    echo -e "${GRAY}$i) ⚙️ Usar configuração padrão ($DEFAULT_TEMPLATE)${NC}"
+    echo -e "${GRAY}$((i+1))) 🔧 Personalizar template existente${NC}"
     echo ""
     
     read -p "Escolha uma opção (1-$((i+1))): " template_choice
     
     if [[ $template_choice -eq $i ]]; then
-        template_interactive_customize
-    elif [[ $template_choice -eq $((i+1)) ]]; then
         SELECTED_TEMPLATE="$DEFAULT_TEMPLATE"
         log_info "Usando template padrão: $DEFAULT_TEMPLATE"
+    elif [[ $template_choice -eq $((i+1)) ]]; then
+        template_interactive_customize
     elif [[ $template_choice -ge 1 && $template_choice -lt $i ]]; then
         SELECTED_TEMPLATE="${template_options[$((template_choice-1))]}"
         log_info "Template selecionado: $SELECTED_TEMPLATE"
@@ -225,7 +258,14 @@ template_collect_ecommerce_fields() {
 template_interactive_customize() {
     log_step "Customizando template..."
     
+    # Se o array está vazio, recarregar configuração
+    if [[ ${#TEMPLATES[@]} -eq 0 ]]; then
+        log_warning "Array TEMPLATES vazio, recarregando configuração..."
+        template_load_config
+    fi
+    
     echo -e "${CYAN}Selecione template base para customizar:${NC}"
+    
     local i=1
     local template_options=()
     
@@ -240,6 +280,11 @@ template_interactive_customize() {
         template_options+=("$name")
         ((i++))
     done
+    
+    if [[ ${#template_options[@]} -eq 0 ]]; then
+        log_error "Nenhuma opção de template disponível!"
+        return 1
+    fi
     
     read -p "Escolha template base (1-$((i-1))): " base_choice
     
@@ -261,6 +306,15 @@ template_create_custom() {
     
     if [[ -f "$base_file" ]]; then
         cp "$base_file" "$custom_file"
+        
+        # Registrar o arquivo customizado para limpeza posterior
+        CUSTOM_TEMPLATE_FILE="$custom_file"
+        
+        # Registrar no sistema de rollback
+        if declare -f rollback_backup_file > /dev/null; then
+            rollback_track_temp_file "$custom_file"
+        fi
+        
         log_info "Template customizado criado: $custom_name"
         
         echo -e "${YELLOW}Edite o arquivo: $custom_file${NC}"
@@ -408,4 +462,23 @@ template_exists() {
     local template_name=$1
     local template_file="$SCRIPT_DIR/templates/${template_name}.md"
     [[ -f "$template_file" ]]
+}
+
+# Limpar templates customizados temporários
+template_cleanup_custom() {
+    if [[ -n "$CUSTOM_TEMPLATE_FILE" && -f "$CUSTOM_TEMPLATE_FILE" ]]; then
+        log_info "Removendo template customizado temporário: $(basename "$CUSTOM_TEMPLATE_FILE")"
+        rm -f "$CUSTOM_TEMPLATE_FILE"
+        CUSTOM_TEMPLATE_FILE=""
+    fi
+}
+
+# Limpar todos os templates customizados antigos (mais de 1 dia)
+template_cleanup_old_custom() {
+    local templates_dir="$SCRIPT_DIR/templates"
+    if [[ -d "$templates_dir" ]]; then
+        # Remover templates customizados com mais de 1 dia
+        find "$templates_dir" -name "custom-*.md" -type f -mtime +1 -delete 2>/dev/null || true
+        log_info "Templates customizados antigos removidos"
+    fi
 }

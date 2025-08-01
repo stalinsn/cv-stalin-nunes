@@ -80,7 +80,8 @@ _pr_generate_url_with_template() {
     local pr_title=$(_pr_url_encode "$(commit_get_title)")
     local pr_body=$(_pr_url_encode "$pr_body_raw")
     
-    local pr_url="$base_url/compare/$current_branch?expand=1&title=$pr_title&body=$pr_body"
+    # Gerar URL sem espaços ou quebras
+    local pr_url="${base_url}/compare/${current_branch}?expand=1&title=${pr_title}&body=${pr_body}"
     
     echo -e "${YELLOW}🔗 CRIAR PR PRÉ-PREENCHIDO (Template: $selected_template):${NC}"
     echo "$pr_url"
@@ -92,13 +93,32 @@ _pr_generate_url_with_template() {
 _pr_url_encode() {
     local string=$1
     
-    # Encoding básico para caracteres comuns
+    # Primeiro converter quebras de linha para %0A
+    string=$(echo "$string" | tr '\n' '\001')
+    
+    # Encoding completo para caracteres comuns
     echo "$string" | sed \
+        -e 's/\001/%0A/g' \
         -e 's/ /%20/g' \
         -e 's/&/%26/g' \
         -e 's/(/\%28/g' \
         -e 's/)/\%29/g' \
         -e 's/:/%3A/g' \
+        -e 's/#/%23/g' \
+        -e 's/\?/%3F/g' \
+        -e 's/=/%3D/g' \
+        -e 's/\[/%5B/g' \
+        -e 's/\]/%5D/g' \
+        -e 's/{/%7B/g' \
+        -e 's/}/%7D/g' \
+        -e 's/|/%7C/g' \
+        -e 's/\\/%5C/g' \
+        -e 's/"/%22/g' \
+        -e "s/'/%27/g" \
+        -e 's/`/%60/g' \
+        -e 's/</%3C/g' \
+        -e 's/>/%3E/g' \
+        -e 's/\+/%2B/g' \
         -e 's/ç/%C3%A7/g' \
         -e 's/ã/%C3%A3/g' \
         -e 's/õ/%C3%B5/g' \

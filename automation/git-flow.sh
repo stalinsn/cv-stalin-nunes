@@ -23,6 +23,7 @@ MODULES_DIR="$SCRIPT_DIR/modules"
 # Carregar módulos
 source "$MODULES_DIR/platform.sh"
 source "$MODULES_DIR/logger.sh"
+source "$MODULES_DIR/rollback.sh"
 source "$MODULES_DIR/git-utils.sh"
 source "$MODULES_DIR/commit-builder.sh"
 source "$MODULES_DIR/versioning.sh"
@@ -45,24 +46,39 @@ main() {
     git_verify_repository
     git_check_status
     
-    # 3. Configuração do commit
+    # 3. Ativar sistema de reversão após verificações
+    rollback_init
+    
+    # 4. Configuração do commit
     commit_interactive_setup
     
-    # 4. Gerenciamento de branch
+    # 5. Gerenciamento de branch
     branch_interactive_management
     
-    # 5. Seleção de template de PR
+    # 6. Seleção de template de PR
     template_interactive_select
     
-    # 6. Versionamento
+    # 7. Versionamento
     version_interactive_setup
     
-    # 7. Execução
-    git_execute_commit
+    # 8. Capturar versão original para rollback
+    ORIGINAL_VERSION=$(version_get_current)
+    
+    # 9. Fazer backup dos arquivos que serão modificados
+    rollback_backup_file "package.json"
+    rollback_backup_file "CHANGELOG.md"
+    
+    # 10. Execução
+    local commit_hash=$(git_execute_commit)
+    rollback_register_commit "$commit_hash"
+    
     version_update_files
     changelog_generate
     
-    # 8. Push e finalização
+    # Criar tag da versão
+    git_create_tag "$NEW_VERSION"
+    
+    # 11. Push e finalização
     git_interactive_push
     pr_generate_summary
     
