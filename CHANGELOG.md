@@ -1,3 +1,10 @@
+## [2.0.4] - 2025-07-31
+
+### docs
+- improve git flow automation with smart PR links
+
+  Enchanced PR creation with pre-filled URLs and removed local template files for better workflow experience
+
 ## [2.0.3] - 2025-07-31
 
 ### docs
@@ -260,4 +267,3 @@ O formato Ã© baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0
 - Tipagem forte para dados do currÃ­culo
 - Estrutura de dados separada por idioma
 - IntegraÃ§Ã£o com API de traduÃ§Ã£o
-

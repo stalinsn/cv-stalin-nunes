@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =============================================================================
-# Ì∫Ä SCRIPT DE AUTOMA√á√ÉO MULTIPLATAFORMA - Git Flow v2.0
+# üöÄ SCRIPT DE AUTOMA√á√ÉO MULTIPLATAFORMA - Git Flow v2.0
 # =============================================================================
 # Automatiza cria√ß√£o de commits, versionamento e releases
 # Suporta: conventional commits, semantic versioning, PR templates
@@ -39,12 +39,12 @@ log_info() { echo -e "${BLUE}‚ÑπÔ∏è  $1${NC}"; }
 log_success() { echo -e "${GREEN}‚úÖ $1${NC}"; }
 log_warning() { echo -e "${YELLOW}‚ö†Ô∏è  $1${NC}"; }
 log_error() { echo -e "${RED}‚ùå $1${NC}"; }
-log_step() { echo -e "${MAGENTA}Ì∫Ä $1${NC}"; }
+log_step() { echo -e "${MAGENTA}ÔøΩÔøΩÔøΩ $1${NC}"; }
 
 # =============================================================================
 # 1. VERIFICA√á√ïES INICIAIS
 # =============================================================================
-echo -e "${CYAN}Ì∂•Ô∏è  Plataforma detectada: $PLATFORM${NC}"
+echo -e "${CYAN}ÔøΩÔøΩÔøΩÔ∏è  Plataforma detectada: $PLATFORM${NC}"
 log_step "Iniciando fluxo de automa√ß√£o Git Flow v2.0..."
 
 # Verificar se estamos em um reposit√≥rio Git
@@ -76,16 +76,16 @@ fi
 log_step "Selecionando tipo de commit..."
 
 echo -e "${CYAN}Selecione o tipo de commit:${NC}"
-echo "1) Ì∂ï feat      - Nova funcionalidade"
-echo "2) Ì∞õ fix       - Corre√ß√£o de bug"
-echo "3) Ì≥ù docs      - Documenta√ß√£o"
-echo "4) Ì≤Ñ style     - Formata√ß√£o/estilo"
+echo "1) ÔøΩÔøΩÔøΩ feat      - Nova funcionalidade"
+echo "2) ÔøΩÔøΩÔøΩ fix       - Corre√ß√£o de bug"
+echo "3) ÔøΩÔøΩÔøΩ docs      - Documenta√ß√£o"
+echo "4) ÔøΩÔøΩÔøΩ style     - Formata√ß√£o/estilo"
 echo "5) ‚ôªÔ∏è  refactor - Refatora√ß√£o"
 echo "6) ‚ö° perf      - Performance"
-echo "7) Ì∑™ test      - Testes"
-echo "8) Ì¥ß chore     - Tarefas de build/ferramentas"
-echo "9) Ì¥í security  - Seguran√ßa"
-echo "10) Ìºê i18n     - Internacionaliza√ß√£o"
+echo "7) ÔøΩÔøΩÔøΩ test      - Testes"
+echo "8) ÔøΩÔøΩÔøΩ chore     - Tarefas de build/ferramentas"
+echo "9) ÔøΩÔøΩÔøΩ security  - Seguran√ßa"
+echo "10) ÔøΩÔøΩÔøΩ i18n     - Internacionaliza√ß√£o"
 
 read -p "Digite o n√∫mero (1-10): " commit_type_num
 
@@ -108,20 +108,20 @@ esac
 # =============================================================================
 log_step "Coletando informa√ß√µes do commit..."
 
-read -p "Ì≥ù Descri√ß√£o curta do commit: " commit_description
-read -p "ÌæØ Escopo (opcional, ex: auth, ui, api): " commit_scope
-read -p "Ì≤• Breaking change? (y/N): " -n 1 -r breaking_change_reply
+read -p "ÔøΩÔøΩÔøΩ Descri√ß√£o curta do commit: " commit_description
+read -p "ÔøΩÔøΩÔøΩ Escopo (opcional, ex: auth, ui, api): " commit_scope
+read -p "ÔøΩÔøΩÔøΩ Breaking change? (y/N): " -n 1 -r breaking_change_reply
 echo
 
 if [[ $breaking_change_reply =~ ^[Yy]$ ]]; then
     breaking_change=true
-    read -p "Ì≥ã Descri√ß√£o do breaking change: " breaking_description
+    read -p "ÔøΩÔøΩÔøΩ Descri√ß√£o do breaking change: " breaking_description
 else
     breaking_change=false
 fi
 
-read -p "Ì≥ã Descri√ß√£o detalhada (opcional): " commit_body
-read -p "Ì¥ó Issue relacionada (opcional, ex: #123): " related_issue
+read -p "ÔøΩÔøΩÔøΩ Descri√ß√£o detalhada (opcional): " commit_body
+read -p "ÔøΩÔøΩÔøΩ Issue relacionada (opcional, ex: #123): " related_issue
 
 # =============================================================================
 # 4. GERENCIAMENTO DE BRANCH
@@ -163,9 +163,9 @@ suggested_branch=$(generate_branch_name "$commit_type" "$commit_scope" "$commit_
 log_info "Branch atual: $current_branch"
 
 echo -e "${CYAN}Op√ß√µes de branch:${NC}"
-echo "1) Ìºø Criar nova branch: $suggested_branch"
-echo "2) Ì≥ù Especificar nome customizado"
-echo "3) Ì∫Ä Continuar na branch atual ($current_branch)"
+echo "1) ÔøΩÔøΩÔøΩ Criar nova branch: $suggested_branch"
+echo "2) ÔøΩÔøΩÔøΩ Especificar nome customizado"
+echo "3) ÔøΩÔøΩÔøΩ Continuar na branch atual ($current_branch)"
 
 read -p "Escolha uma op√ß√£o (1-3): " branch_option
 
@@ -176,7 +176,7 @@ case $branch_option in
         current_branch="$suggested_branch"
         ;;
     2)
-        read -p "Ìºø Nome da nova branch: " custom_branch
+        read -p "ÔøΩÔøΩÔøΩ Nome da nova branch: " custom_branch
         log_info "Criando nova branch: $custom_branch"
         git checkout -b "$custom_branch"
         current_branch="$custom_branch"
@@ -283,10 +283,10 @@ if [[ "$breaking_change" == true ]]; then
 fi
 
 echo -e "${CYAN}Selecione o tipo de versionamento:${NC}"
-echo "1) Ì¥¥ major - Mudan√ßas incompat√≠veis (1.0.0 ‚Üí 2.0.0)"
-echo "2) Ìø° minor - Nova funcionalidade (1.0.0 ‚Üí 1.1.0)"
-echo "3) Ìø¢ patch - Corre√ß√£o (1.0.0 ‚Üí 1.0.1)"
-echo "4) Ì≥ã usar sugest√£o ($suggested_bump)"
+echo "1) ÔøΩÔøΩÔøΩ major - Mudan√ßas incompat√≠veis (1.0.0 ‚Üí 2.0.0)"
+echo "2) ÔøΩÔøΩÔøΩ minor - Nova funcionalidade (1.0.0 ‚Üí 1.1.0)"
+echo "3) ÔøΩÔøΩÔøΩ patch - Corre√ß√£o (1.0.0 ‚Üí 1.0.1)"
+echo "4) ÔøΩÔøΩÔøΩ usar sugest√£o ($suggested_bump)"
 
 read -p "Digite o n√∫mero (1-4): " version_choice
 
@@ -402,9 +402,9 @@ log_step "Preparando para push..."
 
 echo -e "${RED}ÔøΩÔøΩ ATEN√á√ÉO! ${NC}"
 echo -e "${YELLOW}A partir daqui voc√™ ir√°:${NC}"
-echo "‚Ä¢ Ì∫Ä Push da branch: $current_branch"
-echo "‚Ä¢ Ìø∑Ô∏è  Criar tag: v$new_version"
-echo "‚Ä¢ Ì≥§ Enviar para reposit√≥rio remoto"
+echo "‚Ä¢ ÔøΩÔøΩÔøΩ Push da branch: $current_branch"
+echo "‚Ä¢ ÔøΩÔøΩÔøΩÔ∏è  Criar tag: v$new_version"
+echo "‚Ä¢ ÔøΩÔøΩÔøΩ Enviar para reposit√≥rio remoto"
 echo ""
 echo -e "${RED}‚ö†Ô∏è  Isso n√£o pode ser desfeito facilmente!${NC}"
 echo ""
@@ -444,15 +444,15 @@ if [[ -n "$remote_url" ]]; then
         
         # URL do PR pr√©-preenchida
         pr_title=$(echo "$commit_title" | sed 's/ /%20/g' | sed 's/&/%26/g')
-        pr_body="## Ì≥ã Descri√ß√£o%0A$commit_description%0A%0A"
+        pr_body="## ÔøΩÔøΩÔøΩ Descri√ß√£o%0A$commit_description%0A%0A"
         
         if [[ -n "$commit_body" ]]; then
             pr_body_escaped=$(echo "$commit_body" | sed 's/ /%20/g' | sed 's/&/%26/g')
             pr_body="$pr_body$pr_body_escaped%0A%0A"
         fi
         
-        pr_body="${pr_body}## Ì¥Ñ Tipo%0A- [x] $commit_type%0A%0A"
-        pr_body="${pr_body}## Ì≥ä Impacto%0A- Vers√£o: $current_version ‚Üí $new_version%0A"
+        pr_body="${pr_body}## ÔøΩÔøΩÔøΩ Tipo%0A- [x] $commit_type%0A%0A"
+        pr_body="${pr_body}## ÔøΩÔøΩÔøΩ Impacto%0A- Vers√£o: $current_version ‚Üí $new_version%0A"
         pr_body="${pr_body}- Breaking: $(if [[ "$breaking_change" == true ]]; then echo "‚ö†Ô∏è%20SIM"; else echo "‚úÖ%20N√ÉO"; fi)%0A%0A"
         pr_body="${pr_body}## ‚úÖ Checklist%0A- [x] Testado localmente%0A- [x] Changelog atualizado%0A- [x] Vers√£o incrementada"
         
@@ -466,7 +466,7 @@ fi
 
 echo -e "${GREEN}‚úÖ Automa√ß√£o conclu√≠da!${NC}"
 echo
-echo -e "${CYAN}Ì≥ä Resumo:${NC}"
+echo -e "${CYAN}ÔøΩÔøΩÔøΩ Resumo:${NC}"
 echo "‚Ä¢ Plataforma: $PLATFORM"
 echo "‚Ä¢ Branch: $current_branch"
 echo "‚Ä¢ Commit: $commit_title"
@@ -475,24 +475,24 @@ echo "‚Ä¢ Breaking: $(if [[ "$breaking_change" == true ]]; then echo "SIM"; else
 echo
 
 if [[ -n "$repo_owner" && -n "$repo_name" ]]; then
-    echo -e "${CYAN}Ì¥ó Links:${NC}"
-    echo "‚Ä¢ Ìºø Branch: $branch_url"
-    echo "‚Ä¢ Ìø∑Ô∏è  Releases: $releases_url"
+    echo -e "${CYAN}ÔøΩÔøΩÔøΩ Links:${NC}"
+    echo "‚Ä¢ ÔøΩÔøΩÔøΩ Branch: $branch_url"
+    echo "‚Ä¢ ÔøΩÔøΩÔøΩÔ∏è  Releases: $releases_url"
     echo
 fi
 
-echo -e "${CYAN}Ì≥ã Recursos:${NC}"
-echo "‚Ä¢ Ìø∑Ô∏è  Tag: v$new_version"
-echo "‚Ä¢ Ì≥ù Changelog atualizado"
-echo "‚Ä¢ Ì≥¶ Package.json versionado"
+echo -e "${CYAN}ÔøΩÔøΩÔøΩ Recursos:${NC}"
+echo "‚Ä¢ ÔøΩÔøΩÔøΩÔ∏è  Tag: v$new_version"
+echo "‚Ä¢ ÔøΩÔøΩÔøΩ Changelog atualizado"
+echo "‚Ä¢ ÔøΩÔøΩÔøΩ Package.json versionado"
 
 if [[ -n "$pr_url" ]]; then
     echo
-    echo -e "${YELLOW}Ì¥Ñ CRIAR PR PR√â-PREENCHIDO:${NC}"
+    echo -e "${YELLOW}ÔøΩÔøΩÔøΩ CRIAR PR PR√â-PREENCHIDO:${NC}"
     echo "$pr_url"
     echo
-    echo -e "${GREEN}Ì≤° Link j√° preenche t√≠tulo, descri√ß√£o e checklist!${NC}"
+    echo -e "${GREEN}ÔøΩÔøΩÔøΩ Link j√° preenche t√≠tulo, descri√ß√£o e checklist!${NC}"
 fi
 
 echo
-echo -e "${GREEN}Ìæâ Happy coding!${NC}"
+echo -e "${GREEN}ÔøΩÔøΩÔøΩ Happy coding!${NC}"
