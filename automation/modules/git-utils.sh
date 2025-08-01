@@ -169,24 +169,24 @@ git_create_tag() {
 git_interactive_push() {
     log_step "Preparando para push..."
     
-    echo -e "${RED}🚨 ÚLTIMA ETAPA! ${NC}"
-    echo -e "${YELLOW}A partir daqui você irá:${NC}"
-    echo "• 📤 Push da branch: $CURRENT_BRANCH"
-    echo "• 🏷️  Criar tag: v$NEW_VERSION"
-    echo "• 🌐 Enviar para repositório remoto"
+    echo -e "${RED}ULTIMA ETAPA! ${NC}"
+    echo -e "${YELLOW}A partir daqui voce ira:${NC}"
+    echo "• Push da branch: $CURRENT_BRANCH"
+    echo "• Criar tag: v$NEW_VERSION"
+    echo "• Enviar para repositorio remoto"
     echo ""
-    echo -e "${RED}⚠️  Isso não pode ser desfeito facilmente depois do push!${NC}"
+    echo -e "${RED}AVISO: Isso nao pode ser desfeito facilmente depois do push!${NC}"
     echo ""
     
     # Verificar se há mudanças para rollback
     if rollback_has_changes; then
-        echo -e "${CYAN}📋 Opções disponíveis:${NC}"
+        echo -e "${CYAN}Opcoes disponiveis:${NC}"
         echo "• ${GREEN}y${NC} - Continuar e fazer push"
-        echo "• ${RED}n${NC} - Cancelar e desfazer automação (SEU CÓDIGO fica intacto!)"
+        echo "• ${RED}n${NC} - Cancelar e desfazer automacao (SEU CODIGO fica intacto!)"
         echo "• ${YELLOW}p${NC} - Cancelar push mas manter tudo local"
         echo ""
-        echo -e "${BLUE}ℹ️  IMPORTANTE: Opção 'n' só desfaz commits de versionamento/changelog${NC}"
-        echo -e "${BLUE}   Seus arquivos de código (.js, .ts, etc.) são PRESERVADOS!${NC}"
+        echo -e "${BLUE}IMPORTANTE: Opcao 'n' so desfaz commits de versionamento/changelog${NC}"
+        echo -e "${BLUE}Seus arquivos de codigo (.js, .ts, etc.) sao PRESERVADOS!${NC}"
         echo ""
         rollback_show_summary
         echo ""

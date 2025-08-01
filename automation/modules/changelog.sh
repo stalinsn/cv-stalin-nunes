@@ -55,12 +55,12 @@ _changelog_create_entry() {
         # Se não, criar seção Removed para breaking changes
         if [[ "$section" == "Fixed" ]] || [[ "$section" == "Changed" ]]; then
             changelog_entry="$changelog_entry
-- ⚠️ BREAKING CHANGE: Mudança incompatível com versões anteriores"
+- BREAKING CHANGE: Mudanca incompativel com versoes anteriores"
         else
             changelog_entry="$changelog_entry
 
 ### Removed
-- ⚠️ BREAKING CHANGE: $commit_description"
+- BREAKING CHANGE: $commit_description"
         fi
     fi
 
