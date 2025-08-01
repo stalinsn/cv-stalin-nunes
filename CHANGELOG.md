@@ -1,3 +1,10 @@
+## [2.0.2] - 2025-07-31
+
+### docs
+- add git automation system documentation and improve branch naming
+  
+  Added comprehensive documentation for git flow automation system and implemented shorter branch naming algorithm for better usability
+
 ## [2.0.1] - 2025-07-31
 
 ### docs

@@ -11,6 +11,33 @@
 # - Changelog automático
 # - Template de PR
 # - Push para repositório
+# =========# Links diretos se repositório for detectado
+if [[ -n "$repo_owner" && -n "$repo_name" ]]; then
+    echo -e "${CYAN}🔗 Links Diretos:${NC}"
+    echo -e "${YELLOW}👆 CLIQUE AQUI PARA CRIAR PR PRÉ-PREENCHIDO:${NC}"
+    echo "• 🔄 Criar PR: $pr_url"
+    echo
+    echo -e "${CYAN}🔗 Outros Links:${NC}"
+    echo "• 🌿 Ver Branch: $branch_url"
+    echo "• 🏷️  Ver Releases: $releases_url"
+    echo
+fi
+
+echo -e "${CYAN}📋 Recursos Gerados:${NC}"
+echo "• 🏷️  Tag de Release: v$new_version"
+echo "• 📝 Changelog atualizado"
+echo "• 📦 Package.json versionado"
+
+if [[ -n "$pr_url" ]]; then
+    echo
+    echo -e "${GREEN}🎉 PR Link Inteligente:${NC}"
+    echo "O link acima já preenche automaticamente:"
+    echo "• ✅ Título do PR"
+    echo "• ✅ Descrição completa"  
+    echo "• ✅ Checklist de tarefas"
+    echo "• ✅ Informações técnicas"
+fi
+
 # =============================================================================
 
 set -e
@@ -471,65 +498,6 @@ git push origin "v$new_version"
 
 log_success "Push realizado para branch $current_branch e tag v$new_version"
 
-# Gerar template de PR
-generate_pr_template() {
-    cat > PR_TEMPLATE.md << EOF
-# 🚀 Pull Request: $commit_title
-
-## 📋 Descrição
-$commit_description
-
-$(if [[ -n "$commit_body" ]]; then echo "$commit_body"; fi)
-
-## 🔄 Tipo de Mudança
-- [x] $commit_type: $(case $commit_type in
-    "feat") echo "Nova funcionalidade" ;;
-    "fix") echo "Correção de bug" ;;
-    "docs") echo "Documentação" ;;
-    "style") echo "Formatação/estilo" ;;
-    "refactor") echo "Refatoração" ;;
-    "perf") echo "Performance" ;;
-    "test") echo "Testes" ;;
-    "chore") echo "Tarefas de build/ferramentas" ;;
-    "security") echo "Segurança" ;;
-    "i18n") echo "Internacionalização" ;;
-esac)
-
-## 📊 Impacto
-- **Versão**: $current_version → $new_version
-- **Breaking Change**: $(if [[ "$breaking_change" == true ]]; then echo "⚠️ SIM"; else echo "✅ NÃO"; fi)
-$(if [[ "$breaking_change" == true && -n "$breaking_description" ]]; then echo "- **Breaking Change Details**: $breaking_description"; fi)
-
-## 🧪 Como Testar
-1. Fazer checkout da branch \`$current_branch\`
-2. Instalar dependências: \`npm install\` ou \`yarn install\`
-3. Executar testes: \`npm test\` ou \`yarn test\`
-4. Executar aplicação: \`npm start\` ou \`yarn start\`
-
-## ✅ Checklist
-- [x] Código testado localmente
-- [x] Testes passando
-- [x] Documentação atualizada (se necessário)
-- [x] Changelog atualizado
-- [x] Versão incrementada
-
-$(if [[ -n "$related_issue" ]]; then echo "## 🔗 Issues Relacionadas
-$related_issue"; fi)
-
-## 🖥️ Plataforma de Desenvolvimento
-- **OS**: $PLATFORM
-- **Branch**: $current_branch
-- **Commit**: $(git rev-parse --short HEAD)
-
----
-*PR gerado automaticamente pelo Git Flow v2.0* 🤖
-EOF
-
-    log_success "Template de PR gerado: PR_TEMPLATE.md"
-}
-
-generate_pr_template
-
 # =============================================================================
 # 10. RESUMO FINAL COM LINKS
 # =============================================================================
@@ -539,6 +507,10 @@ log_step "Resumo da Operação"
 remote_url=$(git config --get remote.origin.url 2>/dev/null || echo "")
 repo_owner=""
 repo_name=""
+base_url=""
+branch_url=""
+pr_url=""
+releases_url=""
 
 if [[ -n "$remote_url" ]]; then
     if [[ $remote_url =~ github\.com[:/]([^/]+)/([^/\.]+) ]]; then
@@ -546,8 +518,28 @@ if [[ -n "$remote_url" ]]; then
         repo_name="${BASH_REMATCH[2]}"
         base_url="https://github.com/$repo_owner/$repo_name"
         branch_url="$base_url/tree/$current_branch"
-        pr_url="$base_url/compare/$current_branch?expand=1"
         releases_url="$base_url/releases"
+        
+        # Criar URL do PR com conteúdo pré-preenchido
+        pr_title=$(echo "$commit_title" | sed 's/ /%20/g' | sed 's/&/%26/g')
+        pr_body="## 📋 Descrição%0A$commit_description%0A%0A"
+        
+        if [[ -n "$commit_body" ]]; then
+            pr_body_escaped=$(echo "$commit_body" | sed 's/ /%20/g' | sed 's/&/%26/g' | sed 's/$/%0A/g')
+            pr_body="$pr_body$pr_body_escaped%0A"
+        fi
+        
+        pr_body="${pr_body}## 🔄 Tipo de Mudança%0A- [x] $commit_type%0A%0A"
+        pr_body="${pr_body}## 📊 Impacto%0A- **Versão**: $current_version → $new_version%0A"
+        pr_body="${pr_body}- **Breaking Change**: $(if [[ "$breaking_change" == true ]]; then echo "⚠️%20SIM"; else echo "✅%20NÃO"; fi)%0A%0A"
+        pr_body="${pr_body}## ✅ Checklist%0A- [x] Código testado localmente%0A- [x] Changelog atualizado%0A- [x] Versão incrementada"
+        
+        if [[ -n "$related_issue" ]]; then
+            pr_body="${pr_body}%0A%0ACloses $related_issue"
+        fi
+        
+        pr_url="$base_url/compare/$current_branch?expand=1&title=$pr_title&body=$pr_body"
+        
     elif [[ $remote_url =~ gitlab\.com[:/]([^/]+)/([^/\.]+) ]]; then
         repo_owner="${BASH_REMATCH[1]}"
         repo_name="${BASH_REMATCH[2]}"
