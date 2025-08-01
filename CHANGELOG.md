@@ -1,3 +1,10 @@
+## [2.0.3] - 2025-07-31
+
+### docs
+- improve git flow automation with smart PR links
+  
+  Enhanced PR creation with pre-filled URLs and removed local template files
+
 ## [2.0.2] - 2025-07-31
 
 ### docs
