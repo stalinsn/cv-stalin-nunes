@@ -342,12 +342,15 @@ template_process() {
     local template_content=$(<"$template_file")
     
     # Substituir variáveis básicas
+    template_content=$(echo "$template_content" | sed "s/{{TITLE}}/$(template_escape "$(commit_get_description)")/g")
     template_content=$(echo "$template_content" | sed "s/{{DESCRIPTION}}/$(template_escape "$(commit_get_description)")/g")
     template_content=$(echo "$template_content" | sed "s/{{TYPE}}/$(commit_get_type)/g")
+    template_content=$(echo "$template_content" | sed "s/{{AUTHOR}}/$(git config user.name 2>/dev/null || echo 'unknown')/g")
     template_content=$(echo "$template_content" | sed "s/{{CURRENT_VERSION}}/$(version_get_current)/g")
     template_content=$(echo "$template_content" | sed "s/{{NEW_VERSION}}/$(version_get_new)/g")
     template_content=$(echo "$template_content" | sed "s/{{BREAKING}}/$(if [[ "$(commit_is_breaking)" == true ]]; then echo "SIM"; else echo "NÃO"; fi)/g")
     template_content=$(echo "$template_content" | sed "s/{{VERSION_BUMP}}/$(version_get_bump)/g")
+    template_content=$(echo "$template_content" | sed "s/{{RELATED_ISSUES}}/Relacionado a este hotfix de automacao/g")
     
     # Substituir variáveis condicionais
     local commit_body=$(commit_get_body)

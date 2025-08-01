@@ -6,6 +6,13 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 
 
+
+## [2.3.2] - 2025-08-01
+
+### Fixed
+- hotfix de fluxo
+- correcao de fluxo de automacao 3
+
 ## [2.3.1] - 2025-08-01
 
 ### Fixed
