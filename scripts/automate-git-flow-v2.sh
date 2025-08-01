@@ -442,22 +442,23 @@ if [[ -n "$remote_url" ]]; then
         branch_url="$base_url/tree/$current_branch"
         releases_url="$base_url/releases"
         
-        # URL do PR pré-preenchida
-        pr_title=$(echo "$commit_title" | sed 's/ /%20/g' | sed 's/&/%26/g')
-        pr_body="## ��� Descrição%0A$commit_description%0A%0A"
+        # URL do PR pré-preenchida (encoding completo - sem emojis)
+        pr_title=$(echo "$commit_title" | sed 's/ /%20/g' | sed 's/&/%26/g' | sed 's/(/\%28/g' | sed 's/)/\%29/g' | sed 's/:/%3A/g' | sed 's/ç/%C3%A7/g' | sed 's/ã/%C3%A3/g' | sed 's/õ/%C3%B5/g')
+        pr_description_escaped=$(echo "$commit_description" | sed 's/ /%20/g' | sed 's/&/%26/g' | sed 's/(/\%28/g' | sed 's/)/\%29/g' | sed 's/:/%3A/g' | sed 's/ç/%C3%A7/g' | sed 's/ã/%C3%A3/g' | sed 's/õ/%C3%B5/g')
+        pr_body="**Descricao**%0A$pr_description_escaped%0A%0A"
         
         if [[ -n "$commit_body" ]]; then
-            pr_body_escaped=$(echo "$commit_body" | sed 's/ /%20/g' | sed 's/&/%26/g')
+            pr_body_escaped=$(echo "$commit_body" | sed 's/ /%20/g' | sed 's/&/%26/g' | sed 's/(/\%28/g' | sed 's/)/\%29/g' | sed 's/:/%3A/g' | sed 's/ç/%C3%A7/g' | sed 's/ã/%C3%A3/g' | sed 's/õ/%C3%B5/g')
             pr_body="$pr_body$pr_body_escaped%0A%0A"
         fi
         
-        pr_body="${pr_body}## ��� Tipo%0A- [x] $commit_type%0A%0A"
-        pr_body="${pr_body}## ��� Impacto%0A- Versão: $current_version → $new_version%0A"
-        pr_body="${pr_body}- Breaking: $(if [[ "$breaking_change" == true ]]; then echo "⚠️%20SIM"; else echo "✅%20NÃO"; fi)%0A%0A"
-        pr_body="${pr_body}## ✅ Checklist%0A- [x] Testado localmente%0A- [x] Changelog atualizado%0A- [x] Versão incrementada"
+        pr_body="${pr_body}**Tipo**%0A-%20[x]%20$commit_type%0A%0A"
+        pr_body="${pr_body}**Impacto**%0A-%20Versao:%20$current_version%20para%20$new_version%0A"
+        pr_body="${pr_body}-%20Breaking:%20$(if [[ "$breaking_change" == true ]]; then echo "SIM"; else echo "NAO"; fi)%0A%0A"
+        pr_body="${pr_body}**Checklist**%0A-%20[x]%20Testado%20localmente%0A-%20[x]%20Changelog%20atualizado%0A-%20[x]%20Versao%20incrementada"
         
         if [[ -n "$related_issue" ]]; then
-            pr_body="${pr_body}%0A%0ACloses $related_issue"
+            pr_body="${pr_body}%0A%0ACloses%20$related_issue"
         fi
         
         pr_url="$base_url/compare/$current_branch?expand=1&title=$pr_title&body=$pr_body"

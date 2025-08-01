@@ -1,3 +1,10 @@
+## [2.0.5] - 2025-07-31
+
+### docs
+- atualizar documentação do script de automação
+
+  Adiciona instruções detalhadas de uso e corrige formatação dos emojis no script de automação git flow v2
+
 ## [2.0.4] - 2025-07-31
 
 ### docs

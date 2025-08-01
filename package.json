@@ -9,8 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gitflow": "bash ./scripts/automate-git-flow-v2.sh",
-    "gitflow:ps": "powershell -ExecutionPolicy Bypass -File ./scripts/automate-git-flow-v2.ps1"
+    "gitflow": "bash ./automation/git-flow.sh"
   },
   "dependencies": {
     "googleapis": "^150.0.1",
