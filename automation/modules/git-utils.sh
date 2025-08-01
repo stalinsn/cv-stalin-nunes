@@ -180,13 +180,13 @@ git_interactive_push() {
     
     # Verificar se há mudanças para rollback
     if rollback_has_changes; then
-        echo -e "${CYAN}Opcoes disponiveis:${NC}"
-        echo "• ${GREEN}y${NC} - Continuar e fazer push"
-        echo "• ${RED}n${NC} - Cancelar e desfazer automacao (SEU CODIGO fica intacto!)"
-        echo "• ${YELLOW}p${NC} - Cancelar push mas manter tudo local"
+        echo "Opcoes disponiveis:"
+        echo "• y - Continuar e fazer push"
+        echo "• n - Cancelar e desfazer automacao (SEU CODIGO fica intacto!)"
+        echo "• p - Cancelar push mas manter tudo local"
         echo ""
-        echo -e "${BLUE}IMPORTANTE: Opcao 'n' so desfaz commits de versionamento/changelog${NC}"
-        echo -e "${BLUE}Seus arquivos de codigo (.js, .ts, etc.) sao PRESERVADOS!${NC}"
+        echo "IMPORTANTE: Opcao 'n' so desfaz commits de versionamento/changelog"
+        echo "Seus arquivos de codigo (.js, .ts, etc.) sao PRESERVADOS!"
         echo ""
         rollback_show_summary
         echo ""

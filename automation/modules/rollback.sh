@@ -226,24 +226,26 @@ rollback_show_summary() {
         return 0
     fi
     
-    echo -e "${YELLOW}🔄 O que a opção 'n' irá desfazer:${NC}"
+    echo "O que a opcao 'n' ira desfazer:"
     echo ""
     
     if [[ ${#COMMITS_MADE[@]} -gt 0 ]]; then
-        echo "📝 Commits de automação: ${#COMMITS_MADE[@]} (versionamento/changelog)"
+        echo "Commits de automacao: ${#COMMITS_MADE[@]} (versionamento/changelog)"
     fi
     
     if [[ ${#TAGS_CREATED[@]} -gt 0 ]]; then
-        echo "🏷️  Tags criadas: ${TAGS_CREATED[*]}"
+        # Remover duplicatas das tags
+        local unique_tags=($(printf '%s\n' "${TAGS_CREATED[@]}" | sort -u))
+        echo "Tags criadas: ${unique_tags[*]}"
     fi
     
     if [[ ${#BACKUP_FILES[@]} -gt 0 ]]; then
-        echo "📁 Arquivos de configuração: package.json, CHANGELOG.md"
+        echo "Arquivos de configuracao: package.json, CHANGELOG.md"
     fi
     
-    echo "🌿 Branch atual: $(git branch --show-current)"
-    echo "⬅️  Vai voltar para: $ORIGINAL_BRANCH"
+    echo "Branch atual: $(git branch --show-current)"
+    echo "Vai voltar para: $ORIGINAL_BRANCH"
     echo ""
-    echo -e "${GREEN}✅ Preservados: TODOS os seus arquivos de código!${NC}"
+    echo "Preservados: TODOS os seus arquivos de codigo!"
     echo ""
 }
