@@ -338,61 +338,78 @@ template_process() {
         return 1
     fi
     
-    # Ler template
-    local template_content=$(<"$template_file")
+    # Ler template preservando quebras de linha
+    local template_content
+    template_content=$(cat "$template_file")
     
-    # Substituir variáveis básicas
-    template_content=$(echo "$template_content" | sed "s/{{TITLE}}/$(template_escape "$(commit_get_description)")/g")
-    template_content=$(echo "$template_content" | sed "s/{{DESCRIPTION}}/$(template_escape "$(commit_get_description)")/g")
-    template_content=$(echo "$template_content" | sed "s/{{TYPE}}/$(commit_get_type)/g")
-    template_content=$(echo "$template_content" | sed "s/{{AUTHOR}}/$(git config user.name 2>/dev/null || echo 'unknown')/g")
-    template_content=$(echo "$template_content" | sed "s/{{CURRENT_VERSION}}/$(version_get_current)/g")
-    template_content=$(echo "$template_content" | sed "s/{{NEW_VERSION}}/$(version_get_new)/g")
-    template_content=$(echo "$template_content" | sed "s/{{BREAKING}}/$(if [[ "$(commit_is_breaking)" == true ]]; then echo "SIM"; else echo "NÃO"; fi)/g")
-    template_content=$(echo "$template_content" | sed "s/{{VERSION_BUMP}}/$(version_get_bump)/g")
-    template_content=$(echo "$template_content" | sed "s/{{RELATED_ISSUES}}/Relacionado a este hotfix de automacao/g")
+    # Obter valores das variáveis de forma segura
+    local title_escaped=$(template_escape "$(commit_get_description)")
+    local author_escaped=$(template_escape "$(git config user.name 2>/dev/null || echo 'unknown')")
+    local type_escaped=$(template_escape "$(commit_get_type)")
+    local current_version_escaped=$(template_escape "$(version_get_current)")
+    local new_version_escaped=$(template_escape "$(version_get_new)")
+    local breaking_escaped=$(template_escape "$(if [[ "$(commit_is_breaking)" == true ]]; then echo "SIM"; else echo "NÃO"; fi)")
+    local version_bump_escaped=$(template_escape "$(version_get_bump)")
+    local related_issues_escaped=$(template_escape "Relacionado a este hotfix de automacao")
+    
+    # Substituir variáveis básicas usando sed in-place para preservar quebras de linha
+    template_content=$(printf '%s' "$template_content" | sed "s/{{TITLE}}/$title_escaped/g")
+    template_content=$(printf '%s' "$template_content" | sed "s/{{DESCRIPTION}}/$title_escaped/g")
+    template_content=$(printf '%s' "$template_content" | sed "s/{{TYPE}}/$type_escaped/g")
+    template_content=$(printf '%s' "$template_content" | sed "s/{{AUTHOR}}/$author_escaped/g")
+    template_content=$(printf '%s' "$template_content" | sed "s/{{CURRENT_VERSION}}/$current_version_escaped/g")
+    template_content=$(printf '%s' "$template_content" | sed "s/{{NEW_VERSION}}/$new_version_escaped/g")
+    template_content=$(printf '%s' "$template_content" | sed "s/{{BREAKING}}/$breaking_escaped/g")
+    template_content=$(printf '%s' "$template_content" | sed "s/{{VERSION_BUMP}}/$version_bump_escaped/g")
+    template_content=$(printf '%s' "$template_content" | sed "s/{{RELATED_ISSUES}}/$related_issues_escaped/g")
     
     # Substituir variáveis condicionais
     local commit_body=$(commit_get_body)
     if [[ -n "$commit_body" ]]; then
-        template_content=$(echo "$template_content" | sed "s/{{#if BODY}}//g")
-        template_content=$(echo "$template_content" | sed "s/{{\/if}}//g")
-        template_content=$(echo "$template_content" | sed "s/{{BODY}}/$(template_escape "$commit_body")/g")
+        local body_escaped=$(template_escape "$commit_body")
+        template_content=$(printf '%s' "$template_content" | sed "s/{{#if BODY}}//g")
+        template_content=$(printf '%s' "$template_content" | sed "s/{{\/if}}//g")
+        template_content=$(printf '%s' "$template_content" | sed "s/{{BODY}}/$body_escaped/g")
     else
         # Remover seções condicionais vazias
-        template_content=$(echo "$template_content" | sed '/{{#if BODY}}/,/{{\/if}}/d')
+        template_content=$(printf '%s' "$template_content" | sed '/{{#if BODY}}/,/{{\/if}}/d')
     fi
     
     local related_issue=$(commit_get_related_issue)
     if [[ -n "$related_issue" ]]; then
-        template_content=$(echo "$template_content" | sed "s/{{#if RELATED_ISSUE}}//g")
-        template_content=$(echo "$template_content" | sed "s/{{\/if}}//g")
-        template_content=$(echo "$template_content" | sed "s/{{RELATED_ISSUE}}/$(template_escape "$related_issue")/g")
+        local related_issue_escaped=$(template_escape "$related_issue")
+        template_content=$(printf '%s' "$template_content" | sed "s/{{#if RELATED_ISSUE}}//g")
+        template_content=$(printf '%s' "$template_content" | sed "s/{{\/if}}//g")
+        template_content=$(printf '%s' "$template_content" | sed "s/{{RELATED_ISSUE}}/$related_issue_escaped/g")
     else
-        template_content=$(echo "$template_content" | sed '/{{#if RELATED_ISSUE}}/,/{{\/if}}/d')
+        template_content=$(printf '%s' "$template_content" | sed '/{{#if RELATED_ISSUE}}/,/{{\/if}}/d')
     fi
     
     # Substituir campos extras
     if [[ -n "$JIRA_TASK" ]]; then
-        template_content=$(echo "$template_content" | sed "s/{{JIRA_TASK}}/$(template_escape "$JIRA_TASK")/g")
+        local jira_task_escaped=$(template_escape "$JIRA_TASK")
+        template_content=$(printf '%s' "$template_content" | sed "s/{{JIRA_TASK}}/$jira_task_escaped/g")
     fi
     
     if [[ -n "$JIRA_URL" ]]; then
-        template_content=$(echo "$template_content" | sed "s/{{JIRA_URL}}/$(template_escape "$JIRA_URL")/g")
+        local jira_url_escaped=$(template_escape "$JIRA_URL")
+        template_content=$(printf '%s' "$template_content" | sed "s/{{JIRA_URL}}/$jira_url_escaped/g")
     fi
     
     if [[ -n "$DOC_URL" ]]; then
-        template_content=$(echo "$template_content" | sed "s/{{DOC_URL}}/$(template_escape "$DOC_URL")/g")
+        local doc_url_escaped=$(template_escape "$DOC_URL")
+        template_content=$(printf '%s' "$template_content" | sed "s/{{DOC_URL}}/$doc_url_escaped/g")
     fi
     
     if [[ -n "$WORKSPACE_URL" ]]; then
-        template_content=$(echo "$template_content" | sed "s/{{WORKSPACE_URL}}/$(template_escape "$WORKSPACE_URL")/g")
+        local workspace_url_escaped=$(template_escape "$WORKSPACE_URL")
+        template_content=$(printf '%s' "$template_content" | sed "s/{{WORKSPACE_URL}}/$workspace_url_escaped/g")
     fi
     
     # Processar condicionais de tipo
     template_content=$(template_process_conditionals "$template_content")
     
-    echo "$template_content"
+    printf '%s' "$template_content"
 }
 
 # Processar condicionais do template

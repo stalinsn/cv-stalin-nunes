@@ -91,14 +91,14 @@ _pr_generate_url_with_template() {
 
 # Codificar string para URL
 _pr_url_encode() {
-    local string=$1
+    local string="$1"
     
-    # Primeiro converter quebras de linha para %0A
-    string=$(echo "$string" | tr '\n' '\001')
-    
-    # Encoding completo para caracteres comuns
-    echo "$string" | sed \
-        -e 's/\001/%0A/g' \
+    # Usar sed com marcador de quebra de linha
+    # Primeiro, ler todo o conteúdo e substituir quebras por marcador
+    printf '%s' "$string" | \
+    sed ':a;N;$!ba;s/\n/\x1F/g' | \
+    sed \
+        -e 's/\x1F/%0A/g' \
         -e 's/ /%20/g' \
         -e 's/&/%26/g' \
         -e 's/(/\%28/g' \
