@@ -2,23 +2,52 @@
 
 [⬅ Voltar ao Índice](../README_INDEX.md)
 
-Esta pasta contém hooks customizados para gerenciamento de estado, internacionalização, tema e tradução.
+Hooks customizados para gerenciamento de estado, funcionalidades reutilizáveis e lógica de negócio.
 
 ---
 
-## Hooks Documentados
+## 🔧 Hooks Principais
 
-- [useAITranslation](useAITranslation.md) `[!ESTÁVEL]`
-  - Hook para tradução automática usando IA.
-- [useI18n](useI18n.md) `[!ESTÁVEL]`
-  - Hook para internacionalização e troca de idioma.
-- [useLanguage](useLanguage.md) `[!ESTÁVEL]`
-  - Hook para gerenciamento do idioma atual.
-- [useTheme](useTheme.md) `[!ESTÁVEL]`
-  - Hook para alternância e persistência do tema.
-- [useTranslation](useTranslation.md) `[!ESTÁVEL]`
-  - Hook para tradução de textos e labels.
+- [useI18n.ts](useI18n.md) `[CORE]`
+  - **Hook principal** para internacionalização e tradução
+  - Gerencia estado global de idioma e cache
+  - Orquestração de tradução IA + fallbacks
+
+- [useTheme.ts](useTheme.md) `[UI]`
+  - **Alternância de tema** dark/light
+  - Persistência de preferência do usuário
 
 ---
 
-Cada hook possui um arquivo de documentação próprio nesta pasta.
+## ⚠️ Hooks Removidos na Refatoração
+
+- ~~`useLanguage.ts`~~ → Consolidado em `useI18n.ts`
+- ~~`useAITranslation.ts`~~ → Lógica movida para `useI18n.ts`
+- ~~`useTranslation.ts`~~ → Substituído por sistema centralizado
+
+---
+
+## 🏗️ Arquitetura de Hooks
+
+```
+┌─────────────────┐    ┌──────────────────┐
+│     useI18n     │───▶│   translateService│
+│   (orchestr.)   │    │     (API)        │
+└─────────────────┘    └──────────────────┘
+         │                       │
+         ▼                       ▼
+┌─────────────────┐    ┌──────────────────┐
+│ useLocalStorage │    │ Error Handling   │
+│   (persist.)    │    │   + Fallbacks    │
+└─────────────────┘    └──────────────────┘
+```
+
+### Principios de Design
+- **Single Responsibility** - Cada hook tem uma função específica
+- **Composition over Inheritance** - Hooks pequenos e componíveis
+- **Side Effect Management** - useEffect bem definidos
+- **Type Safety** - TypeScript rigoroso em todas as interfaces
+
+---
+
+Hooks bem estruturados são a base de componentes React reutilizáveis e maintíveis.

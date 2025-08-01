@@ -15,7 +15,31 @@ Este projeto é um currículo digital moderno, responsivo e multilíngue, desenv
 - Use o índice principal [`docs/README_INDEX.md`](docs/README_INDEX.md) para navegar entre os módulos e arquivos de documentação.
 - O arquivo [`DOCUMENTATION.md`](DOCUMENTATION.md) traz um resumo e instruções rápidas, mas a referência detalhada está em `docs/`.
 
-## 🧩 Funcionalidades
+## 🚀 Git Flow Automation
+Este projeto inclui um **sistema completo de automação Git Flow** com detecção inteligente de branch e templates contextuais:
+
+### ⚡ **Uso Rápido**
+```bash
+yarn gitflow
+# ou
+npm run gitflow
+```
+
+### 🧠 **Recursos Inteligentes**
+- **Detecção automática** de códigos JIRA da branch (ex: `feature/ccl-3022`)
+- **Templates contextuais** por tipo de projeto (GitHub, Enterprise, E-commerce, Minimal)  
+- **Workspace automático** para e-commerce com URL construída automaticamente
+- **Criação de branch** se estiver na main
+- **Multiplataforma** (Windows, Linux, macOS)
+
+### 📚 **Documentação da Automação**
+- **[⚡ Guia Rápido](automation/QUICK-START.md)** - Start em 30 segundos
+- **[📖 Documentação Completa](automation/INDEX.md)** - Todos os recursos
+- **[🔧 Configuração](automation/config/pr-templates.conf)** - Personalização
+
+---
+
+## 🧩 Funcionalidades do CV
 - **Internacionalização (i18n):** Suporte a português, inglês, espanhol, francês e alemão.
 - **Tradução com IA:** Integração com API de tradução, fallback para tradução mock.
 - **Navbar Dinâmica:** Navegação responsiva e troca de idioma/tema.

@@ -1,20 +1,46 @@
-# Documentação dos Utilitários (Utils)
+# Documentação dos Utils
 
 [⬅ Voltar ao Índice](../README_INDEX.md)
 
-Esta pasta contém utilitários auxiliares para funcionalidades específicas do projeto.
+Utilitários auxiliares e funções de apoio para lógica geral do sistema.
 
 ---
 
-## Arquivos Documentados
+## 🔧 Sistema de Idiomas
 
-- [PasswordModal.tsx](PasswordModal.md) `[!ESTÁVEL]`
-  - Modal para entrada de senha.
-- [translate.ts](translate.md) `[!ESTÁVEL]`
-  - Funções auxiliares para tradução.
-- [translateFree.ts](translateFree.md) `[!ESTÁVEL]`
-  - Tradução gratuita alternativa.
+- [languageUtils.ts](languageUtils.md) `[CORE]`
+  - **Normalização e conversão** de códigos de idioma
+- [translationCache.ts](translationCache.md) `[CACHE]`
+  - **Cache persistente** de traduções no localStorage
 
 ---
 
-Os utilitários apoiam a lógica e a experiência do usuário.
+## 🎨 Interface e Componentes
+
+- [PasswordModal.md](PasswordModal.md) `[UI]`
+  - Modal para inserção de senha de tradução
+- [translateFree.md](translateFree.md) `[INTEGRATION]`
+  - Integração com serviços de tradução gratuita
+
+---
+
+## ⚠️ Arquivos Removidos na Refatoração
+- ~~`translate.ts`~~ → Lógica movida para `languageUtils.ts` e constantes
+
+---
+
+## 🏗️ Arquitetura de Utilitários
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│  languageUtils  │───▶│      useI18n     │───▶│ translateCache  │
+│   (normalize)   │    │    (orchestr.)   │    │   (persist)     │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│ Type Safety     │    │ State Management │    │ Browser Storage │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+Cada utilitário tem responsabilidade específica e bem definida.

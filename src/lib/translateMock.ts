@@ -1,8 +1,15 @@
 import { CvData } from '@/types/cv';
+import { TranslationResult } from '@/types/translation';
+import { getLanguageConfig, normalizeLangCode } from '@/utils/languageUtils';
 
-export function translateMock(cvData: CvData, targetLang: string): Promise<{ translated: CvData; tokensUsed: number }> {
-  // Simula tradução: adiciona prefixo em todos os campos string
-  const prefix = `[${targetLang}] `;
+/**
+ * Simula tradução adicionando prefixo com o nome do idioma
+ */
+export function translateMock(cvData: CvData, targetLang: string): Promise<TranslationResult> {
+  const normalizedLang = normalizeLangCode(targetLang);
+  const langConfig = getLanguageConfig(normalizedLang);
+  const prefix = `[${langConfig.name}] `;
+  
   const fake: CvData = {
     ...cvData,
     name: prefix + cvData.name,
@@ -39,11 +46,27 @@ export function translateMock(cvData: CvData, targetLang: string): Promise<{ tra
     })),
     interests: cvData.interests.map((i) => prefix + i),
   };
-  return Promise.resolve({ translated: fake, tokensUsed: 0 });
+  
+  // Simula delay da rede
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve({ 
+        translated: fake, 
+        tokensUsed: 0 
+      });
+    }, Math.random() * 500 + 200); // 200-700ms
+  });
 }
 
+/**
+ * Simula tradução simples de string
+ * @deprecated Esta função não é mais usada, mantida para compatibilidade
+ */
 export function translateMockString(text: string, targetLang: string): Promise<{ translated: string; tokensUsed: number }> {
-  const prefix = `[${targetLang}] `;
+  const normalizedLang = normalizeLangCode(targetLang);
+  const langConfig = getLanguageConfig(normalizedLang);
+  const prefix = `[${langConfig.name}] `;
+  
   return Promise.resolve({
     translated: prefix + text,
     tokensUsed: text.length,
