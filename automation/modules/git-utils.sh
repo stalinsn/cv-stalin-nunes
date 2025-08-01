@@ -154,6 +154,12 @@ git_create_tag() {
     local message=${2:-"Release version $version"}
     local tag_name="v$version"
     
+    # Verificar se a tag já existe
+    if git tag -l | grep -q "^$tag_name$"; then
+        log_warning "Tag $tag_name já existe - removendo e recriando..."
+        git tag -d "$tag_name" 2>/dev/null || true
+    fi
+    
     git tag -a "$tag_name" -m "$message"
     rollback_register_tag "$tag_name"
     log_success "Tag $tag_name criada!"
@@ -195,7 +201,15 @@ git_interactive_push() {
         [Yy])
             log_step "Fazendo push..."
             git push origin "$CURRENT_BRANCH"
-            git push origin "v$NEW_VERSION"
+            
+            # Push da tag com verificação
+            if git ls-remote --tags origin | grep -q "refs/tags/v$NEW_VERSION"; then
+                log_warning "Tag v$NEW_VERSION já existe no remoto - forçando push..."
+                git push --force origin "v$NEW_VERSION"
+            else
+                git push origin "v$NEW_VERSION"
+            fi
+            
             log_success "Push realizado com sucesso!"
             
             # Limpar backups após sucesso

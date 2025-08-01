@@ -30,27 +30,38 @@ _changelog_create_entry() {
     local is_breaking=$5
     
     local date=$(date '+%Y-%m-%d')
-    local type_emoji=$(_changelog_get_type_emoji "$commit_type")
+    local section=$(_changelog_get_section_name "$commit_type")
     
-    # Construir entrada do changelog
+    # Construir entrada do changelog seguindo Keep a Changelog
     local changelog_entry="## [$version] - $date
 
-### $type_emoji $(echo "$commit_type" | tr '[:lower:]' '[:upper:]')
+### $section
 - $commit_description"
 
     # Adicionar corpo se existir
     if [[ -n "$commit_body" ]]; then
-        changelog_entry="$changelog_entry
-
-  $commit_body"
+        # Dividir o corpo em linhas e adicionar como itens separados
+        while IFS= read -r line; do
+            if [[ -n "$line" ]]; then
+                changelog_entry="$changelog_entry
+- $line"
+            fi
+        done <<< "$commit_body"
     fi
     
     # Adicionar breaking change se existir
     if [[ "$is_breaking" == true ]]; then
-        changelog_entry="$changelog_entry
+        # Se já tem seção Fixed/Changed, adicionar BREAKING CHANGE lá
+        # Se não, criar seção Removed para breaking changes
+        if [[ "$section" == "Fixed" ]] || [[ "$section" == "Changed" ]]; then
+            changelog_entry="$changelog_entry
+- ⚠️ BREAKING CHANGE: Mudança incompatível com versões anteriores"
+        else
+            changelog_entry="$changelog_entry
 
-### 💥 BREAKING CHANGES
-- $(echo "$commit_description" | sed 's/^/  /')"
+### Removed
+- ⚠️ BREAKING CHANGE: $commit_description"
+        fi
     fi
 
     # Atualizar ou criar arquivo
@@ -68,15 +79,40 @@ _changelog_update_existing() {
     # Criar backup
     cp CHANGELOG.md CHANGELOG.md.bak
     
-    # Inserir nova entrada no topo (após o título)
+    # Inserir nova entrada após o cabeçalho e antes da primeira versão
     if grep -q "^# Changelog" CHANGELOG.md; then
-        # Se tem título, inserir após
+        # Encontrar onde inserir (após cabeçalho, antes da primeira versão)
         awk -v entry="$changelog_entry" '
-        /^# Changelog/ { print; print ""; print entry; print ""; next }
+        BEGIN { 
+            header_done = 0
+            entry_inserted = 0
+        }
+        /^# Changelog/ { 
+            print
+            next 
+        }
+        /^O formato é baseado em/ || /^Todas as mudanças/ {
+            print
+            next
+        }
+        /^## \[/ && !entry_inserted {
+            print ""
+            print entry
+            print ""
+            entry_inserted = 1
+            print
+            next
+        }
         { print }
+        END {
+            if (!entry_inserted) {
+                print ""
+                print entry
+            }
+        }
         ' CHANGELOG.md.bak > CHANGELOG.md
     else
-        # Se não tem título, inserir no topo
+        # Se não tem cabeçalho, inserir no topo
         echo "$changelog_entry
 
 $(cat CHANGELOG.md.bak)" > CHANGELOG.md
@@ -92,31 +128,30 @@ _changelog_create_new() {
     cat > CHANGELOG.md << EOF
 # Changelog
 
-Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
-O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
-e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
 $changelog_entry
 EOF
 }
 
-# Obter emoji para tipo de commit
-_changelog_get_type_emoji() {
+# Obter seção do Keep a Changelog para tipo de commit
+_changelog_get_section_name() {
     local commit_type=$1
     
     case $commit_type in
-        "feat") echo "🚀" ;;
-        "fix") echo "🐛" ;;
-        "docs") echo "📚" ;;
-        "style") echo "💄" ;;
-        "refactor") echo "♻️" ;;
-        "perf") echo "⚡" ;;
-        "test") echo "🧪" ;;
-        "chore") echo "🔧" ;;
-        "security") echo "🔒" ;;
-        "i18n") echo "🌐" ;;
-        *) echo "📝" ;;
+        "feat") echo "Added" ;;
+        "fix") echo "Fixed" ;;
+        "docs") echo "Changed" ;;
+        "style") echo "Changed" ;;
+        "refactor") echo "Changed" ;;
+        "perf") echo "Changed" ;;
+        "test") echo "Changed" ;;
+        "chore") echo "Changed" ;;
+        "security") echo "Security" ;;
+        "i18n") echo "Added" ;;
+        *) echo "Changed" ;;
     esac
 }
 
