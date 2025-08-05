@@ -4,6 +4,29 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
+## [2.3.4] - 2025-08-01
+
+### Fixed
+- Corrigido encoding de URL para preservar quebras de linha em templates de PR
+- Templates agora mantêm formatação markdown correta nas URLs do GitHub
+- Melhorada função de processamento de templates para evitar perda de quebras de linha
+
+## [2.3.3] - 2025-08-01
+
+### Fixed
+- fix 4 do link de pr
+- arrumando o link de criação de pr
+
+## [2.3.2] - 2025-08-01
+
+### Fixed
+- hotfix de fluxo
+- correcao de fluxo de automacao 3
+
+## [2.3.1] - 2025-08-01
+
+### Fixed
+- hotfix de fluxo
 
 ## [2.3.0] - 2025-07-31
 
