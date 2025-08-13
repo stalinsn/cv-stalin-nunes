@@ -40,3 +40,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# backups and temp files
+*.backup-*
+*.bak
+*.old
+*~
+*.tmp
+*.temp
+
+# local app/editor state
+.obsidian/
+
+# generated artifacts from automation
+.pr-template-filled.md
