@@ -68,17 +68,18 @@ main() {
     rollback_backup_file "package.json"
     rollback_backup_file "CHANGELOG.md"
     
-    # 10. Execução
-    local commit_hash=$(git_execute_commit)
-    rollback_register_commit "$commit_hash"
-    
+    # 10. Atualizar arquivos de versionamento
     version_update_files
     changelog_generate
     
-    # Criar tag da versão
+    # 11. Execução do commit
+    local commit_hash=$(git_execute_commit)
+    rollback_register_commit "$commit_hash"
+    
+    # 12. Criar tag da versão
     git_create_tag "$NEW_VERSION"
     
-    # 11. Push e finalização
+    # 13. Push e finalização
     git_interactive_push
     pr_generate_summary
     

@@ -4,6 +4,12 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
+
+## [2.3.5] - 2025-08-01
+
+### Fixed
+- fix de emissao de url
+
 ## [2.3.4] - 2025-08-01
 
 ### Fixed
