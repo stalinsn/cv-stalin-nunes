@@ -21,7 +21,6 @@ export default function Header() {
         {/* Util row */}
         <div className="ecom-header__util">
           <div className="ecom-header__loc">
-            <Button variant="icon" aria-label="Abrir menu">☰</Button>
             <button 
               className="delivery-trigger"
               onClick={() => setIsDeliveryModalOpen(true)}

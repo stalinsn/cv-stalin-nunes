@@ -7,6 +7,9 @@ export type CartItem = {
   price: number;
   image?: string;
   qty: number;
+  listPrice?: number;
+  unit?: string;
+  packSize?: number;
 };
 
 export type CartState = {
@@ -25,13 +28,13 @@ type Action =
 function cartReducer(state: CartState, action: Action): CartState {
   switch (action.type) {
     case 'ADD': {
-      const { id, name, price, image, qty = 1 } = action.payload;
+      const { id, name, price, image, listPrice, unit, packSize, qty = 1 } = action.payload;
       const existing = state.items[id];
       const nextQty = (existing?.qty ?? 0) + qty;
       return {
         items: {
           ...state.items,
-          [id]: { id, name, price, image, qty: nextQty },
+          [id]: { id, name, price, image, listPrice, unit, packSize, qty: nextQty },
         },
       };
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../styles/ecommerce.css';
+import '../../styles/ecommerce/index.css';
 import { EcomProviders } from './providers';
 
 export const metadata = { title: 'E-commerce' };

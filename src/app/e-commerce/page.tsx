@@ -12,32 +12,86 @@ import type { EcommerceItem } from '../../features/ecommerce/types/product';
 import { HeroBannerLarge, StripsBelow } from '../../features/ecommerce/components/organisms/Banners';
 import CartMini from '../../features/ecommerce/components/organisms/CartMini';
 import DrawerCart from '../../features/ecommerce/components/organisms/DrawerCart';
-import '../../styles/ecommerce.css';
+import '../../styles/ecommerce/index.css';
 
 export default function EcommerceHome() {
   const data = (raw as unknown as EcommerceItem[]).map(mapToUIProduct);
+  // Demo datasets for behavior tests (do not affect existing shelves)
+  const demo2 = data.slice(0, 2);
+  const demo16 = Array.from({ length: 16 }, (_, i) => data[i % data.length]).map((p, i) => ({ ...p, id: `${p.id}-x${i}` }));
   return (
   <main className="ecom" data-theme="light">
       <Header />
+      {/* Hero principal */}
       <HeroBanner />
-  <HeroBannerLarge />
-  <ServicesBar />
+
+  {/* Ofertas do dia (primeira vitrine após hero) */}
+  <Showcase title="Ofertas do dia" flag="ecom.showcaseDaily" />
+
+      {/* Services (pílulas) */}
+      <ServicesBar />
+
+      {/* Vitrines antes dos combos */}
       <Carousel title="Principais Ofertas">
-    {data.map((p) => (
-          <div key={p.id} style={{ scrollSnapAlign: 'start' }}>
-      <ProductCard id={p.id} name={p.name} image={p.image} price={p.price} listPrice={p.listPrice} unit={p.unit} packSize={p.packSize} />
-          </div>
+        {data.slice(0, 4).map((p) => (
+          <ProductCard
+            key={p.id}
+            id={p.id}
+            name={p.name}
+            image={p.image}
+            price={p.price}
+            listPrice={p.listPrice}
+            unit={p.unit}
+            packSize={p.packSize}
+            url={p.url}
+          />
         ))}
       </Carousel>
-  <StripsBelow />
 
-      <section className="container ecom-section">
-        <Showcase title="Ofertas do dia" flag="ecom.showcaseDaily" />
-        <Showcase title="Para sua despensa" flag="ecom.showcaseGrocery" />
-      </section>
-  <CartMini />
+  <Showcase title="Para sua despensa" flag="ecom.showcaseGrocery" />
+
+      {/* Combos */}
+      <HeroBannerLarge />
+
+      {/* Demais vitrines / faixas */}
+      <StripsBelow />
+
+      {/* --- Demo shelves (for behavior validation) --- */}
+  <Carousel title="Exemplo: Somente 2 itens (alinhado à esquerda)" config={{ variant: 'default', banner: { image: '/globe.svg', alt: 'Pague como preferir', position: 'left' }, seeMoreHref: '#' }}>
+        {demo2.map((p) => (
+          <ProductCard
+            key={p.id}
+            id={p.id}
+            name={p.name}
+            image={p.image}
+            price={p.price}
+            listPrice={p.listPrice}
+            unit={p.unit}
+            packSize={p.packSize}
+            url={p.url}
+          />
+        ))}
+      </Carousel>
+
+  <Carousel title="Exemplo: 16 itens (paginado com peek)" config={{ variant: 'dark', banner: { image: '/window.svg', alt: 'Prime', position: 'right' }, seeMoreHref: '#' }}>
+        {demo16.map((p) => (
+          <ProductCard
+            key={p.id}
+            id={p.id}
+            name={p.name}
+            image={p.image}
+            price={p.price}
+            listPrice={p.listPrice}
+            unit={p.unit}
+            packSize={p.packSize}
+            url={p.url}
+          />
+        ))}
+      </Carousel>
+
+      <CartMini />
       <Footer />
-  <DrawerCart />
+      <DrawerCart />
     </main>
   );
 }

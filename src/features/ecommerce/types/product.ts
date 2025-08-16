@@ -49,4 +49,6 @@ export interface UIProduct {
   url?: string;
   available: boolean;
   packSize?: number; // ex.: 12
+  categories?: string[]; // nomes em ordem hierárquica
+  categoryPath?: { id: string; name: string }[]; // ids e nomes em ordem
 }

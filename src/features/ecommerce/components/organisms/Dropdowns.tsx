@@ -2,28 +2,70 @@
 import React from 'react';
 import { Dropdown } from '../atoms/Dropdown';
 import { DropdownMenu } from '../molecules/DropdownMenu';
+import { MegaMenu, type MegaCategory } from './MegaMenu';
 
-const departmentsSections = [
+const categories: MegaCategory[] = [
   {
-    title: 'Mercearia',
-    items: [
-      { name: 'Carnes e Aves', href: '/e-commerce/carnes-aves' },
-      { name: 'Frios e Laticínios', href: '/e-commerce/frios-laticinios' },
-      { name: 'Limpeza', href: '/e-commerce/limpeza', isHighlighted: true },
-      { name: 'Higiene e Beleza', href: '/e-commerce/higiene-beleza' },
-      { name: 'Hortifruti', href: '/e-commerce/hortifruti' },
-      { name: 'Bebida Alcoólica', href: '/e-commerce/bebida-alcoolica' },
-      { name: 'Bebida não Alcoólica', href: '/e-commerce/bebida-nao-alcoolica' },
-      { name: 'Congelados', href: '/e-commerce/congelados' },
-      { name: 'Utilidades e Casa', href: '/e-commerce/utilidades-casa' },
-      { name: 'Padaria', href: '/e-commerce/padaria' },
-      { name: 'Peixaria', href: '/e-commerce/peixaria' },
-      { name: 'Pet Shop', href: '/e-commerce/pet-shop' },
-      { name: 'Saudáveis', href: '/e-commerce/saudaveis' },
-      { name: 'Eletro', href: '/e-commerce/eletro' },
-      { name: 'Automotivo', href: '/e-commerce/automotivo' }
-    ]
-  }
+    key: 'mercearia',
+    label: 'Mercearia',
+    sections: [
+      {
+        title: 'Grãos e Massas',
+        items: [
+          { name: 'Arroz' },
+          { name: 'Feijão' },
+          { name: 'Macarrão' },
+          { name: 'Molhos' },
+          { name: 'Ver mais', isHighlighted: true },
+        ],
+      },
+      {
+        title: 'Cafés e Matinais',
+        items: [
+          { name: 'Café' },
+          { name: 'Achocolatado' },
+          { name: 'Biscoitos' },
+          { name: 'Cereais' },
+        ],
+      },
+      {
+        title: 'Óleos e Temperos',
+        items: [
+          { name: 'Óleo' },
+          { name: 'Azeite' },
+          { name: 'Temperos' },
+        ],
+      },
+      {
+        title: 'Enlatados',
+        items: [ { name: 'Atum e Sardinha' }, { name: 'Milho e Ervilha' } ],
+      },
+    ],
+  },
+  {
+    key: 'bebidas-nao-alcoolicas',
+    label: 'Bebida Não Alcoólica',
+    sections: [
+      { title: 'Água', items: [{ name: 'Água de Coco' }, { name: 'Com Gás' }, { name: 'Sem Gás' }, { name: 'Ver mais', isHighlighted: true }] },
+      { title: 'Refrigerante', items: [{ name: 'Convencional' }, { name: 'Zero e Diet' }] },
+      { title: 'Suco', items: [{ name: 'Concentrado' }, { name: 'Integral' }, { name: 'Néctar' }] },
+      { title: 'Chá Pronto', items: [{ name: 'Chá Pronto' }] },
+    ],
+  },
+  { key: 'carnes', label: 'Carnes e Aves', sections: [ { title: 'Bovinos', items: [{ name: 'Cortes' }] }, { title: 'Aves', items: [{ name: 'Cortes' }] } ] },
+  { key: 'frios', label: 'Frios e Laticínios', sections: [ { title: 'Queijos', items: [{ name: 'Muçarela' }] }, { title: 'Iogurtes', items: [{ name: 'Tradicionais' }] } ] },
+  { key: 'limpeza', label: 'Limpeza', sections: [ { title: 'Banheiro', items: [{ name: 'Desinfetante' }] }, { title: 'Lavanderia', items: [{ name: 'Sabão Líquido' }] } ] },
+  { key: 'hortifruti', label: 'Hortifruti', sections: [ { title: 'Frutas', items: [{ name: 'Cítricas' }] }, { title: 'Verduras', items: [{ name: 'Folhosas' }] } ] },
+  { key: 'higiene', label: 'Higiene e Beleza', sections: [ { title: 'Cabelos', items: [{ name: 'Shampoo' }] }, { title: 'Corpo', items: [{ name: 'Sabonetes' }] } ] },
+  { key: 'alcoolica', label: 'Bebida Alcoólica', sections: [ { title: 'Cervejas', items: [{ name: 'Lager' }] }, { title: 'Vinhos', items: [{ name: 'Tintos' }] } ] },
+  { key: 'peixaria', label: 'Peixaria', sections: [ { title: 'Peixes', items: [{ name: 'Brancos' }] } ] },
+  { key: 'congelados', label: 'Congelados', sections: [ { title: 'Pratos Prontos', items: [{ name: 'Lasanhas' }] } ] },
+  { key: 'padaria', label: 'Padaria', sections: [ { title: 'Pães', items: [{ name: 'Francês' }] } ] },
+  { key: 'utilidades', label: 'Utilidades e Casa', sections: [ { title: 'Cozinha', items: [{ name: 'Utensílios' }] } ] },
+  { key: 'automotivo', label: 'Automotivo', sections: [ { title: 'Manutenção', items: [{ name: 'Líquidos' }] } ] },
+  { key: 'saudaveis', label: 'Saudáveis', sections: [ { title: 'Diet/Light', items: [{ name: 'Snacks' }] } ] },
+  { key: 'pet', label: 'Pet Shop', sections: [ { title: 'Cães', items: [{ name: 'Rações' }] } ] },
+  { key: 'bazar', label: 'Bazar', sections: [ { title: 'Festas', items: [{ name: 'Descartáveis' }] } ] },
 ];
 
 const limpezaSections = [
@@ -116,7 +158,7 @@ export function DepartmentsDropdown() {
       }
       className="dropdown--departments"
     >
-      <DropdownMenu sections={departmentsSections} className="dropdown-menu--departments" />
+  <MegaMenu categories={categories} />
     </Dropdown>
   );
 }

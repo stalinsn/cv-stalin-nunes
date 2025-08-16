@@ -1,0 +1,38 @@
+/* Dropdown components */
+.dropdown { position: relative; display: inline-block; }
+.dropdown__trigger { cursor: pointer; }
+.dropdown__content { position: absolute; top: 100%; left: 0; z-index: 2100; min-width: 200px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); padding: 8px 0; margin-top: 4px; }
+
+.dropdown--departments .dropdown__content { min-width: 280px; }
+.dropdown--services .dropdown__content { min-width: 240px; }
+.dropdown--limpeza .dropdown__content { min-width: 800px; max-width: 90vw; }
+
+.dropdown-menu { display: grid; gap: 8px; }
+.dropdown-menu--departments { grid-template-columns: 1fr; }
+.dropdown-menu--services { grid-template-columns: 1fr; }
+.dropdown-menu--limpeza { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; padding: 12px; }
+
+.dropdown-menu__section { padding: 8px 12px; }
+.dropdown-menu__title { font-size: var(--font-size-sm); font-weight: 700; color: var(--accent); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+.dropdown-menu__list { list-style: none; padding: 0; margin: 0; }
+.dropdown-menu__list li { margin-bottom: 4px; }
+.dropdown-menu__item { display: block; padding: 6px 8px; color: var(--text); text-decoration: none; border-radius: 6px; transition: background-color var(--transition-fast); font-size: var(--font-size-sm); }
+.dropdown-menu__item:hover { background: var(--bg); }
+.dropdown-menu__item--highlighted { color: var(--accent); font-weight: 600; }
+
+.dropdown-trigger-link { color: var(--accent); cursor: pointer; text-decoration: underline; }
+.dropdown-trigger-link:hover { color: var(--accent-hover); }
+
+/* Mega menu */
+.mega-menu { display: grid; grid-template-columns: 280px 1fr; min-width: min(960px, 90vw); height: 420px; }
+.mega-menu__aside { background: var(--bg); border-right: 1px solid var(--border); padding: 8px; display: grid; gap: 4px; overflow: auto; }
+.mega-menu__tab { text-align: left; background: transparent; border: 0; padding: 10px 12px; border-radius: 8px; color: var(--text); }
+.mega-menu__tab.is-active, .mega-menu__tab:hover { background: var(--card-bg); box-shadow: var(--shadow); }
+.mega-menu__panel { padding: 16px 20px; overflow: auto; }
+.mega-menu__title { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.mega-menu__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.mega-menu__section { min-width: 180px; }
+.mega-menu__section-title { font-weight: 700; margin-bottom: 8px; }
+.mega-menu__list { list-style: none; margin: 0; padding: 0; }
+.mega-menu__link { display: block; padding: 6px 0; color: var(--text); text-decoration: none; }
+.mega-menu__link.is-highlight { color: var(--accent); font-weight: 600; }
