@@ -1,15 +1,21 @@
-@import '../tokens/colors.css';
-@import '../tokens/typography.css';
-@import '../tokens/spacings.css';
+@import "../tokens/colors.css";
+@import "../tokens/typography.css";
+@import "../tokens/spacings.css";
 
 /* Compose ecommerce CSS from modules */
-@import './variables.css';
-@import './header.css';
-@import './sections.css';
-@import './grid-cards.css';
-@import './buttons.css';
-@import './drawer.css';
-@import './services.css';
-@import './dropdown.css';
-@import './modal.css';
-@import './pdp.css';
+@import "./variables.css";
+@import "./theme-prezunic.css"; /* Brand theme overrides scoped to .ecom */
+@import "./scroll-fix.css"; /* High-specificity scroll fixes */
+@import "./header.css";
+@import "./sections.css";
+@import "./grid-cards.css";
+@import "./buttons.css";
+@import "./drawer.css";
+@import "./services.css";
+@import "./dropdown.css";
+@import "./modal.css";
+@import "./pdp.css";
+@import "./plp.css";
+@import "./cart.css";
+@import "./checkout.css";
+@import "./debug.css"; /* optional, applies only when .ecom[data-debug="true"] */

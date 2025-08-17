@@ -10,9 +10,9 @@ function normalizeCep(input: string) {
 
 function formatCep(onlyDigits: string) {
   if (!onlyDigits) return "";
-  const v = onlyDigits.replace(/\D/g, "").slice(0, 8);
-  if (v.length <= 5) return v;
-  return `${v.slice(0, 5)}-${v.slice(5)}`;
+  const digits = onlyDigits.replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 5) return digits;
+  return `${digits.slice(0, 5)}-${digits.slice(5)}`;
 }
 
 function isValidCep(onlyDigits: string) {
@@ -26,7 +26,7 @@ export function PdpCepCalculator() {
   const [quotes, setQuotes] = React.useState<Quote[] | null>(null);
 
   React.useEffect(() => {
-    const saved = typeof window !== 'undefined' ? window.localStorage.getItem('ecom_cep') : null;
+  const saved = typeof window !== 'undefined' ? window.localStorage.getItem('ecom_cep') : null;
     if (saved) setRaw(saved);
   }, []);
 
@@ -35,17 +35,15 @@ export function PdpCepCalculator() {
   const valid = isValidCep(onlyDigits);
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const v = normalizeCep(e.target.value);
-    setRaw(v);
+    const nextValue = normalizeCep(e.target.value);
+    setRaw(nextValue);
     setError(null);
   };
 
   const simulateFetch = async (cepDigits: string): Promise<Quote[]> => {
-    // Mock quotes; in real use, call backend/shipping API
-    // Make up a tiny variance based on last two digits
     const suffix = parseInt(cepDigits.slice(-2), 10) || 0;
-    const base = 1290 + (suffix % 5) * 100; // cents
-    const fast = 2490 + (suffix % 3) * 150; // cents
+  const base = 1290 + (suffix % 5) * 100;
+  const fast = 2490 + (suffix % 3) * 150;
     return [
       { id: 'normal', name: 'Entrega normal', sla: '3-5 dias úteis', price: base / 100 },
       { id: 'express', name: 'Entrega expressa', sla: '1-2 dias úteis', price: fast / 100 },
@@ -64,7 +62,9 @@ export function PdpCepCalculator() {
       setLoading(true);
       const res = await simulateFetch(onlyDigits);
       setQuotes(res);
-      if (typeof window !== 'undefined') window.localStorage.setItem('ecom_cep', onlyDigits);
+      if (typeof window !== 'undefined') {
+        try { window.localStorage.setItem('ecom_cep', onlyDigits); } catch {}
+      }
   } catch {
       setError('Não foi possível calcular o frete agora. Tente novamente.');
     } finally {
@@ -76,7 +76,9 @@ export function PdpCepCalculator() {
     setRaw("");
     setQuotes(null);
     setError(null);
-    if (typeof window !== 'undefined') window.localStorage.removeItem('ecom_cep');
+    if (typeof window !== 'undefined') {
+      try { window.localStorage.removeItem('ecom_cep'); } catch {}
+    }
   };
 
   return (
@@ -103,14 +105,14 @@ export function PdpCepCalculator() {
       {error && <div className="cep-error" role="alert">{error}</div>}
       {quotes && (
         <ul className="cep-result" aria-live="polite">
-          {quotes.map((q) => (
-            <li key={q.id} className="cep-result__item">
+          {quotes.map((quote) => (
+            <li key={quote.id} className="cep-result__item">
               <div className="left">
-                <strong>{q.name}</strong>
-                <small>{q.sla}</small>
+                <strong>{quote.name}</strong>
+                <small>{quote.sla}</small>
               </div>
               <div className="right">
-                {q.price === 0 ? <strong className="free">Grátis</strong> : <strong>R$ {q.price.toFixed(2)}</strong>}
+                {quote.price === 0 ? <strong className="free">Grtis</strong> : <strong>R$ {quote.price.toFixed(2)}</strong>}
               </div>
             </li>
           ))}

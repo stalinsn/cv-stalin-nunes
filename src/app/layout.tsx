@@ -1,6 +1,7 @@
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import ClientBootstrap from './ClientBootstrap';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -20,7 +21,8 @@ export default function RootLayout({
   return (
     <html lang="pt-br" data-theme="light">
       <body className={plusJakarta.className}>
-        {children}
+  <ClientBootstrap />
+  {children}
       </body>
     </html>
   );

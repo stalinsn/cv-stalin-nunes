@@ -4,21 +4,21 @@
    ===================================================================== */
 
 /* Base - Variáveis e utilitários */
-@import '../base/variables.css';
-@import '../base/mixins.css';
+@import "../base/variables.css";
+@import "../base/mixins.css";
 
 /* Layout principal */
-@import './motd/layout.css';
+@import "./motd/layout.css";
 
 /* Componentes da área principal */
-@import './motd/main-area.css';
-@import './motd/stats.css';
-@import './motd/action-buttons.css';
+@import "./motd/main-area.css";
+@import "./motd/stats.css";
+@import "./motd/action-buttons.css";
 
 /* Componentes da sidebar */
-@import './motd/sidebar-layout.css';
-@import './motd/tabs.css';
-@import './motd/sidebar-actions.css';
-@import './motd/search.css';
-@import './motd/phrases-list.css';
-@import './motd/tips.css';
+@import "./motd/sidebar-layout.css";
+@import "./motd/tabs.css";
+@import "./motd/sidebar-actions.css";
+@import "./motd/search.css";
+@import "./motd/phrases-list.css";
+@import "./motd/tips.css";

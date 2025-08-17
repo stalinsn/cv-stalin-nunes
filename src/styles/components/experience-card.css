@@ -1,7 +1,7 @@
-@import '../tokens/colors.css';
-@import '../tokens/typography.css';
-@import '../tokens/spacings.css';
-@import '../tokens/shadows.css';
+@import "../tokens/colors.css";
+@import "../tokens/typography.css";
+@import "../tokens/spacings.css";
+@import "../tokens/shadows.css";
 
 .card {
   position: relative !important;
@@ -73,7 +73,8 @@
   font-size: 1.1em;
 }
 
-.experience-period, .experience-location {
+.experience-period,
+.experience-location {
   color: var(--text-light);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -112,7 +113,7 @@
   .card {
     padding: 1.1rem 0.5rem !important;
     border-radius: var(--radius);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 1.2rem;
   }
 }

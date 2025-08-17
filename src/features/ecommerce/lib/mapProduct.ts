@@ -11,7 +11,6 @@ export function mapToUIProduct(item: EcommerceItem): UIProduct {
   const listCents = item.listPrice ?? priceCents;
   const image = ensureProtocol(item.imageUrls?.at2x) || '/file.svg';
   const packSize = item.priceDefinition?.sellingPrices?.[0]?.quantity || item.quantity || undefined;
-  // Build categories from productCategories/productCategoryIds
   const categories: string[] | undefined = item.productCategories ? Object.values(item.productCategories) : undefined;
   const categoryPath = item.productCategoryIds
     ? item.productCategoryIds

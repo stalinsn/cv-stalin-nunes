@@ -1,4 +1,3 @@
-// Produto no formato próximo ao do exemplo fornecido
 export interface ImageUrls {
   at1x?: string;
   at2x?: string;
@@ -6,7 +5,7 @@ export interface ImageUrls {
 }
 
 export interface PriceDefinition {
-  calculatedSellingPrice: number; // em centavos
+  calculatedSellingPrice: number;
   total: number;
   sellingPrices: { quantity: number; value: number }[];
 }
@@ -21,14 +20,14 @@ export interface EcommerceItem {
   listPrice?: number; // em centavos
   measurementUnit?: string;
   name: string;
-  price?: number; // em centavos
+  price?: number;
   productCategories?: Record<string, string>;
   productCategoryIds?: string;
   productRefId?: string;
   productId?: string;
   quantity?: number;
   seller?: string;
-  sellingPrice?: number; // em centavos
+  sellingPrice?: number;
   skuName?: string;
   unitMultiplier?: number;
   uniqueId?: string;
@@ -37,18 +36,17 @@ export interface EcommerceItem {
   priceDefinition?: PriceDefinition;
 }
 
-// Tipo simples para a UI
 export interface UIProduct {
   id: string;
   name: string;
   image: string;
   brand?: string;
-  price: number; // em reais
-  listPrice?: number; // em reais
+  price: number;
+  listPrice?: number;
   unit?: string;
   url?: string;
   available: boolean;
-  packSize?: number; // ex.: 12
-  categories?: string[]; // nomes em ordem hierárquica
-  categoryPath?: { id: string; name: string }[]; // ids e nomes em ordem
+  packSize?: number;
+  categories?: string[];
+  categoryPath?: { id: string; name: string }[];
 }

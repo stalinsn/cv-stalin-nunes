@@ -3,7 +3,7 @@
   padding: 1.5rem;
   background: #f8f9fa;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   text-align: center;
 }
 .nuvem {
@@ -22,10 +22,14 @@
   padding: 0.7rem 1.3rem;
   border-radius: 2rem;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-  box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+  transition:
+    background 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(44, 62, 80, 0.07);
 }
-.nuvemItem:hover, .nuvemItem:focus {
+.nuvemItem:hover,
+.nuvemItem:focus {
   background: #4f6cff;
   color: #fff;
   outline: none;
@@ -36,7 +40,7 @@
   background: #fff;
   border: 1px solid #dbeafe;
   border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+  box-shadow: 0 2px 12px rgba(44, 62, 80, 0.08);
   padding: 1.2rem 1.5rem;
   text-align: left;
   position: relative;

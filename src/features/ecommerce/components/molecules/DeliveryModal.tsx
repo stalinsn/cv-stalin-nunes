@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from 'react';
 import { Button } from '../atoms/Button';
+import { useOrderForm } from '../../state/OrderFormContext';
+import { inRange, lookupCep, estimateShipping } from '../../lib/cepService';
+import { useUI } from '../../state/UIContext';
 
 type DeliveryOption = 'delivery' | 'pickup';
 
@@ -41,6 +44,13 @@ export function DeliveryModal({ onClose }: DeliveryModalProps) {
   const [selectedOption, setSelectedOption] = useState<DeliveryOption>('delivery');
   const [cep, setCep] = useState('');
   const [selectedStore, setSelectedStore] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { setShipping } = useOrderForm();
+  const { showToast } = useUI();
+
+  const RANGE_START = '00000-001';
+  const RANGE_END = '40000-999';
 
   const handleOptionSelect = (option: DeliveryOption) => {
     setSelectedOption(option);
@@ -51,17 +61,46 @@ export function DeliveryModal({ onClose }: DeliveryModalProps) {
     }
   };
 
-  const handleCepSubmit = () => {
-    // Simular verificação do CEP
-    console.log('Verificando CEP:', cep);
-    onClose();
+  const handleCepSubmit = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const ok = inRange(cep, RANGE_START, RANGE_END);
+      if (!ok) {
+        const msg = `Entregamos somente entre ${RANGE_START} e ${RANGE_END}.`;
+        setError(msg);
+        showToast(msg, 'error');
+        return;
+      }
+      const addr = await lookupCep(cep);
+      const { option } = estimateShipping(cep);
+      setShipping({
+        address: addr
+          ? {
+              street: addr.street,
+              neighborhood: addr.neighborhood,
+              city: addr.city,
+              state: addr.state,
+              postalCode: addr.cep,
+              country: addr.country,
+            }
+          : null,
+        option,
+      });
+  showToast('Endereço confirmado e frete calculado.', 'success');
+  onClose();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleStoreConfirm = () => {
-    if (selectedStore) {
-      console.log('Loja selecionada:', selectedStore);
-      onClose();
-    }
+    if (!selectedStore) return;
+    setShipping({
+      address: null,
+      option: { id: `pickup-${selectedStore}`, name: 'Retire em loja', price: 0, estimate: '1-2h' },
+    });
+    onClose();
   };
 
   if (step === 'options') {
@@ -126,8 +165,9 @@ export function DeliveryModal({ onClose }: DeliveryModalProps) {
               className="cep-input"
               maxLength={9}
             />
-            <Button onClick={handleCepSubmit}>Verificar</Button>
+            <Button onClick={handleCepSubmit} disabled={loading}>{loading ? 'Verificando…' : 'Verificar'}</Button>
           </div>
+          {error && <div style={{ color: '#b00020', marginTop: 8 }}>{error}</div>}
           
           <button className="link-button">
             Não sabe seu CEP? Clique aqui

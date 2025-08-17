@@ -5,6 +5,21 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
 
+## [2.5.0] - 2025-08-17
+
+### Added
+- Documentação funcional do E-commerce em `src/features/ecommerce/docs` (overview, operação, implementação, referências, receitas, troubleshooting, roadmap, checklists)
+- Script `docs:ecom` para concatenar documentação em um único arquivo (`scripts/concat-ecom-docs.mjs`)
+
+### Changed
+- ProductCard: CTA estável e sem utilitários Tailwind para evitar hydration mismatch
+- PriceBlock: padronização de moeda com `formatBRL`
+- Flags: endurecidas com parser de booleano e desativação de demos por padrão em produção
+
+### Technical
+- Build validado (Next 15 App Router) e lint limpo
+- Arquivo consolidado de docs gerado em `src/features/ecommerce/docs/Ecom-Consolidado.md`
+
 ## [2.4.0] - 2025-08-13
 
 ### Added

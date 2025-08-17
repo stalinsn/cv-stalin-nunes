@@ -1,5 +1,5 @@
-@import '../tokens/colors.css';
-@import '../tokens/shadows.css';
+@import "../tokens/colors.css";
+@import "../tokens/shadows.css";
 
 .back-top {
   position: fixed;
@@ -19,7 +19,10 @@
   box-shadow: var(--shadow);
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--transition-normal), visibility var(--transition-normal), background var(--transition-fast);
+  transition:
+    opacity var(--transition-normal),
+    visibility var(--transition-normal),
+    background var(--transition-fast);
 }
 
 .back-top.show {

@@ -14,9 +14,8 @@ export default function Carousel({ children, title, config }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [cardWidth, setCardWidth] = useState<number>(240);
   const [visible, setVisible] = useState<number>(5);
-  const GAP = 12; // px - balanced spacing
-  const PEEK = 0.5; // half card peek when overflow exists
-  // No drag-to-scroll; smooth only via arrow buttons
+  const GAP = 12;
+  const PEEK = 0.5;
 
   const childCount = useMemo(() => React.Children.count(children), [children]);
 
@@ -25,23 +24,18 @@ export default function Carousel({ children, title, config }: Props) {
     if (!el) return;
 
     const calc = () => {
-      const w = el.clientWidth;
-      // Back to original responsive visible counts but with better spacing
-      let v = w >= 1280 ? 5 : w >= 1024 ? 4 : w >= 768 ? 3 : 2;
-      // If there is a side banner and we are on desktop, target 4 visible items (aligned with spec)
+      const containerWidth = el.clientWidth;
+      let visibleCards = containerWidth >= 1280 ? 5 : containerWidth >= 1024 ? 4 : containerWidth >= 768 ? 3 : 2;
       const hasBanner = Boolean(config?.banner);
-      if (w >= 1024 && hasBanner) v = 4;
-      if (w >= 1280 && !hasBanner) v = 5;
-      setVisible(v);
-  // Compute card width based on visible slots (no stretching for small counts)
-  const hasPeek = childCount > v;
-  // If peeking, there is an extra gap between the last full card and the half card
-  const gaps = hasPeek ? v * GAP : (v - 1) * GAP;
-  const denom = hasPeek ? v + PEEK : v;
-  const cw = (w - gaps) / denom;
-  // Reasonable minimum card width - not too big
-  const minCardWidth = w >= 1024 ? 220 : w >= 768 ? 200 : 180;
-  setCardWidth(Math.max(minCardWidth, Math.floor(cw)));
+      if (containerWidth >= 1024 && hasBanner) visibleCards = 4;
+      if (containerWidth >= 1280 && !hasBanner) visibleCards = 5;
+      setVisible(visibleCards);
+  const hasPeek = childCount > visibleCards;
+  const gaps = hasPeek ? visibleCards * GAP : (visibleCards - 1) * GAP;
+  const denom = hasPeek ? visibleCards + PEEK : visibleCards;
+  const computedCardWidth = (containerWidth - gaps) / denom;
+  const minCardWidth = containerWidth >= 1024 ? 220 : containerWidth >= 768 ? 200 : 180;
+  setCardWidth(Math.max(minCardWidth, Math.floor(computedCardWidth)));
     };
 
     calc();
@@ -51,12 +45,12 @@ export default function Carousel({ children, title, config }: Props) {
   }, [childCount, config]);
 
   if (!isOn('ecom.carousel')) return null;
-  const scroll = (dir: 1 | -1) => {
+  const scroll = (direction: 1 | -1) => {
     const el = ref.current;
     if (!el) return;
-    const step = (cardWidth + GAP) * visible; // page-by-page
+  const step = (cardWidth + GAP) * visible;
     const max = el.scrollWidth - el.clientWidth;
-    const target = Math.max(0, Math.min(el.scrollLeft + dir * step, max));
+    const target = Math.max(0, Math.min(el.scrollLeft + direction * step, max));
     el.scrollTo({ left: target, behavior: 'smooth' });
   };
   const variant: ShelfVariant = config?.variant ?? 'default';
@@ -86,7 +80,15 @@ export default function Carousel({ children, title, config }: Props) {
       <div className={`shelf__body ${hasBanner ? 'has-banner' : ''} banner-${bannerPos}`}>
         {hasBanner && (
           <a className="shelf__banner" href={config?.banner?.href ?? '#'} aria-label={config?.banner?.alt ?? 'Banner'}>
-            <Image src={config!.banner!.image} alt={config!.banner!.alt ?? ''} width={400} height={300} style={{ width: '100%', height: 'auto', objectFit: 'cover' }} />
+            <Image 
+              src={config!.banner!.image} 
+              alt={config!.banner!.alt ?? ''} 
+              width={400} 
+              height={300} 
+              sizes="(max-width: 768px) 92vw, (max-width: 1200px) 420px, 480px"
+              loading="lazy"
+              style={{ width: '100%', height: 'auto', objectFit: 'cover' }} 
+            />
           </a>
         )}
         <div
@@ -102,7 +104,7 @@ export default function Carousel({ children, title, config }: Props) {
             paddingBottom: 8,
             paddingLeft: 2,
             paddingRight: 2,
-            justifyContent: 'start', // Align products to the left
+            justifyContent: 'start',
           }}
           className="ecom-carousel"
         >

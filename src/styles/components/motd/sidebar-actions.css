@@ -12,7 +12,7 @@
   flex-shrink: 0;
 }
 
-.clear-button, 
+.clear-button,
 .clear-all-button {
   background: transparent;
   border: 1px solid var(--motd-border);

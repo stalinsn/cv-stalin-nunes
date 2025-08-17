@@ -1,11 +1,11 @@
 "use client";
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useCart } from '../../state/CartContext';
 import { useUI } from '../../state/UIContext';
 import Image from 'next/image';
 import { Button } from '../atoms/Button';
 
-// Tipo para item com todas as propriedades de produto
 interface CartItemWithDetails {
   id: string;
   name: string;
@@ -25,9 +25,9 @@ interface CartItemWithDetails {
 export default function DrawerCart() {
   const { isCartOpen, closeCart } = useUI();
   const { state, inc, dec, remove, totalItems, clear } = useCart();
+  const router = useRouter();
   const items = Object.values(state.items);
   
-  // Cálculos detalhados e inteligentes
   const calculations = React.useMemo(() => {
     let originalTotal = 0;
     let discountTotal = 0;
@@ -68,16 +68,12 @@ export default function DrawerCart() {
     };
   }, [items]);
 
-  // Função para extrair informações do produto
   const getProductInfo = (item: CartItemWithDetails) => {
-    // Usar propriedades diretas do item ou extrair do nome
     const weight = item.unit ? `${item.packSize || 1}${item.unit}` : 
                   (item.name.match(/(\d+(?:\.\d+)?)\s*(kg|g|ml|l|un)/i)?.[0] || 'un');
-    
-    // Extrair marca do nome
+
     const brand = item.name.split(' ')[0];
-    
-    // Verificar desconto usando listPrice do item
+
     const hasDiscount = item.listPrice && item.listPrice > item.price;
     const discountPercent = hasDiscount ? Math.round((1 - item.price / item.listPrice!) * 100) : 0;
     
@@ -100,7 +96,7 @@ export default function DrawerCart() {
   };
 
   return (
-    <div className={`drawer ${isCartOpen ? 'open' : ''}`} aria-hidden={!isCartOpen}>
+    <div className={`drawer ${isCartOpen ? 'open' : ''}`} aria-hidden={!isCartOpen} style={{ display: isCartOpen ? 'block' : 'none' }}>
       <div className="drawer__overlay" onClick={closeCart} />
       <aside className="drawer__panel" aria-label="Meu carrinho" role="dialog" aria-modal="true">
         <header className="drawer__header">
@@ -139,6 +135,9 @@ export default function DrawerCart() {
               </div>
               <p>Seu carrinho está vazio</p>
               <small>Adicione produtos e aproveite nossas ofertas!</small>
+              <div style={{ marginTop: 12 }}>
+                <Button onClick={() => { closeCart(); router.push('/e-commerce/plp'); }}>Ir às compras</Button>
+              </div>
             </div>
           ) : (
             <div className="drawer__list-container">
@@ -307,7 +306,13 @@ export default function DrawerCart() {
               <Button variant="ghost" className="drawer__continue-shopping" onClick={closeCart}>
                 Continuar comprando
               </Button>
-              <Button className="drawer__checkout">
+              <Button
+                className="drawer__checkout"
+                onClick={() => {
+                  closeCart();
+                  router.push('/e-commerce/cart');
+                }}
+              >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="1" y="3" width="15" height="13"></rect>
                   <polygon points="16,8 20,8 23,11 23,16 16,16 16,8"></polygon>

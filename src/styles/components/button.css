@@ -1,5 +1,5 @@
-@import '../tokens/colors.css';
-@import '../tokens/typography.css';
+@import "../tokens/colors.css";
+@import "../tokens/typography.css";
 
 .btn {
   padding: var(--gap-sm) var(--gap-md);

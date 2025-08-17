@@ -1,5 +1,5 @@
-@import '../tokens/colors.css';
-@import '../tokens/typography.css';
+@import "../tokens/colors.css";
+@import "../tokens/typography.css";
 
 /* Tabela padrão */
 table {
@@ -25,6 +25,6 @@ tr:nth-child(even) {
   background: rgba(34, 197, 94, 0.06);
 }
 
-[data-theme='light'] tr:nth-child(even) {
+[data-theme="light"] tr:nth-child(even) {
   background: rgba(0, 0, 0, 0.02);
 }

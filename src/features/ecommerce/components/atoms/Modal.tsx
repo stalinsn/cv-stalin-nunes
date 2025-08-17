@@ -4,9 +4,21 @@ import { createPortal } from 'react-dom';
 
 function ScrollLock() {
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    const body = document.body;
+    const current = parseInt(body.dataset.scrollLocks || '0', 10) || 0;
+    body.dataset.scrollLocks = String(current + 1);
+    if (current === 0) {
+      body.style.overflow = 'hidden';
+      body.style.touchAction = 'none';
+    }
+    return () => {
+      const after = Math.max(0, (parseInt(body.dataset.scrollLocks || '1', 10) || 1) - 1);
+      body.dataset.scrollLocks = String(after);
+      if (after === 0) {
+        body.style.overflow = '';
+        body.style.touchAction = '';
+      }
+    };
   }, []);
   return null;
 }
@@ -41,7 +53,6 @@ export function Modal({ isOpen, onClose, children, className = '' }: ModalProps)
     </div>
   );
 
-  // Render via portal to ensure overlay covers the full viewport
   if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     return createPortal(<><ScrollLock />{content}</>, document.body);
   }

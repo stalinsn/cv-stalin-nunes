@@ -1,4 +1,6 @@
 import React from "react";
+import { safeSet } from '@/utils/safeStorage';
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 import { Language } from "@/types/cv";
 import '@/styles/components/navbar.css';
 import '@/styles/components/theme-toggle.css';
@@ -42,7 +44,7 @@ export default function Navbar({
   githubProjectLink
 }: NavbarProps) {
   const handleLanguageChange = (value: string) => {
-    localStorage.setItem('lastLang', value);
+  safeSet(STORAGE_KEYS.lastLang, value);
     onTranslate(value as Language);
   };
 

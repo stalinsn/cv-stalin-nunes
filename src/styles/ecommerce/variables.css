@@ -1,5 +1,5 @@
-:root { 
-  --container: 1320px; 
+:root {
+  --container: 1320px;
   --container-padding: 12px;
   --ecom-card-min: 160px;
   --ecom-card-max: 220px;
@@ -11,11 +11,13 @@
 }
 
 @media (min-width: 480px) {
-  :root { --container-padding: 16px; }
+  :root {
+    --container-padding: 16px;
+  }
 }
 
 @media (min-width: 768px) {
-  :root { 
+  :root {
     --container-padding: 24px;
     --ecom-card-min: 180px;
     --ecom-card-max: 240px;
@@ -23,7 +25,7 @@
 }
 
 @media (min-width: 1024px) {
-  :root { 
+  :root {
     --container-padding: 32px;
     --ecom-card-min: 200px;
     --ecom-card-max: 260px;
@@ -31,23 +33,41 @@
 }
 
 @media (min-width: 1200px) {
-  :root { 
+  :root {
     --container-padding: 40px;
-    --container: 1200px;
+    --container: 1320px;
   }
 }
 
 @media (min-width: 1400px) {
-  :root { 
-    --container: 1280px; 
-    --container-padding: 48px; 
+  :root {
+    --container: 1320px;
+    --container-padding: 48px;
   }
 }
 
-.ecom * { box-sizing: border-box; }
-.ecom h1, .ecom h2, .ecom h3 { line-height: var(--line-height-heading); }
-.ecom section { scroll-margin-top: 80px; }
+.ecom * {
+  box-sizing: border-box;
+}
+.ecom h1,
+.ecom h2,
+.ecom h3 {
+  line-height: var(--line-height-heading);
+}
+.ecom section {
+  scroll-margin-top: 80px;
+}
 
 /* Override global layout constraint for the e-commerce route */
-.ecom { max-width: none; width: 100%; padding-left: 0; padding-right: 0; }
-.ecom-header { max-width: none; width: 100%; padding-left: 0; padding-right: 0; }
+.ecom {
+  max-width: none;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+.ecom-header {
+  max-width: none;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}

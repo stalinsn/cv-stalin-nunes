@@ -9,8 +9,7 @@ import { shelfConfig } from '../../config/shelfConfig';
 export default function Showcase({ title, flag }: { title: string; flag: Parameters<typeof isOn>[0] }) {
   const data = useProducts();
   if (!isOn(flag)) return null;
-  // Configure different item counts for different showcases
-  let itemCount = 8; // default
+  let itemCount = 8;
   if (flag === 'ecom.showcaseDaily') {
     itemCount = 12;
   } else if (flag === 'ecom.showcaseGrocery') {

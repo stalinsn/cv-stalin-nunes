@@ -10,7 +10,7 @@ export function Button({ variant = 'primary', className = '', ...props }: Button
   const variants: Record<string, string> = {
     primary: 'bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)]',
     ghost: 'bg-transparent text-[var(--text)] border border-[var(--border)] hover:bg-[var(--card-bg)]',
-    icon: 'bg-transparent p-2',
+  icon: 'bg-transparent p-2 text-[var(--text)]',
   };
   return <button className={`${base} ${variants[variant]} ${className}`} {...props} />;
 }

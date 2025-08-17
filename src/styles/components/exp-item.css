@@ -1,6 +1,6 @@
-@import '../tokens/colors.css';
-@import '../tokens/typography.css';
-@import '../tokens/spacings.css';
+@import "../tokens/colors.css";
+@import "../tokens/typography.css";
+@import "../tokens/spacings.css";
 
 .exp-item {
   display: flex;

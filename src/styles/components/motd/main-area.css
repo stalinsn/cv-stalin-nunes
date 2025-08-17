@@ -31,7 +31,9 @@
   align-items: center;
   justify-content: center;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: opacity var(--transition-slow), transform var(--transition-slow);
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
 }
 
 .motd-frase.fade-in {
@@ -131,13 +133,13 @@
     flex: 1;
     padding: var(--space-xl) var(--space-lg);
   }
-  
+
   .motd-frase {
     font-size: clamp(1.5rem, 6vw, 2.5rem);
     margin-bottom: var(--space-xl);
     min-height: 100px;
   }
-  
+
   .motd-button.primary {
     padding: 0.8rem 2rem;
     font-size: var(--font-size-base);

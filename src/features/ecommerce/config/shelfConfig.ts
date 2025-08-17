@@ -15,7 +15,6 @@ export type ShelfConfig = {
   };
 };
 
-// Temporary, managed by code flags; later will be fetched from a CMS/panel
 export const shelfConfig: Partial<Record<FlagKey, ShelfConfig>> = {
   'ecom.showcaseDaily': {
     variant: 'brand',

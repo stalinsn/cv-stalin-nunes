@@ -2,18 +2,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import Header from '../../../../features/ecommerce/components/organisms/Header';
-import Footer from '../../../../features/ecommerce/components/organisms/Footer';
-import DrawerCart from '../../../../features/ecommerce/components/organisms/DrawerCart';
-import { PdpBreadcrumbs } from '../../../../features/ecommerce/components/pdp/PdpBreadcrumbs';
-import { PdpGallery } from '../../../../features/ecommerce/components/pdp/PdpGallery';
-import { PdpPriceActions } from '../../../../features/ecommerce/components/pdp/PdpPriceActions';
+import dynamic from 'next/dynamic';
 
-import raw from '../../../../features/ecommerce/data/products.json';
-import { mapToUIProduct } from '../../../../features/ecommerce/lib/mapProduct';
-import type { EcommerceItem } from '../../../../features/ecommerce/types/product';
-import '../../../../styles/ecommerce/index.css';
-import Showcase from '../../../../features/ecommerce/components/organisms/Showcase';
+const PdpBreadcrumbs = dynamic(() => import('../../../../features/ecommerce/components/pdp/PdpBreadcrumbs').then(m => m.PdpBreadcrumbs));
+const PdpGallery = dynamic(() => import('../../../../features/ecommerce/components/pdp/PdpGallery').then(m => m.PdpGallery), { ssr: false });
+const PdpPriceActions = dynamic(() => import('../../../../features/ecommerce/components/pdp/PdpPriceActions').then(m => m.PdpPriceActions), { ssr: false });
+const Showcase = dynamic(() => import('../../../../features/ecommerce/components/organisms/Showcase'), { ssr: false });
+
+import { getProductBySlugUnified } from '../../../../features/ecommerce/lib/gatekeeper';
+import type { UIProduct } from '../../../../features/ecommerce/types/product';
 
 function Tabs() {
   const [active, setActive] = React.useState(0);
@@ -53,11 +50,13 @@ function Tabs() {
 }
 
 function useProductBySlug(slug: string) {
-  const all = (raw as unknown as EcommerceItem[]).map(mapToUIProduct);
-  // Try match by detailUrl slug (/slug/p) or by id fallback
-  const bySlug = all.find((p) => p.url && p.url.includes(`/${slug}/p`));
-  if (bySlug) return bySlug;
-  return all.find((p) => p.id === slug) || null;
+  const [prod, setProd] = React.useState<UIProduct | null>(null);
+  React.useEffect(() => {
+    let alive = true;
+    getProductBySlugUnified(slug).then((p) => { if (alive) setProd(p); });
+    return () => { alive = false; };
+  }, [slug]);
+  return prod;
 }
 
 export default function ProductDetailPage() {
@@ -67,23 +66,18 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <main className="ecom" data-theme="light">
-        <Header />
+      <>
         <section className="container pdp pdp-empty">
           <h1>Produto não encontrado</h1>
           <p>Não encontramos este produto. Volte para a página inicial e continue comprando.</p>
           <Link href="/e-commerce" className="pdp-back">Voltar para a Home</Link>
         </section>
-        <Footer />
-        <DrawerCart />
-      </main>
+      </>
     );
   }
 
   return (
-    <main className="ecom" data-theme="light">
-      <Header />
-
+    <>
       <PdpBreadcrumbs name={product.name} categoryPath={product.categoryPath} />
 
   <section className="container pdp">
@@ -151,8 +145,6 @@ export default function ProductDetailPage() {
         <Showcase title="Produtos Relacionados" flag="ecom.showcaseGrocery" />
       </section>
 
-      <Footer />
-      <DrawerCart />
-    </main>
+  </>
   );
 }
