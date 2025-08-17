@@ -18,6 +18,7 @@ import Interests from "@/components/Interests";
 import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
 import StatusBar from "@/components/StatusBar";
+import { STORAGE_KEYS } from '@/utils/storageKeys';
 import FallbackModal from "@/components/FallbackModal";
 import ConfirmTranslateModal from "@/components/ConfirmTranslateModal";
 import PrivacyModal from '@/components/PrivacyModal';
@@ -192,7 +193,7 @@ export default function Home() {
   useEffect(() => {
     if (initialized || langChangedManually) return;
     setInitialized(true);
-    const savedLang = typeof window !== 'undefined' ? localStorage.getItem('lastLang') : null;
+  const savedLang = typeof window !== 'undefined' ? window.localStorage.getItem(STORAGE_KEYS.lastLang) : null;
     if (savedLang && savedLang !== lang && savedLang !== 'pt-br') {
       const normalizedLang = normalizeLangCode(savedLang);
       const cacheKey = JSON.stringify(cvData);
@@ -210,16 +211,18 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('lastLang', lang);
+  try { window.localStorage.setItem(STORAGE_KEYS.lastLang, lang); } catch {}
     }
   }, [lang]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const cacheKey = JSON.stringify(cvData);
-      if (!getTranslationCache(cacheKey, 'pt-br')) {
-        localStorage.setItem(`translation_pt-br_${cacheKey}`, JSON.stringify(cvData));
-      }
+      try {
+        const cacheKey = JSON.stringify(cvData);
+        if (!getTranslationCache(cacheKey, 'pt-br')) {
+          window.localStorage.setItem(`translation_pt-br_${cacheKey}`, JSON.stringify(cvData));
+        }
+      } catch {}
     }
   }, []);
 
@@ -230,7 +233,7 @@ export default function Home() {
   const handleClearTranslations = () => {
     clearTranslations();
     if (typeof window !== 'undefined') {
-      localStorage.setItem('lastLang', 'pt-br');
+  try { window.localStorage.setItem(STORAGE_KEYS.lastLang, 'pt-br'); } catch {}
     }
     setCacheCleared(true);
     setTimeout(() => setCacheCleared(false), 2000);
@@ -333,7 +336,7 @@ export default function Home() {
             position: 'fixed',
             bottom: 0,
             left: 0,
-            width: '100vw',
+            width: '100svw',
             background: theme === 'dark' ? '#232b22' : 'var(--accent)',
             color: theme === 'dark' ? 'var(--accent)' : '#fff',
             borderTop: theme === 'dark' ? '2px solid var(--accent)' : '2px solid var(--accent-hover)',

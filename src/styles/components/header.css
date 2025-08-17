@@ -1,7 +1,7 @@
-@import '../tokens/colors.css';
-@import '../tokens/typography.css';
-@import '../tokens/spacings.css';
-@import '../tokens/shadows.css';
+@import "../tokens/colors.css";
+@import "../tokens/typography.css";
+@import "../tokens/spacings.css";
+@import "../tokens/shadows.css";
 
 /* Header e Topbar */
 .topbar {
@@ -90,8 +90,10 @@ button.contact-linkedin {
   cursor: pointer;
   transition: color var(--transition-fast);
 }
-.contact-linkedin:hover, .contact-linkedin:focus,
-button.contact-linkedin:hover, button.contact-linkedin:focus {
+.contact-linkedin:hover,
+.contact-linkedin:focus,
+button.contact-linkedin:hover,
+button.contact-linkedin:focus {
   color: #00c46a;
   text-decoration: underline;
   outline: none;

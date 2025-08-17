@@ -1,15 +1,20 @@
 {
   "name": "cv-stalin-nunes",
-  "version": "2.3.5",
+  "version": "2.5.0",
   "private": true,
   "description": "Currículo multilíngue com tradução IA, controle de tokens e exportação PDF.",
   "license": "MIT",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
+    "dev:tp": "next dev --turbopack",
     "build": "next build",
+    "clean": "rimraf .next",
     "start": "next start",
     "lint": "next lint",
-    "gitflow": "bash ./automation/git-flow.sh"
+    "format": "prettier --check \"src/styles/**/*.css\"",
+    "format:write": "prettier --write \"src/styles/**/*.css\"",
+  "gitflow": "bash ./automation/git-flow.sh",
+  "docs:ecom": "node ./scripts/concat-ecom-docs.mjs"
   },
   "dependencies": {
     "googleapis": "^150.0.1",
@@ -26,7 +31,15 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
+    "postcss-import": "^16.1.1",
+    "postcss-nested": "^7.0.2",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "browserslist": [
+    "since 2020",
+    "not dead"
+  ]
 }

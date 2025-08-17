@@ -33,18 +33,22 @@
 }
 
 .tab-btn:hover:not(.active) {
-  background: linear-gradient(135deg, 
-    rgba(var(--motd-accent-rgb), 0.03) 0%, 
-    rgba(var(--motd-accent-rgb), 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--motd-accent-rgb), 0.03) 0%,
+    rgba(var(--motd-accent-rgb), 0.05) 100%
+  );
   color: var(--text);
   border-top-color: var(--accent);
   border-top-width: 2px;
 }
 
 .tab-btn.active {
-  background: linear-gradient(135deg, 
-    rgba(var(--motd-accent-rgb), 0.08) 0%, 
-    rgba(var(--motd-accent-rgb), 0.12) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--motd-accent-rgb), 0.08) 0%,
+    rgba(var(--motd-accent-rgb), 0.12) 100%
+  );
   color: var(--accent);
   border-top-color: var(--accent);
   border-top-width: 3px;
@@ -54,15 +58,17 @@
 }
 
 .tab-btn.active::before {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -1px;
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(135deg, 
-    rgba(var(--motd-accent-rgb), 0.08) 0%, 
-    rgba(var(--motd-accent-rgb), 0.12) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--motd-accent-rgb), 0.08) 0%,
+    rgba(var(--motd-accent-rgb), 0.12) 100%
+  );
   z-index: 2;
 }
 

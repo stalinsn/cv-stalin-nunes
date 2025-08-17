@@ -5,6 +5,42 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
 
+## [2.5.0] - 2025-08-17
+
+### Added
+- Documentação funcional do E-commerce em `src/features/ecommerce/docs` (overview, operação, implementação, referências, receitas, troubleshooting, roadmap, checklists)
+- Script `docs:ecom` para concatenar documentação em um único arquivo (`scripts/concat-ecom-docs.mjs`)
+
+### Changed
+- ProductCard: CTA estável e sem utilitários Tailwind para evitar hydration mismatch
+- PriceBlock: padronização de moeda com `formatBRL`
+- Flags: endurecidas com parser de booleano e desativação de demos por padrão em produção
+
+### Technical
+- Build validado (Next 15 App Router) e lint limpo
+- Arquivo consolidado de docs gerado em `src/features/ecommerce/docs/Ecom-Consolidado.md`
+
+## [2.4.0] - 2025-08-13
+
+### Added
+- **Nova rota e-commerce completa** `/e-commerce` com arquitetura atômica
+- **Sistema de carrinho funcional** com add/remove/increment/decrement e cálculo de totais
+- **Modal de regionalização** com seleção de entrega/retirada e verificação de CEP
+- **Dropdowns navegacionais** para Departamentos e Serviços com estrutura real
+- **Feature flags** centralizadas para controle granular de funcionalidades
+- **Tipagem robusta de produtos** baseada em estrutura VTEX-like
+- **Design system tokenizado** com tema claro e mobile-first
+- **Componentes atômicos reutilizáveis** (atoms, molecules, organisms)
+
+### Technical
+- Implementação completa com Next.js 15 App Router
+- Estado global com Context API (CartContext + UIContext)
+- Mapeamento de produtos com normalização para UI
+- Drawer lateral para carrinho com overlay
+- Sistema de imagens otimizado com next/image
+- CSS modular com tokens de design consistentes
+- Validação completa de build e TypeScript
+
 ## [2.3.5] - 2025-08-01
 
 ### Fixed

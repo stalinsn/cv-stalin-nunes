@@ -18,8 +18,7 @@
     min-width: 0 !important;
     max-width: 900px !important;
     box-sizing: border-box;
-    page-break-after:auto;
-
+    page-break-after: auto;
   }
 
   main,

@@ -1,0 +1,96 @@
+/* Utility buttons used in ecommerce */
+button {
+  cursor: pointer;
+}
+.inline-flex {
+  display: inline-flex;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.rounded {
+  border-radius: 6px;
+}
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.text-sm {
+  font-size: var(--font-size-sm);
+}
+.font-medium {
+  font-weight: var(--font-weight-medium);
+}
+.transition-colors {
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+.w-full {
+  width: 100%;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+/* Quantity selector */
+.qty-selector {
+  display: grid;
+  grid-template-columns: 32px 1fr 32px;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  padding: 0;
+  height: 40px;
+  width: 100%;
+
+  .qty-selector__value {
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 8px 6px;
+    background: transparent;
+    color: var(--accent);
+    margin: 0;
+    line-height: 1;
+    flex: 1;
+  }
+
+  button.inline-flex {
+    height: 40px;
+    width: 32px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color var(--transition-fast),
+      color var(--transition-fast);
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    flex-shrink: 0;
+
+    &:hover {
+      background: var(--accent);
+      color: var(--text-inverse);
+    }
+  }
+}

@@ -1,3 +1,4 @@
+/* Base body styles - minimal and flexible */
 body {
   background: var(--bg);
   color: var(--text);
@@ -5,10 +6,17 @@ body {
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
   -webkit-font-smoothing: antialiased;
+  margin: 0; /* remove UA default margin to avoid phantom scrollbars */
+  overflow-x: clip; /* prevent horizontal scroll from off-canvas UI (e.g., PDP thumbs) */
+  overscroll-behavior-y: auto;
+}
+
+/* CV/Portfolio specific layout - only apply to pages that need it */
+body:not(:has(.ecom)) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  min-height: 100svh;
 }
 
 a {
@@ -22,7 +30,8 @@ a:hover {
 .wrapper {
   width: 100%;
   max-width: 960px;
-  padding: var(--gap-xl) 1rem 4rem;
+  /* keep generous spacing without forcing scroll when content is short */
+  padding: var(--gap-xl) 1rem var(--gap-xl);
   display: flex;
   flex-direction: column;
   gap: var(--gap-lg);
@@ -47,7 +56,8 @@ header {
   margin-bottom: var(--gap-md);
 }
 
-header h1, .brand {
+header h1,
+.brand {
   font-size: 2.1rem;
   font-weight: var(--font-weight-bold);
   color: var(--accent);

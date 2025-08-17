@@ -336,7 +336,7 @@ export function useMotdLogic() {
   const toggleFavorita = useCallback((fraseTarget: string) => {
     const isCurrentlyFavorited = favoritas.includes(fraseTarget);
     const novasFavoritas = isCurrentlyFavorited 
-      ? favoritas.filter(f => f !== fraseTarget)
+      ? favoritas.filter(frase => frase !== fraseTarget)
       : [...favoritas, fraseTarget];
     
     // Se estamos removendo dos favoritos, garantimos que a frase volte para o histórico

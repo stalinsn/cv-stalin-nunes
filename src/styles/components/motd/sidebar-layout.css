@@ -12,7 +12,7 @@
   box-shadow: var(--motd-shadow);
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100svh;
 }
 
 /* Header da sidebar */
