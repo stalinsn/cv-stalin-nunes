@@ -1,6 +1,6 @@
 {
   "name": "cv-stalin-nunes",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "private": true,
   "description": "Currículo multilíngue com tradução IA, controle de tokens e exportação PDF.",
   "license": "MIT",
@@ -20,10 +20,10 @@
   "previews:dev": "start-server-and-test \"yarn dev\" http://localhost:3000 \"yarn previews:gen\"",
   "previews:cv": "node ./scripts/generate-previews.mjs --only=cv --quality=88 --delay=1100",
   "previews:cv:dev": "start-server-and-test \"yarn dev\" http://localhost:3000 \"yarn previews:cv\"",
-  "export:cv": "node ./scripts/export-app.mjs --app=cv --out=exports --zip",
-  "export:motd": "node ./scripts/export-app.mjs --app=motd --out=exports --zip",
-  "export:ecommerce": "node ./scripts/export-app.mjs --app=ecommerce --out=exports --zip",
-  "export:all": "node ./scripts/export-app.mjs --app=cv --out=exports --zip && node ./scripts/export-app.mjs --app=motd --out=exports --zip && node ./scripts/export-app.mjs --app=ecommerce --out=exports --zip"
+  "export:cv": "node ./scripts/export-app.mjs --app=cv --out=exports --install --zip",
+  "export:motd": "node ./scripts/export-app.mjs --app=motd --out=exports --install --zip",
+  "export:ecommerce": "node ./scripts/export-app.mjs --app=ecommerce --out=exports --install --zip",
+  "export:all": "node ./scripts/export-app.mjs --app=cv --out=exports --install --zip && node ./scripts/export-app.mjs --app=motd --out=exports --install --zip && node ./scripts/export-app.mjs --app=ecommerce --out=exports --install --zip"
   },
   "dependencies": {
     "googleapis": "^150.0.1",

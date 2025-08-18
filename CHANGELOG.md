@@ -23,6 +23,26 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Ajustes de CSS em `src/styles/gallery.css` e markup em `src/app/page.tsx`
 
 
+## [2.6.1] - 2025-08-18
+
+### Added
+- Script de exportação standalone por app com geração de ZIP: `scripts/export-app-graph.mjs`
+- Comando simplificado `export.mjs` para exportar todos ou apps específicos rapidamente
+
+### Changed
+- Export agora limpa versões anteriores automaticamente antes de gerar nova exportação
+- Layout de exportação: garante cópia de `tsconfig.json`, `globals.css` e diretórios de estilos essenciais
+
+### Fixed
+- Corrigido problema de resolução de alias `@/` em projetos exportados (fallback para caminhos relativos quando necessário)
+- Garantido que arquivos CSS referenciados por `@import` sejam incluídos na exportação
+
+### Notes
+- Gerados arquivos ZIP na pasta `exports/` e adicionadas entradas no `.gitignore` para evitar commitar exports
+- Novos scripts/aliases e README e utilitários criados: `export.mjs` para comando único
+
+
+
 ## [2.5.0] - 2025-08-17
 
 ### Added
