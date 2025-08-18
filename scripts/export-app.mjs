@@ -29,6 +29,7 @@ const hasFlag = (name) => argv.includes(`--${name}`);
 const APP = (getArg('app', '') || '').toLowerCase();
 const OUT = getArg('out', 'exports');
 const DO_ZIP = hasFlag('zip');
+const DO_INSTALL = hasFlag('install');
 
 const APPS = {
   cv: { routeDir: 'cv', title: 'CV' },
@@ -109,6 +110,7 @@ async function main() {
     'tsconfig.json',
     'eslint.config.mjs',
     'postcss.config.mjs',
+  'next-env.d.ts',
   ];
   for (const rel of maybeCopyFiles) {
     const src = path.join(ROOT, rel);
@@ -170,11 +172,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     }
   }
 
+  // features: prefer app-specific subfolder if it exists; else copy entire features
+  const featuresRoot = path.join(ROOT, 'src', 'features');
+  if (await exists(featuresRoot)) {
+    const candidate = path.join(featuresRoot, APP);
+    if (await exists(candidate)) {
+      await cp(candidate, path.join(srcDir, 'features', APP));
+    } else {
+      await cp(featuresRoot, path.join(srcDir, 'features'));
+    }
+  }
+
   // 5) README for the exported app
-  const readme = `# ${cfg.title} (Standalone)\n\nEsta pasta contém uma extração do app \`${cfg.title}\` como projeto Next.js independente.\n\n## Rodar\n\n\`\`\`bash\nyarn install\nyarn dev\n\`\`\`\n\nRota principal: /.\nRota original (ainda disponível): /${cfg.routeDir}\n`;
+  const readme = `# ${cfg.title} (Standalone)\n\nEsta pasta contém uma extração do app \`${cfg.title}\` como projeto Next.js independente.\n\n## Rodar\n\n1) Instale dependências antes de iniciar:\n\n\`\`\`bash\nyarn install\n# ou npm install / pnpm install\n\`\`\`\n\n2) Suba o dev server:\n\n\`\`\`bash\nyarn dev\n\`\`\`\n\n> Observação: se você iniciar direto com \`yarn dev\`, o Next pode instalar apenas TypeScript automaticamente e faltar plugins do PostCSS (ex.: \`postcss-import\`). Sempre rode \`yarn install\` antes.\n\nRota principal: /.\nRota original (ainda disponível): /${cfg.routeDir}\n`;
   await writeFile(path.join(outDir, 'README.md'), readme);
 
-  // 6) Optional ZIP on Windows
+  // 6) Optional install
+  if (DO_INSTALL) {
+    await new Promise((resolve) => {
+      exec(`cmd /c "cd /d \"${outDir}\" && yarn install"`, (err) => {
+        if (err) console.warn('Install step failed or skipped:', err?.message || err);
+        else console.log('Dependencies installed in', outDir);
+        resolve();
+      });
+    });
+  }
+
+  // 7) Optional ZIP on Windows
   if (DO_ZIP && process.platform === 'win32') {
     const zipPath = path.join(exportRoot, `${APP}.zip`);
     await new Promise((resolve) => {
