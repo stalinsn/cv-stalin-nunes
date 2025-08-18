@@ -10,6 +10,43 @@
 				"$eslint - stylish"
 			],
 			"group": "build"
+		},
+		{
+			"label": "build-next-custom-dist",
+			"type": "shell",
+			"command": "NEXT_DIST_DIR=.next-build npm run -s build",
+			"group": "build"
+		},
+		{
+			"label": "previews-dev-once",
+			"type": "shell",
+			"command": "yarn previews:dev",
+			"problemMatcher": [
+				"$tsc",
+				"$eslint - stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "dev-validate-gallery",
+			"type": "shell",
+			"command": "yarn dev",
+			"isBackground": true,
+			"problemMatcher": [
+				"$tsc",
+				"$eslint - stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "previews-dev-once",
+			"type": "shell",
+			"command": "yarn previews:dev",
+			"problemMatcher": [
+				"$tsc",
+				"$eslint - stylish"
+			],
+			"group": "build"
 		}
 	]
 }

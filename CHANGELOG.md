@@ -5,6 +5,24 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
 
+## [2.6.0] - 2025-08-17
+
+### Added
+- Nova galeria de apps na home com cards estáticos e imagem de preview no topo
+- Paleta pastel e chips suaves para melhor legibilidade
+- Documentação por app: `docs/apps/{cv,motd,ecommerce}.md` e índice `docs/apps/README.md`
+
+### Changed
+- Design dos cards: bordas finas, sombra sutil, tipografia mais leve e espaçamento maior
+- Card inteiro clicável (removido botão CTA) e textos sem sublinhado
+- Hover refinado (sem deslocamento de padding, sombra mais próxima e sem “bordinha” no hover)
+- README principal simplificado com foco em quick start e links
+
+### Technical
+- Script de geração de previews em ESM com flags cross‑platform (`scripts/generate-previews.mjs`)
+- Ajustes de CSS em `src/styles/gallery.css` e markup em `src/app/page.tsx`
+
+
 ## [2.5.0] - 2025-08-17
 
 ### Added

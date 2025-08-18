@@ -1,0 +1,51 @@
+/*
+  Generate JPG previews for app cards using Playwright (Chromium).
+  - Captures /cv, /motd, /e-commerce and saves under public/previews
+  Usage:
+    yarn previews:install
+    # in another terminal: yarn dev
+    yarn previews:gen
+*/
+const path = require('path');
+const fs = require('fs');
+const { chromium } = require('playwright');
+
+const BASE = process.env.PREVIEW_BASE_URL || 'http://localhost:3000';
+const OUT_DIR = path.resolve(process.cwd(), 'public', 'previews');
+
+const targets = [
+  { slug: 'cv', path: '/cv' },
+  { slug: 'motd', path: '/motd' },
+  { slug: 'ecommerce', path: '/e-commerce' },
+];
+
+function ensureOut() {
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+}
+
+async function run() {
+  ensureOut();
+  const browser = await chromium.launch();
+  try {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+    const page = await ctx.newPage();
+
+    for (const t of targets) {
+      const url = BASE + t.path;
+      console.log('Capturing', url);
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
+      // small settle delay for animations and client effects
+      await page.waitForTimeout(800);
+      const file = path.join(OUT_DIR, `${t.slug}.jpg`);
+      await page.screenshot({ path: file, type: 'jpeg', quality: 75, fullPage: false });
+      console.log('Saved:', file);
+    }
+  } finally {
+    await browser.close();
+  }
+}
+
+run().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

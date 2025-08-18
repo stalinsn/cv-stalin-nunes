@@ -73,4 +73,12 @@ Bem-vindo à documentação técnica do projeto! Após refatoração completa do
 
 ---
 
+---
+
+## 🧭 Apps
+
+- [CV](apps/cv.md)
+- [MOTD](apps/motd.md)
+- [E‑commerce](apps/ecommerce.md)
+
 Consulte cada seção para detalhes técnicos específicos. A documentação é atualizada continuamente para refletir o estado atual do código.

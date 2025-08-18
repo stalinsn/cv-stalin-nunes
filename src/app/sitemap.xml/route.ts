@@ -4,15 +4,15 @@ export async function GET() {
   // Rotas estáticas e dinâmicas do seu site
   const dynamicRoutes = [
     '', // homepage
-    'projetos/vtex-io',
-    'projetos/fast-store',
-    // Adicione mais rotas conforme necessário
+    'cv',
+    'motd',
+    'e-commerce',
   ];
 
   const urls = dynamicRoutes.map(
     (route) => `
       <url>
-        <loc>https://www.artmeta.com.br/${route}</loc>
+  <loc>https://www.artmeta.com.br/${route}</loc>
         <priority>${route === '' ? '1.0' : '0.8'}</priority>
       </url>`
   ).join('');
