@@ -74,16 +74,32 @@ async function main() {
 
   // 1) Base files (package.json minimal)
   const rootPkg = JSON.parse(await fsp.readFile(path.join(ROOT, 'package.json'), 'utf8'));
+  const baseDeps = {
+    next: rootPkg.dependencies?.next || '15.3.3',
+    react: rootPkg.dependencies?.react || '^19.0.0',
+    'react-dom': rootPkg.dependencies?.['react-dom'] || '^19.0.0',
+  };
+  // Include API-related deps if present in root
+  for (const opt of ['openai', 'googleapis']) {
+    if (rootPkg.dependencies?.[opt]) baseDeps[opt] = rootPkg.dependencies[opt];
+  }
+  const devDeps = {
+    typescript: rootPkg.devDependencies?.typescript || '^5',
+    '@types/node': rootPkg.devDependencies?.['@types/node'] || '^20',
+    '@types/react': rootPkg.devDependencies?.['@types/react'] || '^19',
+    '@types/react-dom': rootPkg.devDependencies?.['@types/react-dom'] || '^19',
+    postcss: rootPkg.devDependencies?.postcss || '^8',
+    '@tailwindcss/postcss': rootPkg.devDependencies?.['@tailwindcss/postcss'] || '^4',
+    'postcss-import': rootPkg.devDependencies?.['postcss-import'] || '^16',
+    'postcss-nested': rootPkg.devDependencies?.['postcss-nested'] || '^7',
+  };
   const pkg = {
     name: `standalone-${APP}`,
     private: true,
     version: '0.1.0',
     scripts: { dev: 'next dev', build: 'next build', start: 'next start' },
-    dependencies: {
-      next: rootPkg.dependencies?.next || '15.3.3',
-      react: rootPkg.dependencies?.react || '^19.0.0',
-      'react-dom': rootPkg.dependencies?.['react-dom'] || '^19.0.0',
-    },
+    dependencies: baseDeps,
+    devDependencies: devDeps,
   };
   await writeFile(path.join(outDir, 'package.json'), JSON.stringify(pkg, null, 2));
 
@@ -122,6 +138,12 @@ async function main() {
     process.exit(2);
   }
   await cp(routeSrc, routeDest);
+
+  // Copy API routes if exist (some apps use server routes)
+  const apiSrc = path.join(ROOT, 'src', 'app', 'api');
+  if (await exists(apiSrc)) {
+    await cp(apiSrc, path.join(appDir, 'api'));
+  }
 
   const layoutContent = `export const metadata = { title: '${cfg.title}' };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
