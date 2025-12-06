@@ -2,6 +2,7 @@ import React from 'react';
 import '@/styles/components/section-toggler.css';
 import { CvData } from '@/types/cv';
 import SectionCard from './SectionCard';
+import { sanitizeHtml } from '@/utils/sanitize';
 
 interface SummaryProps {
   data: CvData;
@@ -14,7 +15,7 @@ export default function Summary({ data, title, open, setOpen }: SummaryProps) {
   return (
     <SectionCard title={title} open={open} setOpen={setOpen} titleClassName="text-xl mb-2">
       <div
-        dangerouslySetInnerHTML={{ __html: data?.summary }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(data?.summary) }}
       />
     </SectionCard>
   );
