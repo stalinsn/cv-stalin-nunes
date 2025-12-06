@@ -20,7 +20,7 @@ export default function MotdPage() {
     copiarFrase,
     compartilharFrase,
     limparHistorico,
-    limparTudo
+    limparTudo,
   } = useMotdLogic();
 
   // Gerar frase automaticamente na primeira carga
@@ -69,7 +69,7 @@ export default function MotdPage() {
   }, [gerarNovaFrase, frase, toggleFavorita, copiarFrase, compartilharFrase]);
 
   return (
-    <div className="motd-container">
+    <div className="motd-container" data-theme="light">
       <MotdMainArea
         frase={frase}
         fadeClass={fadeClass}
