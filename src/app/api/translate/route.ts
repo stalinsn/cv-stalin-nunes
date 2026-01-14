@@ -14,14 +14,13 @@ const languageNames: Record<string, string> = {
   fr: "Francês", 
   de: "Alemão", 
   it: "Italiano", 
-  // se quiser suporte a mais, inclua aqui…
+  
 };
 
 export async function POST(req: NextRequest) {
   const { cvData, targetLang, token, password, origem } = await req.json();
   
-  // Verificação de senha se fornecida
-  if (password) {
+    if (password) {
     const correctPassword = process.env.AI_TRANSLATE_PASSWORD;
     if (correctPassword && password === correctPassword) {
       // Senha correta, prosseguir sem validação de token
