@@ -31,25 +31,31 @@ export function CartShipping() {
   };
 
   const selected = orderForm.shipping.selectedAddress;
+  const selectedOption = orderForm.shipping.deliveryOptions[orderForm.shipping.deliveryOptions.length - 1];
   const shippingValue = orderForm.totalizers.find((t) => t.id === 'Shipping')?.value || 0;
 
   return (
     <div className="cart-shipping">
       <h3>Calcular frete</h3>
       <div className="shipping-form">
+        <label htmlFor="shipping-cep">CEP</label>
         <input
+          id="shipping-cep"
           placeholder="CEP (00000-000)"
           value={cep}
-          onChange={(e) => setCep(e.target.value)}
+          onChange={(e) => setCep(e.target.value.replace(/[^\d-]/g, '').slice(0, 9))}
           maxLength={9}
+          inputMode="numeric"
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? 'shipping-error' : undefined}
         />
-        <button onClick={onCalc} disabled={loading}>{loading ? 'Calculando…' : 'Calcular'}</button>
+        <button data-track-id="cart-calc-shipping" onClick={onCalc} disabled={loading}>{loading ? 'Calculando…' : 'Calcular'}</button>
       </div>
-      {error && <div className="shipping-error">{error}</div>}
+      {error && <div className="shipping-error" id="shipping-error" role="alert">{error}</div>}
       {selected && (
         <div className="shipping-address">
           <div><strong>Entrega em:</strong> {selected.street ? `${selected.street}, ` : ''}{selected.neighborhood ? `${selected.neighborhood}, ` : ''}{selected.city} - {selected.state} • CEP {selected.postalCode}</div>
-          <div className="shipping-price"><strong>Frete:</strong> {formatBRL(shippingValue)} — Entrega Padrão</div>
+          <div className="shipping-price"><strong>Frete:</strong> {formatBRL(shippingValue)} — {selectedOption?.name || 'Entrega'}</div>
         </div>
       )}
     </div>

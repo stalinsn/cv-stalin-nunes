@@ -17,28 +17,33 @@ type Props = {
   unit?: string;
   packSize?: number;
   url?: string;
+  imagePriority?: boolean;
 };
 
-export default function ProductCard({ id, name, image = '/file.svg', price, listPrice, unit, packSize, url }: Props) {
+export default function ProductCard({ id, name, image = '/file.svg', price, listPrice, unit, packSize, url, imagePriority = false }: Props) {
   const { add, inc, dec, state } = useCart();
   const item = state.items[id];
   const hasItems = !!(item && item.qty > 0);
   const [mounted, setMounted] = React.useState(false);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
   const slug = url && url.includes('/p') ? url.split('/').filter(Boolean).slice(-2, -1)[0] : id;
   const href = `/e-commerce/${slug}/p`;
   
   return (
-    <div className="product-card">
+    <article className="product-card" aria-label={name} data-sku-id={id}>
       <Link href={href} className="product-card__img" aria-label={`Ver detalhes de ${name}`} prefetch={false}>
+        {!imageLoaded && <span className="product-card__imgPlaceholder skeleton" aria-hidden="true" />}
         <Image 
           src={image} 
           alt={name} 
           width={320} 
-          height={200} 
+          height={320} 
           sizes="(max-width: 768px) 45vw, (max-width: 1200px) 30vw, 320px"
           style={{ objectFit: 'contain', width: '100%', height: '100%' }} 
-          loading="lazy"
+          loading={imagePriority ? 'eager' : 'lazy'}
+          priority={imagePriority}
+          onLoadingComplete={() => setImageLoaded(true)}
         />
         <DiscountBadge price={price} listPrice={listPrice} />
       </Link>
@@ -49,11 +54,11 @@ export default function ProductCard({ id, name, image = '/file.svg', price, list
       </div>
       <div className="product-card__cta">
         {!(mounted && hasItems) ? (
-          <Button onClick={() => add({ id, name, price, listPrice, image, unit, packSize })}>Adicionar</Button>
+          <Button data-track-id="product-add" onClick={() => add({ id, name, price, listPrice, image, unit, packSize })}>Adicionar</Button>
         ) : (
-          <QuantitySelector value={item.qty} onDec={() => dec(id)} onInc={() => inc(id)} />
+          <QuantitySelector value={item.qty} onDec={() => dec(id)} onInc={() => inc(id)} trackIdBase="product-card-qty" />
         )}
       </div>
-    </div>
+    </article>
   );
 }

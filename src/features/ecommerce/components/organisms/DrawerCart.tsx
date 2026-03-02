@@ -27,6 +27,7 @@ export default function DrawerCart() {
   const { state, inc, dec, remove, totalItems, clear } = useCart();
   const router = useRouter();
   const items = Object.values(state.items);
+  const [viewMode, setViewMode] = React.useState<'detailed' | 'compact'>('compact');
   
   const calculations = React.useMemo(() => {
     let originalTotal = 0;
@@ -96,7 +97,7 @@ export default function DrawerCart() {
   };
 
   return (
-    <div className={`drawer ${isCartOpen ? 'open' : ''}`} aria-hidden={!isCartOpen} style={{ display: isCartOpen ? 'block' : 'none' }}>
+    <div className={`drawer ecom-tokens ${isCartOpen ? 'open' : ''}`} aria-hidden={!isCartOpen}>
       <div className="drawer__overlay" onClick={closeCart} />
       <aside className="drawer__panel" aria-label="Meu carrinho" role="dialog" aria-modal="true">
         <header className="drawer__header">
@@ -141,6 +142,25 @@ export default function DrawerCart() {
             </div>
           ) : (
             <div className="drawer__list-container">
+              <div className="drawer__view-switch" role="tablist" aria-label="Visualização do carrinho">
+                <button
+                  role="tab"
+                  className={`drawer__view-tab ${viewMode === 'detailed' ? 'is-active' : ''}`}
+                  aria-selected={viewMode === 'detailed'}
+                  onClick={() => setViewMode('detailed')}
+                >
+                  Visão detalhada
+                </button>
+                <button
+                  role="tab"
+                  className={`drawer__view-tab ${viewMode === 'compact' ? 'is-active' : ''}`}
+                  aria-selected={viewMode === 'compact'}
+                  onClick={() => setViewMode('compact')}
+                >
+                  Visão rápida
+                </button>
+              </div>
+
               {calculations.hasDiscounts && (
                 <div className="drawer__promotion-banner">
                   <div className="drawer__promotion-icon">🎉</div>
@@ -151,111 +171,164 @@ export default function DrawerCart() {
                 </div>
               )}
               
-              <ul className="drawer__list">
-                {items.map((it) => {
-                  const productInfo = getProductInfo(it as CartItemWithDetails);
-                  const itemTotal = it.price * it.qty;
-                  const itemOriginalTotal = (it.listPrice || it.price) * it.qty;
-                  const itemSavings = itemOriginalTotal - itemTotal;
-                  
-                  return (
-                    <li key={it.id} className="drawer__item">
-                      <div className="drawer__item-image">
-                        <Image 
-                          src={it.image || '/file.svg'} 
-                          alt={it.name} 
-                          width={80} 
-                          height={80}
-                        />
-                        {productInfo.hasDiscount && (
-                          <div className="drawer__item-discount-badge">
-                            -{productInfo.discountPercent}%
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="drawer__item-details">
-                        <div className="drawer__item-header">
-                          <h4 className="drawer__item-title">{it.name}</h4>
-                          <button 
-                            className="drawer__remove" 
-                            aria-label="Remover item" 
-                            onClick={() => remove(it.id)}
-                          >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <polyline points="3,6 5,6 21,6"></polyline>
-                              <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
-                            </svg>
-                          </button>
+              {viewMode === 'detailed' ? (
+                <ul className="drawer__list">
+                  {items.map((it) => {
+                    const productInfo = getProductInfo(it as CartItemWithDetails);
+                    const itemTotal = it.price * it.qty;
+                    const itemOriginalTotal = (it.listPrice || it.price) * it.qty;
+                    const itemSavings = itemOriginalTotal - itemTotal;
+                    
+                    return (
+                      <li key={it.id} className="drawer__item">
+                        <div className="drawer__item-image">
+                          <Image 
+                            src={it.image || '/file.svg'} 
+                            alt={it.name} 
+                            width={80} 
+                            height={80}
+                          />
+                          {productInfo.hasDiscount && (
+                            <div className="drawer__item-discount-badge">
+                              -{productInfo.discountPercent}%
+                            </div>
+                          )}
                         </div>
                         
-                        <div className="drawer__item-meta">
-                          <span className="drawer__item-brand">{productInfo.brand}</span>
-                          <span className="drawer__item-weight">{productInfo.weight}</span>
-                          {productInfo.isOrganic && <span className="drawer__item-organic">🌱 Orgânico</span>}
-                        </div>
-                        
-                        {productInfo.promotionLabel && (
-                          <div className="drawer__item-promotion">
-                            {productInfo.promotionLabel}
-                          </div>
-                        )}
-                        
-                        <div className="drawer__item-pricing">
-                          <div className="drawer__item-prices">
-                            {productInfo.hasDiscount && (
-                              <span className="drawer__price-original">
-                                R$ {it.listPrice!.toFixed(2)}
-                              </span>
-                            )}
-                            <span className="drawer__price-current">
-                              R$ {it.price.toFixed(2)}
-                            </span>
-                            <span className="drawer__price-unit">cada</span>
+                        <div className="drawer__item-details">
+                          <div className="drawer__item-header">
+                            <h4 className="drawer__item-title">{it.name}</h4>
+                            <button 
+                              className="drawer__remove" 
+                              aria-label="Remover item" 
+                              onClick={() => remove(it.id)}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="3,6 5,6 21,6"></polyline>
+                                <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                              </svg>
+                            </button>
                           </div>
                           
-                          <div className="drawer__item-total-price">
-                            {itemSavings > 0 && (
-                              <div className="drawer__item-savings">
-                                Economia: R$ {itemSavings.toFixed(2)}
-                              </div>
-                            )}
-                            <strong className="drawer__item-total">
-                              R$ {itemTotal.toFixed(2)}
-                            </strong>
+                          <div className="drawer__item-meta">
+                            <span className="drawer__item-brand">{productInfo.brand}</span>
+                            <span className="drawer__item-weight">{productInfo.weight}</span>
+                            {productInfo.isOrganic && <span className="drawer__item-organic">🌱 Orgânico</span>}
+                          </div>
+                          
+                          {productInfo.promotionLabel && (
+                            <div className="drawer__item-promotion">
+                              {productInfo.promotionLabel}
+                            </div>
+                          )}
+                          
+                          <div className="drawer__item-pricing">
+                            <div className="drawer__item-prices">
+                              {productInfo.hasDiscount && (
+                                <span className="drawer__price-original">
+                                  R$ {it.listPrice!.toFixed(2)}
+                                </span>
+                              )}
+                              <span className="drawer__price-current">
+                                R$ {it.price.toFixed(2)}
+                              </span>
+                              <span className="drawer__price-unit">cada</span>
+                            </div>
+                            
+                            <div className="drawer__item-total-price">
+                              {itemSavings > 0 && (
+                                <div className="drawer__item-savings">
+                                  Economia: R$ {itemSavings.toFixed(2)}
+                                </div>
+                              )}
+                              <strong className="drawer__item-total">
+                                R$ {itemTotal.toFixed(2)}
+                              </strong>
+                            </div>
+                          </div>
+                          
+                          <div className="drawer__item-controls">
+                            <div className="drawer__qty">
+                              <Button 
+                                variant="ghost" 
+                                onClick={() => dec(it.id)} 
+                                className="drawer__qty-btn"
+                                disabled={it.qty <= 1}
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                              </Button>
+                              <span className="drawer__qty-value">{it.qty}</span>
+                              <Button 
+                                variant="ghost" 
+                                onClick={() => inc(it.id)} 
+                                className="drawer__qty-btn"
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                        
-                        <div className="drawer__item-controls">
-                          <div className="drawer__qty">
-                            <Button 
-                              variant="ghost" 
-                              onClick={() => dec(it.id)} 
-                              className="drawer__qty-btn"
-                              disabled={it.qty <= 1}
-                            >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                              </svg>
-                            </Button>
-                            <span className="drawer__qty-value">{it.qty}</span>
-                            <Button 
-                              variant="ghost" 
-                              onClick={() => inc(it.id)} 
-                              className="drawer__qty-btn"
-                            >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                              </svg>
-                            </Button>
-                          </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <ul className="drawer__list drawer__list--compact">
+                  {items.map((it) => {
+                    const productInfo = getProductInfo(it as CartItemWithDetails);
+                    const itemTotal = it.price * it.qty;
+                    return (
+                      <li key={it.id} className="drawer__item drawer__item--compact">
+                        <div className="drawer__compact-main">
+                          <h4 className="drawer__compact-title">{it.name}</h4>
+                          {productInfo.hasDiscount ? <span className="drawer__compact-discount">-{productInfo.discountPercent}%</span> : null}
                         </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+                        <div className="drawer__compact-pricing" title={`R$ ${it.price.toFixed(2)} cada`}>
+                          <strong className="drawer__compact-total">R$ {itemTotal.toFixed(2)}</strong>
+                        </div>
+                        <div className="drawer__qty drawer__qty--compact">
+                          <Button
+                            variant="ghost"
+                            onClick={() => dec(it.id)}
+                            className="drawer__qty-btn"
+                            disabled={it.qty <= 1}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                          </Button>
+                          <span className="drawer__qty-value">{it.qty}</span>
+                          <Button
+                            variant="ghost"
+                            onClick={() => inc(it.id)}
+                            className="drawer__qty-btn"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <line x1="12" y1="5" x2="12" y2="19"></line>
+                              <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                          </Button>
+                        </div>
+                        <button
+                          className="drawer__remove drawer__remove--compact"
+                          aria-label="Remover item"
+                          onClick={() => remove(it.id)}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="3,6 5,6 21,6"></polyline>
+                            <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                          </svg>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </div>
           )}
         </div>

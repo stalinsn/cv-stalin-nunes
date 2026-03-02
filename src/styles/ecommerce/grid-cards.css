@@ -2,7 +2,7 @@
 .ecom-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--ecom-card-min), var(--ecom-card-max)));
-  gap: 14px;
+  gap: clamp(12px, 1.8vw, 18px);
   justify-content: start;
   margin: 0;
   width: 100%;
@@ -18,18 +18,18 @@
 }
 
 .product-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  background: var(--ecom-card-bg);
+  border: var(--ecom-card-border);
+  border-radius: var(--ecom-radius-lg);
+  padding: clamp(12px, 1.2vw, 16px);
+  box-shadow: var(--ecom-card-shadow);
   display: flex;
   flex-direction: column;
   position: relative;
   transition:
     transform var(--transition-fast),
     box-shadow var(--transition-fast);
-  min-height: 400px;
+  min-height: clamp(360px, 45vw, 400px);
   width: 100%;
   margin: 0 auto;
 
@@ -38,41 +38,52 @@
     min-height: 380px;
   }
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+    box-shadow: var(--ecom-card-shadow-hover);
   }
 
   &__img {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 180px;
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
     background: var(--surface-soft, #fafafa);
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 14px;
+    border-radius: var(--ecom-radius-md);
+    overflow: clip;
+    margin-bottom: 12px;
+    border: 1px solid var(--ecom-color-border-soft);
 
     @media (max-width: 767px) {
-      height: 160px;
       margin-bottom: 12px;
+    }
+    .product-card__imgPlaceholder {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
     }
     img {
       width: 100%;
       height: 100%;
       object-fit: contain;
+      position: relative;
+      z-index: 2;
+      transition: transform var(--transition-fast);
     }
   }
 
+  &:hover .product-card__img img {
+    transform: scale(1.03);
+  }
+
   &__title {
-    font-size: 14px;
+    font-size: var(--ecom-font-size-sm);
     color: var(--text);
-    margin-bottom: 12px;
+    margin: 0 0 10px;
     font-weight: 500;
     line-height: 1.35;
-    min-height: 48px;
+    min-height: 42px;
     flex: 1;
     @media (min-width: 768px) {
-      font-size: 15px;
+      font-size: var(--ecom-font-size-md);
       min-height: 50px;
     }
   }
@@ -80,8 +91,8 @@
   &__prices {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 12px;
+    gap: 4px;
+    margin-bottom: 10px;
   }
   &__list {
     color: var(--text-light);
@@ -92,7 +103,7 @@
   &__price {
     color: var(--text);
     font-weight: 800;
-    font-size: 18px;
+    font-size: clamp(1.05rem, 0.92rem + 0.35vw, 1.2rem);
     order: 2;
     @media (min-width: 768px) {
       font-size: 19px;
@@ -106,7 +117,7 @@
   &__pack {
     color: var(--text-light);
     font-size: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   &__cta {
@@ -120,14 +131,20 @@
       background: var(--accent);
       color: var(--text-inverse);
       border: none;
-      padding: 14px 16px;
-      border-radius: var(--radius);
+      min-height: var(--ecom-touch-target);
+      padding: 10px 14px;
+      border-radius: var(--ecom-radius-sm);
       font-weight: 700;
-      font-size: 15px;
-      transition: background-color var(--transition-fast);
+      font-size: var(--ecom-font-size-sm);
+      transition:
+        background-color var(--ecom-motion-fast),
+        transform var(--ecom-motion-fast),
+        box-shadow var(--ecom-motion-fast);
     }
     > button:hover {
       background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--ecom-shadow-sm);
     }
 
     @media (max-width: 767px) {
@@ -144,10 +161,10 @@
   top: 10px;
   left: 10px;
   background: var(--badge-danger, #dc2626);
-  color: white;
+  color: var(--ecom-color-brand-contrast);
   padding: 6px 10px;
   border-radius: 6px;
   font-size: 11px;
   font-weight: 800;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--ecom-shadow-sm);
 }

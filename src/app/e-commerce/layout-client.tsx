@@ -1,17 +1,54 @@
 "use client";
 import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { useUI } from '../../features/ecommerce/state/UIContext';
+import { safeGet, safeSet } from '../../utils/safeStorage';
+import {
+  ECOM_CAMPAIGNS,
+  ECOM_THEMES,
+  DEFAULT_ECOM_CAMPAIGN,
+  DEFAULT_ECOM_THEME,
+} from '../../features/ecommerce/config/styleguide';
 const DrawerCart = dynamic(() => import('../../features/ecommerce/components/organisms/DrawerCart'), { ssr: false });
+
+const THEME_STORAGE_KEY = 'ecom.theme.v1';
+const CAMPAIGN_STORAGE_KEY = 'ecom.campaign.v1';
+const VALID_THEMES: Set<string> = new Set(ECOM_THEMES as readonly string[]);
+const VALID_CAMPAIGNS: Set<string> = new Set(ECOM_CAMPAIGNS as readonly string[]);
 
 export default function EcommerceLayoutClient({ children }: { children: React.ReactNode }) {
   const params = useSearchParams();
+  const pathname = usePathname();
+  const { closeCart } = useUI();
+  const hideDrawer = pathname.startsWith('/e-commerce/cart') || pathname.startsWith('/e-commerce/checkout');
+
+  useEffect(() => {
+    if (hideDrawer) closeCart();
+  }, [hideDrawer, closeCart]);
+
   useEffect(() => {
     // Fallback simples para navegadores que não suportam :has()
     document.body.classList.add('ecom-body-override');
     // Parse flags from URL
     const enableDebug = params.get('debug') === 'true' || params.get('inspect') === 'true';
+    const themeParam = (params.get('theme') || '').trim().toLowerCase();
+    const campaignParam = (params.get('campaign') || '').trim().toLowerCase();
     const root = document.querySelector('main.ecom');
+    const persistedTheme = (safeGet(THEME_STORAGE_KEY) || '').trim().toLowerCase();
+    const persistedCampaign = (safeGet(CAMPAIGN_STORAGE_KEY) || '').trim().toLowerCase();
+
+    const nextTheme = VALID_THEMES.has(themeParam)
+      ? themeParam
+      : VALID_THEMES.has(persistedTheme)
+        ? persistedTheme
+        : DEFAULT_ECOM_THEME;
+    const nextCampaign = VALID_CAMPAIGNS.has(campaignParam)
+      ? campaignParam
+      : VALID_CAMPAIGNS.has(persistedCampaign)
+        ? persistedCampaign
+        : DEFAULT_ECOM_CAMPAIGN;
+
     if (root && enableDebug) {
       root.setAttribute('data-debug', 'true');
       root.setAttribute('data-inspect', 'true');
@@ -19,6 +56,12 @@ export default function EcommerceLayoutClient({ children }: { children: React.Re
       root.removeAttribute('data-debug');
       root.removeAttribute('data-inspect');
     }
+    if (root) {
+      root.setAttribute('data-theme', nextTheme);
+      root.setAttribute('data-campaign', nextCampaign);
+    }
+    safeSet(THEME_STORAGE_KEY, nextTheme);
+    safeSet(CAMPAIGN_STORAGE_KEY, nextCampaign);
 
     // Friendly label resolver for known ecommerce BEM classes
     const getFriendlyLabel = (el: HTMLElement) => {
@@ -166,6 +209,6 @@ export default function EcommerceLayoutClient({ children }: { children: React.Re
 
   return <>
     {children}
-    <DrawerCart />
+    {!hideDrawer ? <DrawerCart /> : null}
   </>;
 }

@@ -2,6 +2,8 @@
 import React from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { useOrderForm } from '../../../features/ecommerce/state/OrderFormContext';
+import { PLPSkeleton } from '../../../features/ecommerce/components/plp/PLPSkeleton';
 
 const PLPHeader = dynamic(() => import('../../../features/ecommerce/components/plp/PLPHeader').then(m => m.PLPHeader));
 const PLPToolbar = dynamic(() => import('../../../features/ecommerce/components/plp/PLPToolbar').then(m => m.PLPToolbar));
@@ -14,6 +16,7 @@ import { queryPLPUnified } from '../../../features/ecommerce/lib/plpDataSource';
 import { PLPPagination } from '../../../features/ecommerce/components/plp/PLPPagination';
 
 export default function PLPClient() {
+  const { orderForm } = useOrderForm();
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -41,14 +44,24 @@ export default function PLPClient() {
   const [filters, setFilters] = React.useState<FacetState>({
     brand: parseMulti('brand'),
     dept: parseMulti('dept'),
+    collection: parseMulti('collection'),
     price: parsePrice(),
   });
   const [page, setPage] = React.useState(pageParam);
   const pageSize = 24;
+  const regionalization = React.useMemo(() => {
+    const selectedOption = orderForm.shipping.deliveryOptions[orderForm.shipping.deliveryOptions.length - 1];
+    const mode = selectedOption?.id?.startsWith('pickup') ? 'pickup' : 'delivery';
+    return {
+      postalCode: orderForm.shipping.selectedAddress?.postalCode,
+      mode,
+    } as const;
+  }, [orderForm.shipping.deliveryOptions, orderForm.shipping.selectedAddress?.postalCode]);
+  const regionKey = `${regionalization.mode || 'delivery'}:${regionalization.postalCode || ''}`;
 
   // Use a unified data source so we can switch between local and VTEX via env flag
   const source = process.env.NEXT_PUBLIC_DATA_SOURCE || 'local';
-  const localData = source === 'local' ? queryPLP({ categorySlug, searchTerm, sort, page, pageSize, filters }) : undefined;
+  const localData = source === 'local' ? queryPLP({ categorySlug, searchTerm, sort, page, pageSize, filters, regionalization }) : undefined;
 
   type LocalPLPResult = ReturnType<typeof queryPLP>;
   const [remoteData, setRemoteData] = React.useState<LocalPLPResult | null>(null);
@@ -58,7 +71,7 @@ export default function PLPClient() {
     if (source === 'local') return;
     let alive = true;
     setLoading(true);
-    queryPLPUnified({ categorySlug, searchTerm, sort, page, pageSize, filters })
+    queryPLPUnified({ categorySlug, searchTerm, sort, page, pageSize, filters, regionalization })
       .then((data) => {
         if (!alive) return;
         setRemoteData(data as LocalPLPResult);
@@ -67,7 +80,7 @@ export default function PLPClient() {
     return () => {
       alive = false;
     };
-  }, [source, categorySlug, searchTerm, sort, page, pageSize, filters]);
+  }, [source, categorySlug, searchTerm, sort, page, pageSize, filters, regionKey, regionalization]);
 
   const derived = source === 'local' && localData ? localData : remoteData;
   const products = derived?.products ?? [];
@@ -91,6 +104,7 @@ export default function PLPClient() {
     if (page && page > 1) queryParams.set('page', String(page));
     if (filters.brand?.length) filters.brand.forEach((brand) => queryParams.append('brand', brand));
     if (filters.dept?.length) filters.dept.forEach((department) => queryParams.append('dept', department));
+    if (filters.collection?.length) filters.collection.forEach((collection) => queryParams.append('collection', collection));
     if (filters.price) queryParams.set('price', `${filters.price[0]}-${filters.price[1]}`);
     const next = `${pathname}?${queryParams.toString()}`;
     // Avoid redundant pushes
@@ -102,20 +116,21 @@ export default function PLPClient() {
   // Reset page when filters or sort change
   const brandKey = React.useMemo(() => (filters.brand || []).join(','), [filters.brand]);
   const deptKey = React.useMemo(() => (filters.dept || []).join(','), [filters.dept]);
+  const collectionKey = React.useMemo(() => (filters.collection || []).join(','), [filters.collection]);
   const priceKey = React.useMemo(() => (filters.price ? filters.price.join('-') : ''), [filters.price]);
   React.useEffect(() => {
     setPage(1);
-  }, [sort, brandKey, deptKey, priceKey]);
+  }, [sort, brandKey, deptKey, collectionKey, priceKey]);
 
   return (
     <section className="plp-container">
       <div className="plp-layout">
         <PLPHeader title={title} breadcrumbs={breadcrumbs} />
         <PLPToolbar total={total} sort={sort || 'relevance'} onSort={setSort} />
-        <div className="plp-main">
+        <div className="plp-main" aria-busy={loading}>
           <PLPFacets facets={facets} value={filters} onChange={setFilters} />
           {loading ? (
-            <div style={{ padding: 16 }}>Carregando…</div>
+            <PLPSkeleton cards={12} />
           ) : products.length ? (
             <div>
               <PLPGrid products={products} />

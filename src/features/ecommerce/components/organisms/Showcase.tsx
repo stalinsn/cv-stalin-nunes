@@ -18,7 +18,7 @@ export default function Showcase({ title, flag }: { title: string; flag: Paramet
   
   return (
     <Carousel title={title} config={shelfConfig[flag]}>
-      {data.slice(0, itemCount).map((p) => (
+      {data.slice(0, itemCount).map((p, index) => (
         <ProductCard
           key={p.id}
           id={p.id}
@@ -29,6 +29,7 @@ export default function Showcase({ title, flag }: { title: string; flag: Paramet
           unit={p.unit}
           packSize={p.packSize}
           url={p.url}
+          imagePriority={index < 2}
         />
       ))}
     </Carousel>

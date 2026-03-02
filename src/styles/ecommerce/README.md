@@ -14,5 +14,5 @@ Validation
 - After changes, run the production build to ensure Next.js/Tailwind/PostCSS compiles nesting correctly.
 
 Notes
-- Variables live in `variables.css` and brand overrides in `theme-prezunic.css`.
+- Variables live in `variables.css` and brand overrides in `theme-classic.css`.
 - If a utility or global selector doesn’t belong to a block, keep it flat to avoid unintended scoping.

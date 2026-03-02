@@ -1,11 +1,12 @@
 "use client";
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import type { OrderForm, OrderFormItem, Totalizer, ShippingData, Address } from '../types/orderForm';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import type { OrderForm, OrderFormItem, ShippingData, Address, Totalizer } from '../types/orderForm';
 import { safeJsonGet, safeJsonSet } from '@/utils/safeStorage';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
 import { useCart } from './CartContext';
 import { isVtexLive } from '../lib/runtimeConfig';
 import { simulateShipping } from '../lib/vtexCheckoutService';
+import { buildOrderPricing } from '../lib/pricing';
 
 const STORAGE_KEY = STORAGE_KEYS.orderForm;
 
@@ -15,19 +16,6 @@ function generateId() {
     return (cryptoObj as { randomUUID: () => string }).randomUUID();
   }
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
-
-function buildTotalizers(items: OrderFormItem[], prev: Totalizer[] = []): Totalizer[] {
-  const itemsTotal = items.reduce((sum, it) => sum + it.quantity * it.price, 0);
-  const others = prev.filter((t) => t.id !== 'Items');
-  return [
-    ...others,
-    { id: 'Items', name: 'Itens', value: itemsTotal },
-  ];
-}
-
-function computeValue(totalizers: Totalizer[]) {
-  return totalizers.reduce((sum, t) => sum + t.value, 0);
 }
 
 function itemsEqual(left: OrderFormItem[], right: OrderFormItem[]) {
@@ -46,7 +34,9 @@ function itemsEqual(left: OrderFormItem[], right: OrderFormItem[]) {
       itemLeft.unit !== itemRight.unit ||
       itemLeft.packSize !== itemRight.packSize ||
       itemLeft.quantity !== itemRight.quantity
-    ) return false;
+    ) {
+      return false;
+    }
   }
   return true;
 }
@@ -58,9 +48,26 @@ function totalizersEqual(left: Totalizer[], right: Totalizer[]) {
     const totalizerLeft = left[index];
     const totalizerRight = right[index];
     if (!totalizerLeft || !totalizerRight) return false;
-    if (totalizerLeft.id !== totalizerRight.id || totalizerLeft.name !== totalizerRight.name || totalizerLeft.value !== totalizerRight.value) return false;
+    if (
+      totalizerLeft.id !== totalizerRight.id ||
+      totalizerLeft.name !== totalizerRight.name ||
+      totalizerLeft.value !== totalizerRight.value
+    ) {
+      return false;
+    }
   }
   return true;
+}
+
+function normalizeShipping(shipping?: Partial<ShippingData> | null): ShippingData {
+  return {
+    countries: shipping?.countries || [],
+    availableAddresses: shipping?.availableAddresses || [],
+    selectedAddress: shipping?.selectedAddress || null,
+    deliveryOptions: shipping?.deliveryOptions || [],
+    pickupOptions: shipping?.pickupOptions || [],
+    isValid: Boolean(shipping?.isValid),
+  };
 }
 
 type Ctx = {
@@ -76,70 +83,110 @@ const OrderFormCtx = createContext<Ctx | null>(null);
 
 export function OrderFormProvider({ children }: { children: React.ReactNode }) {
   const { state: cart } = useCart();
-  const [orderForm, setOrderForm] = useState<OrderForm>(() => {
-    const empty: OrderForm = {
-      id: generateId(),
-      items: [],
-      value: 0,
-      totalizers: [],
-      marketingData: {},
-      canEditData: true,
-      loggedIn: false,
-      paymentData: { 
-        paymentSystems: [
-          { id: 'pix', name: 'PIX' },
-          { id: 'cash_on_delivery', name: 'Pagamento na entrega' },
-          { id: 'credit_card', name: 'Cartão de crédito' },
-        ],
-        payments: [],
-        installmentOptions: [],
-        availableAccounts: [],
-        isValid: false 
-      },
-      messages: { couponMessages: [], generalMessages: [] },
-      shipping: { countries: [], availableAddresses: [], selectedAddress: null, deliveryOptions: [], pickupOptions: [], isValid: false },
-      userProfileId: null,
-      userType: 'STORE_USER',
-      clientProfileData: null,
-      clientPreferencesData: { locale: 'pt-BR', optInNewsletter: null },
-      allowManualPrice: false,
-      customData: null,
-    };
-    return empty;
-  });
+  const [orderForm, setOrderForm] = useState<OrderForm>(() => ({
+    id: generateId(),
+    items: [],
+    value: 0,
+    totalizers: [],
+    marketingData: {},
+    canEditData: true,
+    loggedIn: false,
+    paymentData: {
+      paymentSystems: [
+        { id: 'pix', name: 'PIX' },
+        { id: 'cash_on_delivery', name: 'Pagamento na entrega' },
+        { id: 'credit_card', name: 'Cartão de crédito' },
+      ],
+      payments: [],
+      installmentOptions: [],
+      availableAccounts: [],
+      isValid: false,
+    },
+    messages: { couponMessages: [], generalMessages: [] },
+    shipping: { countries: [], availableAddresses: [], selectedAddress: null, deliveryOptions: [], pickupOptions: [], isValid: false },
+    userProfileId: null,
+    userType: 'STORE_USER',
+    clientProfileData: null,
+    clientPreferencesData: { locale: 'pt-BR', optInNewsletter: null },
+    allowManualPrice: false,
+    customData: null,
+  }));
   const [hydrated, setHydrated] = useState(false);
+  const orderFormRef = useRef(orderForm);
 
   useEffect(() => {
-  if (!hydrated) return;
+    orderFormRef.current = orderForm;
+  }, [orderForm]);
+
+  useEffect(() => {
+    if (!hydrated) return;
     safeJsonSet(STORAGE_KEY, orderForm);
   }, [orderForm, hydrated]);
 
   useEffect(() => {
     const persisted = safeJsonGet<OrderForm | null>(STORAGE_KEY, null);
     if (persisted) {
-      setOrderForm((prev) => ({ ...prev, ...persisted }));
+      setOrderForm((prev) => {
+        const merged: OrderForm = {
+          ...prev,
+          ...persisted,
+          marketingData: { ...prev.marketingData, ...(persisted.marketingData || {}) },
+          paymentData: { ...prev.paymentData, ...(persisted.paymentData || {}) },
+          messages: { ...prev.messages, ...(persisted.messages || {}) },
+          shipping: normalizeShipping(persisted.shipping),
+          clientPreferencesData: { ...prev.clientPreferencesData, ...(persisted.clientPreferencesData || {}) },
+        };
+        const pricing = buildOrderPricing({
+          items: merged.items,
+          shipping: merged.shipping,
+          coupon: merged.marketingData.coupon,
+        });
+        return {
+          ...merged,
+          totalizers: pricing.totalizers,
+          value: pricing.value,
+          messages: { ...merged.messages, couponMessages: pricing.couponMessages },
+        };
+      });
     }
     setHydrated(true);
   }, []);
 
   const refreshFromCart = React.useCallback(() => {
     setOrderForm((prev) => {
-      const items: OrderFormItem[] = Object.values(cart.items).map((it) => ({
-        id: it.id,
-        name: it.name,
-        image: it.image,
-        price: it.price,
-        listPrice: it.listPrice,
-        unit: it.unit,
-        packSize: it.packSize,
-        quantity: it.qty,
+      const items: OrderFormItem[] = Object.values(cart.items).map((item) => ({
+        id: item.id,
+        name: item.name,
+        image: item.image,
+        price: item.price,
+        listPrice: item.listPrice,
+        unit: item.unit,
+        packSize: item.packSize,
+        quantity: item.qty,
       }));
-      const totalizers = buildTotalizers(items, prev.totalizers);
-      const value = computeValue(totalizers);
-      if (itemsEqual(prev.items, items) && totalizersEqual(prev.totalizers, totalizers) && prev.value === value) {
+
+      const pricing = buildOrderPricing({
+        items,
+        shipping: prev.shipping,
+        coupon: prev.marketingData.coupon,
+      });
+
+      if (
+        itemsEqual(prev.items, items) &&
+        totalizersEqual(prev.totalizers, pricing.totalizers) &&
+        prev.value === pricing.value &&
+        prev.messages.couponMessages.join('|') === pricing.couponMessages.join('|')
+      ) {
         return prev;
       }
-      return { ...prev, items, totalizers, value };
+
+      return {
+        ...prev,
+        items,
+        totalizers: pricing.totalizers,
+        value: pricing.value,
+        messages: { ...prev.messages, couponMessages: pricing.couponMessages },
+      };
     });
   }, [cart.items]);
 
@@ -148,8 +195,23 @@ export function OrderFormProvider({ children }: { children: React.ReactNode }) {
   }, [refreshFromCart]);
 
   const updateMarketing = React.useCallback((data: Partial<OrderForm['marketingData']>) => {
-    setOrderForm((prev) => ({ ...prev, marketingData: { ...prev.marketingData, ...data } }));
+    setOrderForm((prev) => {
+      const marketingData = { ...prev.marketingData, ...data };
+      const pricing = buildOrderPricing({
+        items: prev.items,
+        shipping: prev.shipping,
+        coupon: marketingData.coupon,
+      });
+      return {
+        ...prev,
+        marketingData,
+        totalizers: pricing.totalizers,
+        value: pricing.value,
+        messages: { ...prev.messages, couponMessages: pricing.couponMessages },
+      };
+    });
   }, []);
+
   const updatePreferences = React.useCallback((data: Partial<OrderForm['clientPreferencesData']>) => {
     setOrderForm((prev) => ({ ...prev, clientPreferencesData: { ...prev.clientPreferencesData, ...data } }));
   }, []);
@@ -159,47 +221,65 @@ export function OrderFormProvider({ children }: { children: React.ReactNode }) {
       const shipping: ShippingData = {
         ...prev.shipping,
         selectedAddress: params.address === undefined ? prev.shipping.selectedAddress : (params.address ?? null),
-        deliveryOptions: params.option
-          ? [
-              ...prev.shipping.deliveryOptions.filter((o) => o.id !== params.option!.id),
-              params.option,
-            ]
-          : prev.shipping.deliveryOptions,
-        isValid: params.address ? true : prev.shipping.isValid,
+        deliveryOptions: params.option ? [params.option] : prev.shipping.deliveryOptions,
+        isValid: Boolean(params.address) || Boolean(params.option) || prev.shipping.isValid,
       };
 
-      const withoutShipping = prev.totalizers.filter((t) => t.id !== 'Shipping');
-      const totalizers = params.option
-        ? [...withoutShipping, { id: 'Shipping', name: 'Frete', value: params.option.price }]
-        : withoutShipping;
-      const recomputed = buildTotalizers(prev.items, totalizers);
-      const value = computeValue(recomputed);
-      return { ...prev, shipping, totalizers: recomputed, value };
+      const pricing = buildOrderPricing({
+        items: prev.items,
+        shipping,
+        coupon: prev.marketingData.coupon,
+      });
+
+      return {
+        ...prev,
+        shipping,
+        totalizers: pricing.totalizers,
+        value: pricing.value,
+        messages: { ...prev.messages, couponMessages: pricing.couponMessages },
+      };
     });
 
-    // If VTEX live, try to simulate shipping against VTEX based on current items/address
     if (isVtexLive() && (params.address || params.option === undefined)) {
       setTimeout(async () => {
         try {
-          const upd = await simulateShipping((params.address ?? null) || orderForm.shipping.selectedAddress || {}, orderForm.items);
-          if (upd) {
-            setOrderForm((prev) => {
-              const mergedShipping: ShippingData = { ...prev.shipping, ...upd.shipping };
-              const withoutShipping = prev.totalizers.filter((t) => t.id !== 'Shipping');
-              const totalizers = upd.totalizers.length ? [...withoutShipping, ...upd.totalizers] : withoutShipping;
-              const recomputed = buildTotalizers(prev.items, totalizers);
-              const value = computeValue(recomputed);
-              return { ...prev, shipping: mergedShipping, totalizers: recomputed, value };
+          const latest = orderFormRef.current;
+          const address = params.address ?? latest.shipping.selectedAddress;
+          if (!address) return;
+          const update = await simulateShipping(address, latest.items);
+          if (!update) return;
+
+          setOrderForm((prev) => {
+            const shipping: ShippingData = {
+              ...prev.shipping,
+              ...update.shipping,
+              selectedAddress: update.shipping.selectedAddress ?? prev.shipping.selectedAddress,
+            };
+            const pricing = buildOrderPricing({
+              items: prev.items,
+              shipping,
+              coupon: prev.marketingData.coupon,
             });
-          }
+            return {
+              ...prev,
+              shipping,
+              totalizers: pricing.totalizers,
+              value: pricing.value,
+              messages: { ...prev.messages, couponMessages: pricing.couponMessages },
+            };
+          });
         } catch {
-          // silent fallback to local logic
+          // silent fallback to local pricing flow
         }
       }, 0);
     }
-  }, [orderForm.items, orderForm.shipping.selectedAddress]);
+  }, []);
 
-  const ctx = useMemo<Ctx>(() => ({ orderForm, setOrderForm, refreshFromCart, updateMarketing, updatePreferences, setShipping }), [orderForm, refreshFromCart, updateMarketing, updatePreferences, setShipping]);
+  const ctx = useMemo<Ctx>(
+    () => ({ orderForm, setOrderForm, refreshFromCart, updateMarketing, updatePreferences, setShipping }),
+    [orderForm, refreshFromCart, updateMarketing, updatePreferences, setShipping],
+  );
+
   return <OrderFormCtx.Provider value={ctx}>{children}</OrderFormCtx.Provider>;
 }
 

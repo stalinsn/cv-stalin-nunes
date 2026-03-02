@@ -1,13 +1,25 @@
 "use client";
 import React, { useState } from 'react';
+import Link from 'next/link';
 
 type MegaItem = { name: string; href?: string; isHighlighted?: boolean };
 type MegaSection = { title?: string; items: MegaItem[] };
-export type MegaCategory = { key: string; label: string; href?: string; sections: MegaSection[] };
+export type MegaCategory = {
+  key: string;
+  label: string;
+  href?: string;
+  sections: MegaSection[];
+};
 
 export function MegaMenu({ categories }: { categories: MegaCategory[] }) {
   const [activeKey, setActiveKey] = useState(categories[0]?.key ?? '');
   const active = categories.find((c) => c.key === activeKey) ?? categories[0];
+
+  React.useEffect(() => {
+    if (!categories.some((category) => category.key === activeKey)) {
+      setActiveKey(categories[0]?.key ?? '');
+    }
+  }, [categories, activeKey]);
 
   // Auto-split a single long section into multiple balanced columns for nicer layout
   function computeColumns() {
@@ -31,27 +43,30 @@ export function MegaMenu({ categories }: { categories: MegaCategory[] }) {
     <div className="mega-menu">
       <aside className="mega-menu__aside" role="tablist" aria-label="Categorias">
         {categories.map((cat) => (
-          <button
+          <Link
             key={cat.key}
             role="tab"
             aria-selected={cat.key === activeKey}
             className={`mega-menu__tab ${cat.key === activeKey ? 'is-active' : ''}`}
+            href={cat.href || '#'}
             onMouseEnter={() => setActiveKey(cat.key)}
             onFocus={() => setActiveKey(cat.key)}
             onClick={() => setActiveKey(cat.key)}
           >
             {cat.label}
-          </button>
+          </Link>
         ))}
       </aside>
       <div className="mega-menu__panel" role="tabpanel">
-        {active?.href ? (
-          <h3 className="mega-menu__title">
-            <a className="mega-menu__title-link" href={active.href}>{active.label}</a>
-          </h3>
-        ) : (
-          <h3 className="mega-menu__title">{active?.label}</h3>
-        )}
+        <div className="mega-menu__panelTop">
+          {active?.href ? (
+            <h3 className="mega-menu__title">
+              <Link className="mega-menu__title-link" href={active.href}>{active.label}</Link>
+            </h3>
+          ) : (
+            <h3 className="mega-menu__title">{active?.label}</h3>
+          )}
+        </div>
         <div className="mega-menu__grid">
           {columns.map((section, index) => (
             <div key={index} className="mega-menu__section">
@@ -61,9 +76,9 @@ export function MegaMenu({ categories }: { categories: MegaCategory[] }) {
               <ul className="mega-menu__list">
                 {section.items.map((item, itemIndex) => (
                   <li key={itemIndex}>
-                    <a className={`mega-menu__link ${item.isHighlighted ? 'is-highlight' : ''}`} href={item.href || '#'}>
+                    <Link className={`mega-menu__link ${item.isHighlighted ? 'is-highlight' : ''}`} href={item.href || '#'}>
                       {item.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

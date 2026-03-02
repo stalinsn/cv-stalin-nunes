@@ -2,18 +2,11 @@ import type { PLPQuery } from './plp';
 import { queryPLP as queryLocalPLP } from './plp';
 import { queryVtexPLP } from './vtexPlpBridge';
 import type { UIProduct } from '../types/product';
-import rawCategories from '../data/categories.json';
+import { catalogCategories, productCollectionsById, productDepartmentsById } from './catalog';
+import { applyRegionalization } from './regionalization';
 
-type Category = {
-  id: string;
-  slug: string;
-  name: string;
-  parentId: string | null;
-  productIds: string[];
-  children?: { id: string; slug: string; name: string }[];
-};
-
-const allCategories = rawCategories as Category[];
+type Category = (typeof catalogCategories)[number];
+const allCategories = catalogCategories as Category[];
 
 function getCategoryBySlug(slug?: string) {
   if (!slug) return undefined;
@@ -33,7 +26,17 @@ function applyFilters(products: UIProduct[], filters?: PLPQuery['filters']) {
   }
   if (filters.dept?.length) {
     const set = new Set(filters.dept.map((d) => d.toLocaleLowerCase()));
-    filteredProducts = filteredProducts.filter((p) => p.categories?.some((c) => set.has(c.toLocaleLowerCase())));
+    filteredProducts = filteredProducts.filter((p) => {
+      const departments = productDepartmentsById[p.id] || p.categories || [];
+      return departments.some((department) => set.has(department.toLocaleLowerCase()));
+    });
+  }
+  if (filters.collection?.length) {
+    const set = new Set(filters.collection.map((c) => c.toLocaleLowerCase()));
+    filteredProducts = filteredProducts.filter((p) => {
+      const collections = productCollectionsById[p.id] || [];
+      return collections.some((collection) => set.has(collection.toLocaleLowerCase()));
+    });
   }
   return filteredProducts;
 }
@@ -60,15 +63,20 @@ function sortProducts(products: UIProduct[], sort?: PLPQuery['sort']) {
 
 function buildFacets(products: UIProduct[]) {
   const brands = Array.from(new Set(products.map((p) => p.brand).filter(Boolean))) as string[];
-  const depts = Array.from(new Set(products.flatMap((p) => p.categories || [])));
+  const depts = Array.from(new Set(products.flatMap((p) => productDepartmentsById[p.id] || p.categories || [])));
+  const collections = Array.from(new Set(products.flatMap((p) => productCollectionsById[p.id] || [])));
   const prices = products.map((p) => p.price);
   const min = prices.length ? Math.floor(Math.min(...prices)) : 0;
   const max = prices.length ? Math.ceil(Math.max(...prices)) : 0;
-  return [
+  const facets = [
     { type: 'range', key: 'price', label: 'Faixa de preço', min, max, step: Math.max(1, Math.round((max - min) / 10)) },
     { type: 'multi', key: 'brand', label: 'Marca', options: brands },
     { type: 'multi', key: 'dept', label: 'Subcategoria', options: depts },
   ] as NonNullable<ReturnType<typeof queryLocalPLP>['facets']>;
+  if (collections.length) {
+    facets.push({ type: 'multi', key: 'collection', label: 'Coleções', options: collections });
+  }
+  return facets;
 }
 
 export async function queryPLPUnified(params: PLPQuery) {
@@ -82,10 +90,13 @@ export async function queryPLPUnified(params: PLPQuery) {
   const pageSize = params.pageSize ?? 24;
   const page = params.page ?? 1;
   const term = params.searchTerm;
-  const { products } = await queryVtexPLP({ term, categoryIds, page, pageSize, sort: params.sort });
+  const { products } = await queryVtexPLP({ term, categoryIds, page, pageSize, sort: params.sort, regionalization: params.regionalization });
 
   let result = products;
   result = applyFilters(result, params.filters);
+  if (!params.sort || params.sort === 'relevance') {
+    result = applyRegionalization(result, params.regionalization);
+  }
   result = sortProducts(result, params.sort);
 
   const total = result.length;
