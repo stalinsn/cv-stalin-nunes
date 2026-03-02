@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { Breadcrumbs, Crumb } from '../common/Breadcrumbs';
-import rawCategories from '../../data/categories.json';
+import { catalogCategories } from '../../lib/catalog';
 
 type Cat = {
   id: string;
@@ -18,7 +18,7 @@ export function PdpBreadcrumbs({
   name: string;
   categoryPath?: { id: string; name: string }[];
 }) {
-  const all = rawCategories as unknown as Cat[];
+  const all = catalogCategories as unknown as Cat[];
   const topById = new Map(all.map((c) => [c.id, c]));
   const childById = new Map(
     all.flatMap((parent) => (parent.children || []).map((ch) => [ch.id, { child: ch, parent }]))

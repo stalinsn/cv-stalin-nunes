@@ -13,7 +13,7 @@ export default function EcommerceLayout({ children }: { children: React.ReactNod
     <EcomProviders>
       <Suspense
         fallback={
-          <main className="ecom" data-theme="light">
+          <main className="ecom" data-theme="default" data-campaign="none">
             <Header />
             {children}
             <Footer />
@@ -21,7 +21,7 @@ export default function EcommerceLayout({ children }: { children: React.ReactNod
         }
       >
         <EcommerceLayoutClient>
-          <main className="ecom" data-theme="light">
+          <main className="ecom" data-theme="default" data-campaign="none">
             <Header />
             {children}
             <Footer />

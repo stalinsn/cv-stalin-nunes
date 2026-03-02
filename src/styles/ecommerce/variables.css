@@ -1,6 +1,6 @@
 :root {
-  --container: 1320px;
-  --container-padding: 12px;
+  --container: 1300px;
+  --container-padding: clamp(12px, 2.2vw, 24px);
   --ecom-card-min: 160px;
   --ecom-card-max: 220px;
   /* accent rgb helper for focus rings */
@@ -10,15 +10,8 @@
   --surface-rgb: 248, 249, 250;
 }
 
-@media (min-width: 480px) {
-  :root {
-    --container-padding: 16px;
-  }
-}
-
 @media (min-width: 768px) {
   :root {
-    --container-padding: 24px;
     --ecom-card-min: 180px;
     --ecom-card-max: 240px;
   }
@@ -26,32 +19,21 @@
 
 @media (min-width: 1024px) {
   :root {
-    --container-padding: 32px;
     --ecom-card-min: 200px;
     --ecom-card-max: 260px;
-  }
-}
-
-@media (min-width: 1200px) {
-  :root {
-    --container-padding: 40px;
-    --container: 1320px;
-  }
-}
-
-@media (min-width: 1400px) {
-  :root {
-    --container: 1320px;
-    --container-padding: 48px;
   }
 }
 
 .ecom * {
   box-sizing: border-box;
 }
+.ecom {
+  font-family: var(--ecom-font-family-base, var(--font-family));
+}
 .ecom h1,
 .ecom h2,
 .ecom h3 {
+  font-family: var(--ecom-font-family-display, var(--font-family));
   line-height: var(--line-height-heading);
 }
 .ecom section {

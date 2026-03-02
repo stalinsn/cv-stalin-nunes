@@ -4,7 +4,8 @@
 
 /* Compose ecommerce CSS from modules */
 @import "./variables.css";
-@import "./theme-prezunic.css"; /* Brand theme overrides scoped to .ecom */
+@import "./styleguide.css"; /* Central design system tokens + themes/campaigns */
+@import "./theme-classic.css"; /* Classic preset */
 @import "./scroll-fix.css"; /* High-specificity scroll fixes */
 @import "./header.css";
 @import "./sections.css";

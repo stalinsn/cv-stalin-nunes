@@ -24,10 +24,10 @@ export function CartItems() {
                 {it.packSize && <span className="meta-pill">Pacote c/ {it.packSize}</span>}
               </div>
               <div className="cart-item__qty">
-                <button aria-label="Diminuir" onClick={() => dec(it.id)}>-</button>
+                <button data-track-id="cart-item-dec" aria-label={`Diminuir quantidade de ${it.name}`} onClick={() => dec(it.id)}>-</button>
                 <span>{it.quantity}</span>
-                <button aria-label="Aumentar" onClick={() => inc(it.id)}>+</button>
-                <button className="cart-item__remove" onClick={() => remove(it.id)}>Remover</button>
+                <button data-track-id="cart-item-inc" aria-label={`Aumentar quantidade de ${it.name}`} onClick={() => inc(it.id)}>+</button>
+                <button className="cart-item__remove" data-track-id="cart-item-remove" onClick={() => remove(it.id)}>Remover</button>
               </div>
             </div>
             <div className="cart-item__price">

@@ -159,15 +159,16 @@ export function DeliveryModal({ onClose }: DeliveryModalProps) {
           <div className="cep-input-group">
             <input 
               type="text"
+              aria-label="Digite o CEP"
               placeholder="Digite seu CEP"
               value={cep}
-              onChange={(e) => setCep(e.target.value)}
+              onChange={(e) => setCep(e.target.value.replace(/[^\d-]/g, '').slice(0, 9))}
               className="cep-input"
               maxLength={9}
             />
-            <Button onClick={handleCepSubmit} disabled={loading}>{loading ? 'Verificando…' : 'Verificar'}</Button>
+            <Button data-track-id="delivery-modal-check-cep" onClick={handleCepSubmit} disabled={loading}>{loading ? 'Verificando…' : 'Verificar'}</Button>
           </div>
-          {error && <div style={{ color: '#b00020', marginTop: 8 }}>{error}</div>}
+          {error && <div style={{ color: '#b00020', marginTop: 8 }} role="alert">{error}</div>}
           
           <button className="link-button">
             Não sabe seu CEP? Clique aqui
@@ -226,6 +227,7 @@ export function DeliveryModal({ onClose }: DeliveryModalProps) {
           </div>
           
           <Button 
+            data-track-id="delivery-modal-confirm-store"
             onClick={handleStoreConfirm}
             disabled={!selectedStore}
             className="w-full"

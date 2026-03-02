@@ -1,12 +1,12 @@
 /* Global main container */
 .ecom {
   width: 100%;
-  max-width: var(--container);
-  background: var(--bg);
+  max-width: none;
+  background: var(--ecom-page-gradient), var(--bg);
   color: var(--text);
-  line-height: 1.6;
-  margin: 0 auto;
-  padding: 0 var(--container-padding);
+  line-height: var(--line-height-base);
+  margin: 0;
+  padding: 0;
   /* Reset parent container centering and height constraints */
   align-self: stretch;
   min-height: auto;
@@ -15,6 +15,20 @@
   > * {
     max-width: 100%;
   }
+}
+
+.ecom :is(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid rgba(var(--accent-rgb, 13, 122, 95), 0.45);
+  outline-offset: 2px;
+}
+
+.ecom :is(button, a, input, select, textarea) {
+  transition:
+    color var(--ecom-motion-fast),
+    border-color var(--ecom-motion-fast),
+    background-color var(--ecom-motion-fast),
+    box-shadow var(--ecom-motion-fast),
+    transform var(--ecom-motion-fast);
 }
 
 /* Ensure no horizontal overflow */
@@ -32,9 +46,14 @@ body {
   box-sizing: border-box;
 }
 
+.ecom {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 /* Constrain main content to container width on desktop while keeping header/footer full-bleed */
 .ecom > section {
-  max-width: var(--container);
+  max-width: calc(var(--container) + (var(--container-padding) * 2));
   margin-left: auto;
   margin-right: auto;
 }
@@ -50,22 +69,22 @@ body {
 
 /* Sections and banners */
 .ecom-section {
-  padding: 24px 0;
+  padding: clamp(18px, 2vw, 28px) 0;
   margin: 0;
   width: 100%;
 }
 @media (min-width: 768px) {
   .ecom-section {
-    padding: 32px 0;
+    padding: clamp(24px, 3vw, 38px) 0;
   }
 }
 @media (min-width: 1024px) {
   .ecom-section {
-    padding: 40px 0;
+    padding: clamp(28px, 3.4vw, 44px) 0;
   }
 }
 .ecom-section-title {
-  font-size: 20px;
+  font-size: var(--ecom-font-size-xl);
   font-weight: 700;
   margin-bottom: 20px;
   color: var(--text);
@@ -75,11 +94,11 @@ body {
 }
 
 .ecom-hero {
-  margin: 20px 0;
+  margin: clamp(12px, 2vw, 20px) 0;
   width: 100%;
   .banner {
     width: 100%;
-    height: 360px;
+    height: clamp(220px, 42vw, 380px);
     border-radius: var(--radius-lg);
     background: var(--card-bg);
     display: flex;
@@ -88,7 +107,7 @@ body {
     color: var(--text);
     font-size: 18px;
     font-weight: 700;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--ecom-elevation-card);
   }
 }
 
@@ -98,7 +117,7 @@ body {
 }
 .ecom-banner__hero {
   width: 100%;
-  height: 440px;
+  height: clamp(240px, 48vw, 440px);
   border-radius: var(--radius-lg);
   background: var(--card-bg);
   display: flex;
@@ -107,7 +126,7 @@ body {
   color: var(--text);
   font-size: 18px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--ecom-elevation-card);
   overflow: hidden;
 }
 
@@ -120,8 +139,8 @@ body {
 
 .ecom-strips {
   display: grid;
-  gap: 20px;
-  padding: 20px 0;
+  gap: clamp(12px, 1.8vw, 20px);
+  padding: clamp(14px, 1.8vw, 20px) 0;
   margin: 0;
   width: 100%;
 }
@@ -130,7 +149,7 @@ body {
   border: 1px solid var(--border);
   background: var(--card-bg);
   padding: 48px 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--ecom-elevation-card);
   min-height: 120px;
   display: flex;
   align-items: center;
@@ -155,14 +174,14 @@ body {
 
 /* Carousel arrows */
 .carousel-arrow {
-  width: 44px;
-  height: 44px;
+  width: var(--ecom-touch-target);
+  height: var(--ecom-touch-target);
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--card-bg);
   color: var(--text);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--ecom-motion-fast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -171,7 +190,8 @@ body {
   &:hover {
     background: var(--bg);
     border-color: var(--accent);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: var(--ecom-elevation-floating);
   }
 }
 @media (max-width: 767px) {
@@ -217,7 +237,7 @@ body {
   margin: 0;
   width: 100%;
   position: relative;
-  padding: 20px 0;
+  padding: clamp(14px, 2vw, 24px) 0;
   &__header {
     display: flex;
     align-items: center;
@@ -278,7 +298,7 @@ body {
 
 /* Variants */
 .shelf--brand {
-  background: linear-gradient(135deg, rgba(var(--accent-rgb, 34, 197, 94), 0.1), transparent);
+  background: linear-gradient(135deg, rgba(var(--accent-rgb, 13, 122, 95), 0.12), transparent);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   margin: 20px 0;
@@ -287,22 +307,22 @@ body {
 }
 .shelf--dark {
   background: var(--surface-dark, #222);
-  border: 1px solid #333;
-  color: #fff;
+  border: 1px solid var(--ecom-color-border-strong);
+  color: var(--text-inverse);
   margin: 20px 0;
   padding: 24px var(--container-padding);
   box-sizing: border-box;
 }
 .shelf--dark .shelf__title {
-  color: #fff;
+  color: var(--text-inverse);
 }
 .shelf--dark .shelf__see-more {
-  color: #4ade80;
+  color: var(--ecom-color-brand);
 }
 .shelf--dark .carousel-arrow {
-  background: #2b2b2b;
-  border-color: #3a3a3a;
-  color: #fff;
+  background: var(--ecom-color-surface-strong);
+  border-color: var(--ecom-color-border-strong);
+  color: var(--text-inverse);
 }
 .shelf--brand .carousel-arrow {
   background: var(--card-bg);
@@ -348,11 +368,9 @@ body {
   padding: 40px 0;
   color: var(--text);
   width: 100%;
-  background: linear-gradient(180deg, rgba(248, 249, 250, 0.6) 0%, rgba(243, 244, 246, 0.8) 100%);
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow:
-    0 -2px 8px rgba(0, 0, 0, 0.04),
-    0 0 0 1px rgba(255, 255, 255, 0.8);
+  background: var(--ecom-footer-bg);
+  border-top: 1px solid var(--ecom-color-border-soft);
+  box-shadow: var(--ecom-shadow-sm);
   > * {
     max-width: var(--container);
     margin: 0 auto;
@@ -559,16 +577,12 @@ body {
   }
 }
 
-/* Override global layout constraint for the e-commerce route (keep gutters managed by child sections) */
-.ecom {
-  max-width: none;
-  width: 100%;
-  padding-left: 0;
-  padding-right: 0;
-}
-.ecom-header {
-  max-width: none;
-  width: 100%;
-  padding-left: 0;
-  padding-right: 0;
+@media (prefers-reduced-motion: reduce) {
+  .ecom *,
+  .ecom *::before,
+  .ecom *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }

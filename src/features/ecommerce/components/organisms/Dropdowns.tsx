@@ -3,29 +3,102 @@ import React from 'react';
 import { Dropdown } from '../atoms/Dropdown';
 import type { MegaCategory } from './MegaMenu';
 import { useState } from 'react';
-import rawCategories from '../../data/categories.json';
+import { catalogCategories, catalogProducts, productCollectionsById, productDepartmentsById } from '../../lib/catalog';
 import { isVtexLive } from '../../lib/runtimeConfig';
 import { MegaMenu } from './MegaMenu';
+import Link from 'next/link';
 
-type Category = { id: string; slug: string; name: string; parentId: string | null; productIds: string[]; children?: { id: string; slug: string; name: string }[] };
-const allCats = rawCategories as unknown as Category[];
+type Category = (typeof catalogCategories)[number];
+const allCats = catalogCategories as Category[];
 
 function mapToMega(cats: Category[]): MegaCategory[] {
+  const productById = new Map(catalogProducts.map((product) => [product.id, product]));
   return cats
     .filter((c) => (c.productIds?.length || 0) > 0 || (c.children?.length || 0) > 0)
-    .map((c) => ({
-      key: c.slug,
-      label: c.name,
-      href: `/e-commerce/plp?categoria=${encodeURIComponent(c.slug)}`,
-      sections: [
-        {
-          items: (c.children || []).map((ch) => ({
-            name: ch.name,
-            href: `/e-commerce/plp?categoria=${encodeURIComponent(c.slug)}&dept=${encodeURIComponent(ch.name)}`,
-          })),
-        },
-      ],
-    }));
+    .map((category) => {
+      const products = (category.productIds || [])
+        .map((id) => productById.get(id))
+        .filter((product): product is NonNullable<typeof product> => Boolean(product));
+
+      const deptCounts = new Map<string, number>();
+      for (const product of products) {
+        const departments = productDepartmentsById[product.id] || [];
+        departments.forEach((department) => {
+          if (!department) return;
+          deptCounts.set(department, (deptCounts.get(department) || 0) + 1);
+        });
+      }
+
+      const childNamesRaw =
+        category.children?.length
+          ? category.children.map((child) => child.name)
+          : Array.from(deptCounts.keys());
+      const childNames = Array.from(
+        childNamesRaw
+          .map((name) => name.trim())
+          .filter(Boolean)
+          .reduce((accumulator, name) => {
+            const normalized = name
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .toLocaleLowerCase();
+            if (!accumulator.has(normalized)) accumulator.set(normalized, name);
+            return accumulator;
+          }, new Map<string, string>())
+          .values()
+      );
+
+      const subcategoryItems = childNames
+        .map((name) => ({ name, count: deptCounts.get(name) || 0 }))
+        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+        .slice(0, 12)
+        .map(({ name, count }) => ({
+          name: count ? `${name} (${count})` : name,
+          href: `/e-commerce/plp?categoria=${encodeURIComponent(category.slug)}&dept=${encodeURIComponent(name)}`,
+        }));
+
+      const collectionCounts = new Map<string, number>();
+      for (const product of products) {
+        const collections = productCollectionsById[product.id] || [];
+        for (const collection of collections) {
+          collectionCounts.set(collection, (collectionCounts.get(collection) || 0) + 1);
+        }
+      }
+
+      const collectionItems = Array.from(collectionCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8)
+        .map(([collection, count]) => ({
+          name: `${collection} (${count})`,
+          href: `/e-commerce/plp?categoria=${encodeURIComponent(category.slug)}&collection=${encodeURIComponent(collection)}`,
+          isHighlighted: collection === 'Ofertas' || collection === 'Black Friday',
+        }));
+
+      const featuredItems = products.slice(0, 8).map((product) => ({
+        name: product.name,
+        href: product.url ? `/e-commerce${product.url}` : `/e-commerce/${product.id}/p`,
+        isHighlighted: (product.listPrice || product.price) > product.price,
+      }));
+
+      const sections = [];
+      if (subcategoryItems.length) sections.push({ items: subcategoryItems });
+      if (collectionItems.length) sections.push({ items: collectionItems });
+      if (featuredItems.length) sections.push({ items: featuredItems });
+
+      if (!sections.length) {
+        sections.push({
+          title: 'Navegacao',
+          items: [{ name: 'Ver todos os produtos', href: `/e-commerce/plp?categoria=${encodeURIComponent(category.slug)}` }],
+        });
+      }
+
+      return {
+        key: category.slug,
+        label: category.name,
+        href: `/e-commerce/plp?categoria=${encodeURIComponent(category.slug)}`,
+        sections,
+      } satisfies MegaCategory;
+    });
 }
 
 export function DepartmentsDropdown({ trigger }: { trigger?: React.ReactNode }) {
@@ -79,16 +152,18 @@ export function DepartmentsDropdown({ trigger }: { trigger?: React.ReactNode }) 
             const isOpen = !!openKeys[cat.key];
             return (
               <div key={cat.key} className={`dept-item ${isOpen ? 'is-open' : ''}`}>
-                <button className="dept-item__header" onClick={() => toggle(cat.key)} aria-expanded={isOpen}>
-                  <span className="dept-item__label">{cat.label}</span>
-                  <span className="dept-item__chev" aria-hidden>›</span>
-                </button>
+                <div className="dept-item__header">
+                  <Link href={cat.href || '#'} className="dept-item__categoryLink">{cat.label}</Link>
+                  <button className="dept-item__toggle" onClick={() => toggle(cat.key)} aria-expanded={isOpen} aria-label={`Expandir ${cat.label}`}>
+                    <span className="dept-item__chev" aria-hidden>›</span>
+                  </button>
+                </div>
                 {isOpen && (
                   <div className="dept-item__panel">
                     {cat.sections.map((sec, i) => (
                       <ul key={i} className="dept-item__list">
                         {sec.items.map((it, j) => (
-                          <li key={j}><a className="dept-item__link" href={it.href || '#'}>{it.name}</a></li>
+                          <li key={j}><Link className="dept-item__link" href={it.href || '#'}>{it.name}</Link></li>
                         ))}
                       </ul>
                     ))}
@@ -102,4 +177,3 @@ export function DepartmentsDropdown({ trigger }: { trigger?: React.ReactNode }) 
     </Dropdown>
   );
 }
-

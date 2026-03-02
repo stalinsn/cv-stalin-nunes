@@ -1,20 +1,11 @@
-import type { UIProduct, EcommerceItem } from '../types/product';
+import type { UIProduct } from '../types/product';
 import type { PLPQuery } from './plp';
 import { queryPLP as queryLocalPLP } from './plp';
 import { queryVtexPLP } from './vtexPlpBridge';
-import rawCategories from '../data/categories.json';
-import rawProducts from '../data/products.json';
-import { mapToUIProduct } from './mapProduct';
+import { catalogCategories, catalogProducts, productCollectionsById, productDepartmentsById } from './catalog';
 
-type Category = {
-  id: string;
-  slug: string;
-  name: string;
-  parentId: string | null;
-  children?: { id: string; slug: string; name: string }[];
-};
-
-const allCategories = rawCategories as Category[];
+type Category = (typeof catalogCategories)[number];
+const allCategories = catalogCategories as Category[];
 
 function getCategoryBySlug(slug?: string) {
   if (!slug) return undefined;
@@ -34,7 +25,17 @@ function applyFilters(products: UIProduct[], filters?: PLPQuery['filters']) {
   }
   if (filters.dept?.length) {
     const set = new Set(filters.dept.map((d) => d.toLocaleLowerCase()));
-    filteredProducts = filteredProducts.filter((p) => p.categories?.some((c) => set.has(c.toLocaleLowerCase())));
+    filteredProducts = filteredProducts.filter((p) => {
+      const departments = productDepartmentsById[p.id] || p.categories || [];
+      return departments.some((department) => set.has(department.toLocaleLowerCase()));
+    });
+  }
+  if (filters.collection?.length) {
+    const set = new Set(filters.collection.map((c) => c.toLocaleLowerCase()));
+    filteredProducts = filteredProducts.filter((p) => {
+      const collections = productCollectionsById[p.id] || [];
+      return collections.some((collection) => set.has(collection.toLocaleLowerCase()));
+    });
   }
   return filteredProducts;
 }
@@ -57,15 +58,20 @@ function sortProducts(products: UIProduct[], sort?: PLPQuery['sort']) {
 
 function buildFacets(products: UIProduct[]) {
   const brands = Array.from(new Set(products.map((p) => p.brand).filter(Boolean))) as string[];
-  const depts = Array.from(new Set(products.flatMap((p) => p.categories || [])));
+  const depts = Array.from(new Set(products.flatMap((p) => productDepartmentsById[p.id] || p.categories || [])));
+  const collections = Array.from(new Set(products.flatMap((p) => productCollectionsById[p.id] || [])));
   const prices = products.map((p) => p.price);
   const min = prices.length ? Math.floor(Math.min(...prices)) : 0;
   const max = prices.length ? Math.ceil(Math.max(...prices)) : 0;
-  return [
+  const facets = [
     { type: 'range', key: 'price', label: 'Faixa de preço', min, max, step: Math.max(1, Math.round((max - min) / 10)) },
     { type: 'multi', key: 'brand', label: 'Marca', options: brands },
     { type: 'multi', key: 'dept', label: 'Subcategoria', options: depts },
   ] as NonNullable<ReturnType<typeof queryLocalPLP>['facets']>;
+  if (collections.length) {
+    facets.push({ type: 'multi', key: 'collection', label: 'Coleções', options: collections });
+  }
+  return facets;
 }
 
 export type DataSource = 'local' | 'vtexMock' | 'vtexLive';
@@ -85,7 +91,7 @@ export async function queryPLPUnified(params: PLPQuery) {
   const pageSize = params.pageSize ?? 24;
   const page = params.page ?? 1;
   const term = params.searchTerm;
-  const { products } = await queryVtexPLP({ term, categoryIds, page, pageSize, sort: params.sort });
+  const { products } = await queryVtexPLP({ term, categoryIds, page, pageSize, sort: params.sort, regionalization: params.regionalization });
   // Safety: if VTEX/mocks return nothing, fall back to local to avoid blank PLP during dev
   if (!products || products.length === 0) {
     return queryLocalPLP(params);
@@ -112,7 +118,7 @@ export async function queryPLPUnified(params: PLPQuery) {
 export async function getProductBySlugUnified(slug: string): Promise<UIProduct | null> {
   const source = getDataSource();
   if (source === 'local') {
-    const all = (rawProducts as unknown as EcommerceItem[]).map(mapToUIProduct);
+    const all = catalogProducts;
     const bySlug = all.find((p) => p.url && p.url.includes(`/${slug}/p`));
     if (bySlug) return bySlug;
     return all.find((p) => p.id === slug) || null;
@@ -121,7 +127,7 @@ export async function getProductBySlugUnified(slug: string): Promise<UIProduct |
   const bySlug = products.find((p) => p.url && p.url.includes(`/${slug}/p`));
   if (bySlug) return bySlug;
   // Try local fallback by slug or id
-  const all = (rawProducts as unknown as EcommerceItem[]).map(mapToUIProduct);
+  const all = catalogProducts;
   const fromLocal = all.find((p) => p.url && p.url.includes(`/${slug}/p`)) || all.find((p) => p.id === slug) || null;
   return products[0] || fromLocal;
 }

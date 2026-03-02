@@ -1,20 +1,9 @@
-import rawProducts from '../data/products.json';
-import rawCategories from '../data/categories.json';
-import { mapToUIProduct } from './mapProduct';
-import type { UIProduct, EcommerceItem } from '../types/product';
+import { catalogCategories, catalogProducts, productCollectionsById, productDepartmentsById } from './catalog';
+import type { CatalogCategory } from './catalog';
+import type { UIProduct } from '../types/product';
+import { applyRegionalization, type RegionalizationContext } from './regionalization';
 
-export type Category = {
-  id: string;
-  slug: string;
-  name: string;
-  parentId: string | null;
-  children?: { id: string; slug: string; name: string }[];
-  productIds: string[];
-  facets?: Array<
-    | { type: 'range'; key: 'price'; label: string; min: number; max: number; step?: number }
-    | { type: 'multi'; key: 'brand' | 'dept'; label: string; options: string[] }
-  >;
-};
+export type Category = CatalogCategory;
 
 export type PLPQuery = {
   categorySlug?: string;
@@ -22,15 +11,16 @@ export type PLPQuery = {
   page?: number;
   pageSize?: number;
   sort?: 'relevance' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
+  regionalization?: RegionalizationContext;
   filters?: {
     price?: [number, number];
     brand?: string[];
-  dept?: string[];
+    dept?: string[];
+    collection?: string[];
   };
 };
-
-const allProducts: UIProduct[] = (rawProducts as unknown as EcommerceItem[]).map(mapToUIProduct);
-const allCategories: Category[] = rawCategories as unknown as Category[];
+const allProducts: UIProduct[] = catalogProducts;
+const allCategories: Category[] = catalogCategories;
 
 function getCategoryBySlug(slug?: string) {
   if (!slug) return undefined;
@@ -67,7 +57,17 @@ function applyFilters(products: UIProduct[], filters?: PLPQuery['filters']) {
   }
   if (filters.dept?.length) {
     const set = new Set(filters.dept.map((d) => d.toLocaleLowerCase()));
-    filteredProducts = filteredProducts.filter((p) => p.categories?.some((c) => set.has(c.toLocaleLowerCase())));
+    filteredProducts = filteredProducts.filter((p) => {
+      const departments = productDepartmentsById[p.id] || p.categories || [];
+      return departments.some((department) => set.has(department.toLocaleLowerCase()));
+    });
+  }
+  if (filters.collection?.length) {
+    const set = new Set(filters.collection.map((c) => c.toLocaleLowerCase()));
+    filteredProducts = filteredProducts.filter((p) => {
+      const collections = productCollectionsById[p.id] || [];
+      return collections.some((collection) => set.has(collection.toLocaleLowerCase()));
+    });
   }
   return filteredProducts;
 }
@@ -93,12 +93,15 @@ function sortProducts(products: UIProduct[], sort?: PLPQuery['sort']) {
 }
 
 export function queryPLP(params: PLPQuery) {
-  const { categorySlug, searchTerm, page = 1, pageSize = 16, sort, filters } = params;
+  const { categorySlug, searchTerm, page = 1, pageSize = 16, sort, filters, regionalization } = params;
   const cat = getCategoryBySlug(categorySlug);
   let result = allProducts;
   result = filterByCategory(result, cat);
   result = filterBySearch(result, searchTerm);
   result = applyFilters(result, filters);
+  if (!sort || sort === 'relevance') {
+    result = applyRegionalization(result, regionalization);
+  }
   const total = result.length;
   result = sortProducts(result, sort);
   const start = (page - 1) * pageSize;
@@ -115,13 +118,18 @@ export function queryPLP(params: PLPQuery) {
 
 function buildFacetsFromProducts(products: UIProduct[]): Category['facets'] {
   const brands = Array.from(new Set(products.map((p) => p.brand).filter(Boolean))) as string[];
-  const depts = Array.from(new Set(products.flatMap((p) => p.categories || [])));
+  const depts = Array.from(new Set(products.flatMap((p) => productDepartmentsById[p.id] || p.categories || [])));
+  const collections = Array.from(new Set(products.flatMap((p) => productCollectionsById[p.id] || [])));
   const prices = products.map((p) => p.price);
   const min = Math.floor(Math.min(...prices, 0));
   const max = Math.ceil(Math.max(...prices, 0));
-  return [
+  const facets: NonNullable<Category['facets']> = [
     { type: 'range', key: 'price', label: 'Faixa de preço', min, max, step: Math.max(1, Math.round((max - min) / 10)) },
     { type: 'multi', key: 'brand', label: 'Marca', options: brands },
     { type: 'multi', key: 'dept', label: 'Subcategoria', options: depts },
   ];
+  if (collections.length) {
+    facets.push({ type: 'multi', key: 'collection', label: 'Coleções', options: collections });
+  }
+  return facets;
 }

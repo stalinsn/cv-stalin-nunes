@@ -10,12 +10,14 @@ export function PLPToolbar({
   sort: 'relevance' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
   onSort: (s: 'relevance' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc') => void;
 }) {
+  const selectId = 'plp-sort-select';
   return (
     <div className="plp-toolbar">
-      <div className="plp-toolbar__count">{total} resultados</div>
-      <label className="plp-toolbar__sort">
+      <div className="plp-toolbar__count" role="status" aria-live="polite">{total} resultados</div>
+      <label className="plp-toolbar__sort" htmlFor={selectId}>
         <span>Ordenar por</span>
         <select
+          id={selectId}
           value={sort}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             onSort(e.target.value as 'relevance' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc')

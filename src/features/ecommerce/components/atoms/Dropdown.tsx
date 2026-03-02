@@ -37,7 +37,15 @@ export function Dropdown({ trigger, children, className = '' }: DropdownProps) {
         {trigger}
       </div>
       {isOpen && (
-        <div className="dropdown__content">
+        <div
+          className="dropdown__content"
+          onClickCapture={(event) => {
+            const target = event.target as HTMLElement;
+            if (target.closest('a[href]')) {
+              setIsOpen(false);
+            }
+          }}
+        >
           {children}
         </div>
       )}

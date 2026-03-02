@@ -1,10 +1,10 @@
-/* Prezunic brand theme overrides scoped to the ecommerce route */
-.ecom {
+/* Classic brand theme overrides (enabled with data-theme="classic") */
+.ecom[data-theme="classic"] {
   /* Brand palette */
-  --brand-primary: #0050b3; /* Prezunic blue */
+  --brand-primary: #0050b3;
   --brand-primary-rgb: 0, 80, 179; /* For rgba() usage */
   --brand-primary-600: #003f8c; /* hover/pressed */
-  --brand-secondary: #ffd100; /* Prezunic yellow */
+  --brand-secondary: #ffd100;
   --brand-secondary-300: #ffea70; /* lighter yellow for gradients */
 
   /* Map brand to generic tokens used by components */

@@ -5,6 +5,25 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
 
+## [2.7.0] - 2026-03-02
+
+### Added
+- Catálogo mock robusto para o e-commerce em `src/features/ecommerce/data/mock-catalog` (manifesto, taxonomy, índice e base extensa de produtos)
+- Novas camadas de domínio para catálogo, precificação e regionalização: `catalog.ts`, `pricing.ts` e `regionalization.ts`
+- Esqueleto de carregamento da PLP (`PLPSkeleton.tsx`) para feedback visual durante carregamento
+- Novo styleguide de e-commerce com arquivo de estilo dedicado (`src/styles/ecommerce/styleguide.css`) e configuração (`src/features/ecommerce/config/styleguide.ts`)
+
+### Changed
+- Refatoração ampla da experiência e-commerce em layout, PLP, carrinho, checkout, header, dropdowns e PDP para melhorar consistência visual e fluxo de navegação
+- Ajustes na integração de dados da PLP (`plp.ts`, `plpDataSource.ts`, `vtexPlpBridge.ts`, `useProducts.ts`) e evolução das regras de gatekeeper
+- Tema CSS renomeado de `theme-prezunic.css` para `theme-classic.css`, com atualização da base de estilos e documentação associada
+- Script de lint atualizado para `eslint src` em `package.json`
+
+### Technical
+- Grande atualização de estilos do e-commerce (botões, drawer, checkout, cart, header, dropdown, PLP/PDP, variáveis e seções)
+- Atualização de lockfile e configuração de ambiente Yarn para suportar o novo conjunto de dependências/execução
+
+
 ## [2.6.0] - 2025-08-17
 
 ### Added

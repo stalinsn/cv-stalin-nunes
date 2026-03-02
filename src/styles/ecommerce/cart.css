@@ -1,16 +1,16 @@
 .cart-page {
-  padding: 24px 16px;
+  padding: clamp(16px, 2vw, 26px) var(--container-padding);
 
   .cart-title {
-    font-size: 24px;
+    font-size: var(--ecom-font-size-xl);
     font-weight: 700;
     margin: 8px 0 16px;
   }
 
   .cart-layout {
     display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 24px;
+    grid-template-columns: 1fr minmax(290px, 340px);
+    gap: clamp(16px, 2vw, 26px);
     align-items: start;
 
     @media (max-width: 900px) {
@@ -38,16 +38,17 @@
 
 .cart-item {
   display: grid;
-  grid-template-columns: 72px 1fr auto;
-  gap: 12px;
-  padding: 12px;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 14px;
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--ecom-radius-md);
+  box-shadow: var(--ecom-shadow-sm);
 
   &__media {
-    width: 72px;
-    height: 72px;
+    width: 84px;
+    height: 84px;
     display: grid;
     place-items: center;
   }
@@ -68,7 +69,8 @@
     align-items: center;
 
     button {
-      padding: 6px 10px;
+      min-height: var(--ecom-touch-target);
+      padding: 8px 12px;
       border-radius: 8px;
       border: 1px solid var(--border);
       background: var(--bg);
@@ -100,11 +102,11 @@
 .cart-summary {
   &__box {
     position: sticky;
-    top: 16px;
+    top: 108px;
     padding: 16px;
     background: var(--card-bg);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--ecom-radius-md);
     display: grid;
     gap: 10px;
   }
@@ -117,7 +119,7 @@
 .summary-row--total {
   border-top: 1px dashed var(--border);
   padding-top: 8px;
-  font-size: 18px;
+  font-size: var(--ecom-font-size-lg);
 }
 
 .coupon-box {
@@ -130,26 +132,38 @@
   gap: 8px;
 
   input {
-    padding: 8px 10px;
+    min-height: var(--ecom-touch-target);
+    padding: 10px 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
   }
   button {
-    padding: 8px 12px;
+    min-height: var(--ecom-touch-target);
+    padding: 10px 14px;
     border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--bg);
   }
 }
 
+.coupon-message {
+  color: var(--ecom-color-text-muted);
+  font-size: 12px;
+}
+
 .checkout-btn {
+  min-height: var(--ecom-touch-target);
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: var(--ecom-radius-sm);
   border: 0;
   background: var(--accent);
-  color: #fff;
+  color: var(--ecom-color-brand-contrast);
   font-weight: 600;
   cursor: pointer;
+}
+.checkout-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .cart-shipping {
@@ -163,13 +177,21 @@
     grid-template-columns: 1fr auto;
     gap: 8px;
 
+    label {
+      grid-column: 1 / -1;
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
     input {
-      padding: 8px 10px;
+      min-height: var(--ecom-touch-target);
+      padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: 8px;
     }
     button {
-      padding: 8px 12px;
+      min-height: var(--ecom-touch-target);
+      padding: 10px 14px;
       border-radius: 8px;
       border: 1px solid var(--border);
       background: var(--bg);
@@ -177,7 +199,7 @@
   }
 
   .shipping-error {
-    color: #b00020;
+    color: var(--ecom-color-danger);
   }
   .shipping-address {
     font-size: 14px;
@@ -185,5 +207,16 @@
   }
   .shipping-price {
     font-weight: 600;
+  }
+}
+
+@media (max-width: 900px) {
+  .cart-item {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 12px;
+  }
+  .cart-item__price {
+    grid-column: 2;
+    justify-items: start;
   }
 }
