@@ -5,6 +5,25 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
 
+## [2.8.0] - 2026-03-03
+
+### Added
+- Novo app administrativo `EcommPanel` em `src/app/ecommpanel` com login, recuperação/reset de senha, área admin e módulos de usuários/site.
+- Nova API administrativa em `src/app/api/ecommpanel/*` com endpoints de autenticação, gestão de usuários e gestão de páginas/rotas dinâmicas.
+- Runtime de conteúdo publicado para integração painel -> storefront em `src/features/site-runtime` e resolução de rotas dinâmicas no e-commerce (`[...cmsPath]`).
+- Novas documentações operacionais e de arquitetura: `docs/SYSTEM_MAP.md`, `docs/RUNBOOK.md`, `docs/IMPLEMENTATION_ROADMAP.md`, `docs/P0_EXECUTION_BACKLOG.md` e `docs/apps/ecommpanel.md`.
+
+### Changed
+- README principal atualizado para refletir os 4 apps (`CV`, `MOTD`, `E-commerce`, `EcommPanel`), fluxo de export desacoplado e bridge de conteúdo por `ECOM_CONTENT_PATH`.
+- Feature flags do e-commerce ampliadas para granularidade por área (layout, header, home, PLP, PDP, cart, drawer e checkout) em `src/features/ecommerce/config/featureFlags.ts`.
+- Componentes de ecommerce adaptados para flags finas (ex.: `Header`, `Banners`, `CheckoutView`, `DrawerCart`, `CartView`, `Showcase`) e suporte a renderização condicional por contexto.
+- Exportação standalone estendida com `export:ecommpanel` e atualização do `export:all`.
+
+### Technical
+- Ajustes estruturais de rotas/layout do e-commerce para conviver com páginas nativas e CMS dinâmico.
+- Inclusão de variável opcional `ECOM_CONTENT_PATH` em `.env.example` para diretório compartilhado de publicação/leitura entre painel e loja.
+
+
 ## [2.7.0] - 2026-03-02
 
 ### Added
