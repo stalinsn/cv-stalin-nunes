@@ -5,8 +5,8 @@
 .wrapper,
 .toolbar,
 .topbar,
-main:not(.ecom),
-header {
+main:not(.ecom):not(.panel-root),
+header:not(.panel-topbar):not(.ecom-header) {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -22,8 +22,8 @@ header {
   .wrapper,
   .toolbar,
   .topbar,
-  main:not(.ecom),
-  header {
+  main:not(.ecom):not(.panel-root),
+  header:not(.panel-topbar):not(.ecom-header) {
     max-width: 98vw;
     padding-left: 2vw;
     padding-right: 2vw;
@@ -33,8 +33,8 @@ header {
   .wrapper,
   .toolbar,
   .topbar,
-  main:not(.ecom),
-  header {
+  main:not(.ecom):not(.panel-root),
+  header:not(.panel-topbar):not(.ecom-header) {
     max-width: 100vw;
     padding-left: var(--gap-xs);
     padding-right: var(--gap-xs);
@@ -44,7 +44,7 @@ header {
 .wrapper,
 .toolbar,
 .topbar,
-main:not(.ecom),
-header {
+main:not(.ecom):not(.panel-root),
+header:not(.panel-topbar):not(.ecom-header) {
   position: static !important;
 }

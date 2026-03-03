@@ -12,11 +12,16 @@ body {
 }
 
 /* CV/Portfolio specific layout - only apply to pages that need it */
-body:not(:has(.ecom)) {
+body:not(:has(.ecom)):not(:has(.panel-root)) {
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100svh;
+}
+
+/* Admin panel must always use full-width flow */
+body:has(.panel-root) {
+  display: block;
 }
 
 a {

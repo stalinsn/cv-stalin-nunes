@@ -1,0 +1,77 @@
+import type { NextRequest } from 'next/server';
+import {
+  getApiAuthContext,
+  hasPermission,
+  hasValidCsrf,
+  isTrustedOrigin,
+} from '@/features/ecommpanel/server/auth';
+import { errorNoStore, jsonNoStore } from '@/features/ecommpanel/server/http';
+import {
+  createSitePage,
+  getSitePageBySlug,
+  isValidSlug,
+  listSitePages,
+  normalizeSlug,
+} from '@/features/ecommpanel/server/siteBuilderStore';
+
+export const dynamic = 'force-dynamic';
+
+type CreatePageBody = {
+  title?: string;
+  slug?: string;
+  description?: string;
+};
+
+async function requireSiteContentPermission(req: NextRequest) {
+  const auth = await getApiAuthContext(req);
+  if (!auth) return { error: errorNoStore(401, 'Não autenticado.') };
+  if (!hasPermission(auth.user, 'site.content.manage')) {
+    return { error: errorNoStore(403, 'Sem permissão para gerenciar páginas.') };
+  }
+  return { auth };
+}
+
+export async function GET(req: NextRequest) {
+  const guard = await requireSiteContentPermission(req);
+  if ('error' in guard) return guard.error;
+
+  return jsonNoStore({ pages: listSitePages() });
+}
+
+export async function POST(req: NextRequest) {
+  if (!isTrustedOrigin(req)) {
+    return errorNoStore(403, 'Origem não permitida.');
+  }
+
+  const guard = await requireSiteContentPermission(req);
+  if ('error' in guard) return guard.error;
+
+  if (!hasValidCsrf(req, guard.auth.csrfToken)) {
+    return errorNoStore(403, 'Token CSRF inválido.');
+  }
+
+  const body = (await req.json().catch(() => null)) as CreatePageBody | null;
+  const title = body?.title?.trim() || '';
+  const slug = normalizeSlug(body?.slug || '');
+
+  if (!title || !slug) {
+    return errorNoStore(400, 'Título e slug são obrigatórios.');
+  }
+
+  if (!isValidSlug(slug)) {
+    return errorNoStore(400, 'Slug inválido. Use apenas letras minúsculas, números e hífen.');
+  }
+
+  const existing = getSitePageBySlug(slug);
+  if (existing) {
+    return errorNoStore(409, 'Já existe uma página com esse slug.');
+  }
+
+  const page = createSitePage({
+    title,
+    slug,
+    description: body?.description,
+  });
+
+  return jsonNoStore({ ok: true, page });
+}

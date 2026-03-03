@@ -3,10 +3,11 @@ import React from 'react';
 import ProductCard from '../molecules/ProductCard';
 import { useProducts } from '../../lib/useProducts';
 import { isOn } from '../../config/featureFlags';
+import type { FlagKey } from '../../config/featureFlags';
 import Carousel from './Carousel';
 import { shelfConfig } from '../../config/shelfConfig';
 
-export default function Showcase({ title, flag }: { title: string; flag: Parameters<typeof isOn>[0] }) {
+export default function Showcase({ title, flag }: { title: string; flag: FlagKey }) {
   const data = useProducts();
   if (!isOn(flag)) return null;
   let itemCount = 8;

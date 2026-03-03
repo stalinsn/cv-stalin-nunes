@@ -11,6 +11,7 @@ const Showcase = dynamic(() => import('../../../../features/ecommerce/components
 
 import { getProductBySlugUnified } from '../../../../features/ecommerce/lib/gatekeeper';
 import type { UIProduct } from '../../../../features/ecommerce/types/product';
+import { isOn } from '../../../../features/ecommerce/config/featureFlags';
 
 function Tabs() {
   const [active, setActive] = React.useState(0);
@@ -78,11 +79,11 @@ export default function ProductDetailPage() {
 
   return (
     <>
-      <PdpBreadcrumbs name={product.name} categoryPath={product.categoryPath} />
+      {isOn('ecom.pdp.breadcrumbs') ? <PdpBreadcrumbs name={product.name} categoryPath={product.categoryPath} /> : null}
 
   <section className="container pdp">
         {/* Gallery à esquerda */}
-        <PdpGallery image={product.image} name={product.name} price={product.price} listPrice={product.listPrice} />
+        {isOn('ecom.pdp.gallery') ? <PdpGallery image={product.image} name={product.name} price={product.price} listPrice={product.listPrice} /> : null}
 
         {/* Info à direita */}
         <div className="pdp__info">
@@ -103,47 +104,59 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Badge Prime */}
-          <div className="prime-section">
-            <div className="prime-badge">
-              <span className="prime-logo">prime</span>
-              <span className="prime-text">Até 5 unidades, demais unidades poderão ser...</span>
+          {isOn('ecom.pdp.primeBadge') ? (
+            <div className="prime-section">
+              <div className="prime-badge">
+                <span className="prime-logo">prime</span>
+                <span className="prime-text">Até 5 unidades, demais unidades poderão ser...</span>
+              </div>
             </div>
-          </div>
+          ) : null}
 
           {/* Botão de adicionar */}
-          <PdpPriceActions id={product.id} name={product.name} image={product.image} price={product.price} listPrice={product.listPrice} unit={product.unit} packSize={product.packSize} />
+          {isOn('ecom.pdp.priceActions') ? (
+            <PdpPriceActions id={product.id} name={product.name} image={product.image} price={product.price} listPrice={product.listPrice} unit={product.unit} packSize={product.packSize} />
+          ) : null}
 
           {/* Sobre o produto */}
-          <div className="pdp__about">
-            <h3>Sobre o produto</h3>
-            <p>
-              Informações do produto, detalhes e especificações. Este bloco é um placeholder para
-              descrição, origem, conservação e outros atributos.
-            </p>
-          </div>
+          {isOn('ecom.pdp.about') ? (
+            <div className="pdp__about">
+              <h3>Sobre o produto</h3>
+              <p>
+                Informações do produto, detalhes e especificações. Este bloco é um placeholder para
+                descrição, origem, conservação e outros atributos.
+              </p>
+            </div>
+          ) : null}
         </div>
       </section>
 
       {/* Tabs: Descrição / Características / Avaliações (interactive) */}
-      <section className="container pdp-tabs" aria-labelledby="pdp-tabs">
-        <Tabs />
-      </section>
+      {isOn('ecom.pdp.tabs') ? (
+        <section className="container pdp-tabs" aria-labelledby="pdp-tabs">
+          <Tabs />
+        </section>
+      ) : null}
 
-  <section className="container pdp__extra">
-        <div className="pdp__panel">
-          <h3>Informações nutricionais</h3>
-          <p>Conteúdo ilustrativo. Adicione aqui tabela e observações.</p>
-        </div>
-        <div className="pdp__panel">
-          <h3>Conservação</h3>
-          <p>Mantenha refrigerado/ambiente conforme o tipo de produto.</p>
-        </div>
-      </section>
+  {isOn('ecom.pdp.extraPanels') ? (
+    <section className="container pdp__extra">
+          <div className="pdp__panel">
+            <h3>Informações nutricionais</h3>
+            <p>Conteúdo ilustrativo. Adicione aqui tabela e observações.</p>
+          </div>
+          <div className="pdp__panel">
+            <h3>Conservação</h3>
+            <p>Mantenha refrigerado/ambiente conforme o tipo de produto.</p>
+          </div>
+        </section>
+    ) : null}
 
       {/* Related products shelf */}
-      <section className="container pdp-related">
-        <Showcase title="Produtos Relacionados" flag="ecom.showcaseGrocery" />
-      </section>
+      {isOn('ecom.pdp.related') ? (
+        <section className="container pdp-related">
+          <Showcase title="Produtos Relacionados" flag="ecom.showcaseGrocery" />
+        </section>
+      ) : null}
 
   </>
   );

@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ConfirmationClient() {
   const params = useSearchParams();
@@ -10,7 +11,7 @@ export default function ConfirmationClient() {
       <h1>Pedido confirmado</h1>
       <p>Obrigado pela sua compra!</p>
       {orderId && <p><strong>Código do pedido:</strong> {orderId}</p>}
-      <a href="/e-commerce">Voltar à loja</a>
+      <Link href="/e-commerce">Voltar à loja</Link>
     </div>
   );
 }

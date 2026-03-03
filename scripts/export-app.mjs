@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- Export a standalone Next.js project for a given app (cv|motd|ecommerce).
+ Export a standalone Next.js project for a given app (cv|motd|ecommerce|ecommpanel).
  - Copies minimal skeleton (package.json, next.config.ts, tsconfig, public, src)
  - Copies route folder under src/app/<routeDir>
  - Creates src/app/page.tsx that re-exports the app's page component
@@ -35,10 +35,18 @@ const APPS = {
   cv: { routeDir: 'cv', title: 'CV' },
   motd: { routeDir: 'motd', title: 'MOTD' },
   ecommerce: { routeDir: 'e-commerce', title: 'E-commerce' },
+  ecommpanel: { routeDir: 'ecommpanel', title: 'EcommPanel' },
+};
+
+const APP_FEATURES = {
+  cv: [],
+  motd: [],
+  ecommerce: ['ecommerce', 'ecommpanel', 'site-runtime'],
+  ecommpanel: ['ecommpanel', 'site-runtime'],
 };
 
 if (!APPS[APP]) {
-  console.error('Missing or invalid --app. Use one of: cv, motd, ecommerce');
+  console.error('Missing or invalid --app. Use one of: cv, motd, ecommerce, ecommpanel');
   process.exit(1);
 }
 
@@ -158,13 +166,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 `;
   await writeFile(path.join(appDir, 'layout.tsx'), layoutContent);
 
-  // Re-export the app page as root page
-  const pageContent = `export { default } from './${cfg.routeDir}/page';
+  // Keep the original segmented app entrypoint and redirect "/" to it.
+  // This preserves each app's own layout/providers (ex.: /e-commerce/layout.tsx).
+  const pageContent = `import { redirect } from 'next/navigation';
+
+export default function RootPage() {
+  redirect('/${cfg.routeDir}');
+}
 `;
   await writeFile(path.join(appDir, 'page.tsx'), pageContent);
 
   // 4) Copy shared folders commonly imported via @/
-  const shared = ['components', 'styles', 'data', 'lib', 'types', 'utils', 'constants'];
+  const shared = ['components', 'styles', 'data', 'lib', 'types', 'utils', 'constants', 'hooks'];
   for (const folder of shared) {
     const src = path.join(ROOT, 'src', folder);
     if (await exists(src)) {
@@ -172,14 +185,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     }
   }
 
-  // features: prefer app-specific subfolder if it exists; else copy entire features
+  // features: copy explicit dependencies for each app when configured
+  // (keeps standalone exports small and avoids missing cross-feature imports)
   const featuresRoot = path.join(ROOT, 'src', 'features');
   if (await exists(featuresRoot)) {
-    const candidate = path.join(featuresRoot, APP);
-    if (await exists(candidate)) {
-      await cp(candidate, path.join(srcDir, 'features', APP));
+    const mappedFeatures = APP_FEATURES[APP] || [];
+    if (mappedFeatures.length > 0) {
+      for (const feature of mappedFeatures) {
+        const featureSrc = path.join(featuresRoot, feature);
+        if (await exists(featureSrc)) {
+          await cp(featureSrc, path.join(srcDir, 'features', feature));
+        }
+      }
     } else {
-      await cp(featuresRoot, path.join(srcDir, 'features'));
+      const candidate = path.join(featuresRoot, APP);
+      if (await exists(candidate)) {
+        await cp(candidate, path.join(srcDir, 'features', APP));
+      } else {
+        await cp(featuresRoot, path.join(srcDir, 'features'));
+      }
     }
   }
 

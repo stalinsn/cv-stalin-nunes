@@ -8,6 +8,8 @@ Bem-vindo à documentação técnica do projeto! Após refatoração completa do
 
 - **[Arquitetura do Sistema](ARCHITECTURE.md)** `[ESSENCIAL]`
   - Visão geral, fluxos, e design decisions do sistema de tradução refatorado
+- **[Mapa do Sistema](SYSTEM_MAP.md)** `[NOVO]`
+  - Mapa arquitetural consolidado dos apps e blueprint do novo painel administrativo
 
 ---
 
@@ -15,6 +17,12 @@ Bem-vindo à documentação técnica do projeto! Após refatoração completa do
 
 - **[Git Flow Automation](GIT_AUTOMATION.md)** `[NOVO]`
   - Sistema automatizado de commits, versionamento e releases
+- **[Runbook Operacional](RUNBOOK.md)** `[NOVO]`
+  - Operação diária, deploy, smoke tests, rollback e troubleshooting
+- **[Roadmap de Implementação](IMPLEMENTATION_ROADMAP.md)** `[NOVO]`
+  - Plano de evolução do sistema para produção (catálogo, pagamento, regionalização, promoções e contas)
+- **[Backlog Executável P0](P0_EXECUTION_BACKLOG.md)** `[NOVO]`
+  - Ordem prática de implementação com estimativa, dependências e critérios de aceite
 
 ---
 
@@ -80,5 +88,7 @@ Bem-vindo à documentação técnica do projeto! Após refatoração completa do
 - [CV](apps/cv.md)
 - [MOTD](apps/motd.md)
 - [E‑commerce](apps/ecommerce.md)
+- [EcommPanel](apps/ecommpanel.md)
+- [Índice de Apps e operação integrada](apps/README.md)
 
 Consulte cada seção para detalhes técnicos específicos. A documentação é atualizada continuamente para refletir o estado atual do código.
