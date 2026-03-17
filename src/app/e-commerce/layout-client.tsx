@@ -10,6 +10,7 @@ import {
   DEFAULT_ECOM_CAMPAIGN,
   DEFAULT_ECOM_THEME,
 } from '../../features/ecommerce/config/styleguide';
+import { isOn } from '../../features/ecommerce/config/featureFlags';
 const DrawerCart = dynamic(() => import('../../features/ecommerce/components/organisms/DrawerCart'), { ssr: false });
 
 const THEME_STORAGE_KEY = 'ecom.theme.v1';
@@ -22,6 +23,7 @@ export default function EcommerceLayoutClient({ children }: { children: React.Re
   const pathname = usePathname();
   const { closeCart } = useUI();
   const hideDrawer = pathname.startsWith('/e-commerce/cart') || pathname.startsWith('/e-commerce/checkout');
+  const showDrawerCart = isOn('ecom.layout.drawerCart');
 
   useEffect(() => {
     if (hideDrawer) closeCart();
@@ -209,6 +211,6 @@ export default function EcommerceLayoutClient({ children }: { children: React.Re
 
   return <>
     {children}
-    {!hideDrawer ? <DrawerCart /> : null}
+    {!hideDrawer && showDrawerCart ? <DrawerCart /> : null}
   </>;
 }

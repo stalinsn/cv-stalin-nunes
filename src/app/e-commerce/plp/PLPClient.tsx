@@ -14,6 +14,7 @@ const PLPEmpty = dynamic(() => import('../../../features/ecommerce/components/pl
 import { queryPLP, PLPQuery } from '../../../features/ecommerce/lib/plp';
 import { queryPLPUnified } from '../../../features/ecommerce/lib/plpDataSource';
 import { PLPPagination } from '../../../features/ecommerce/components/plp/PLPPagination';
+import { isOn } from '../../../features/ecommerce/config/featureFlags';
 
 export default function PLPClient() {
   const { orderForm } = useOrderForm();
@@ -89,6 +90,13 @@ export default function PLPClient() {
   const facets = derived?.facets;
 
   const title = category?.name || (searchTerm ? `Resultados para "${searchTerm}"` : 'Resultados');
+  const showHeader = isOn('ecom.plp.header');
+  const showToolbar = isOn('ecom.plp.toolbar');
+  const showFacets = isOn('ecom.plp.facets');
+  const showGrid = isOn('ecom.plp.grid');
+  const showPagination = isOn('ecom.plp.pagination');
+  const showEmptyState = isOn('ecom.plp.emptyState');
+  const showLoadingSkeleton = isOn('ecom.plp.loadingSkeleton');
   const breadcrumbs = [
     category
       ? { href: `/e-commerce/plp?categoria=${category.slug}`, label: category.name }
@@ -125,19 +133,19 @@ export default function PLPClient() {
   return (
     <section className="plp-container">
       <div className="plp-layout">
-        <PLPHeader title={title} breadcrumbs={breadcrumbs} />
-        <PLPToolbar total={total} sort={sort || 'relevance'} onSort={setSort} />
+        {showHeader ? <PLPHeader title={title} breadcrumbs={breadcrumbs} /> : null}
+        {showToolbar ? <PLPToolbar total={total} sort={sort || 'relevance'} onSort={setSort} /> : null}
         <div className="plp-main" aria-busy={loading}>
-          <PLPFacets facets={facets} value={filters} onChange={setFilters} />
+          {showFacets ? <PLPFacets facets={facets} value={filters} onChange={setFilters} /> : null}
           {loading ? (
-            <PLPSkeleton cards={12} />
+            showLoadingSkeleton ? <PLPSkeleton cards={12} /> : null
           ) : products.length ? (
             <div>
-              <PLPGrid products={products} />
-              <PLPPagination page={page} pageSize={24} total={total} onPageChange={setPage} />
+              {showGrid ? <PLPGrid products={products} /> : null}
+              {showGrid && showPagination ? <PLPPagination page={page} pageSize={24} total={total} onPageChange={setPage} /> : null}
             </div>
           ) : (
-            <PLPEmpty term={searchTerm || category?.name} />
+            showEmptyState ? <PLPEmpty term={searchTerm || category?.name} /> : null
           )}
         </div>
       </div>

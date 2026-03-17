@@ -56,6 +56,21 @@ export const apps: AppEntry[] = [
       'Checkout com confirmação',
     ],
   },
+  {
+    slug: 'ecommpanel',
+    title: 'EcommPanel',
+    path: '/ecommpanel/login',
+    description:
+      'Painel administrativo mock para operação do e-commerce com autenticação, RBAC, gestão de usuários e base de segurança em camadas.',
+    image: '/window.svg',
+    accent: '#0b7a5a',
+    features: [
+      'Login seguro com sessão e CSRF',
+      'Perfis e permissões granulares',
+      'Gestão de usuários administrativa',
+      'Base pronta para integração REST',
+    ],
+  },
 ];
 
 export default apps;

@@ -21,7 +21,7 @@ export default function Header() {
   const [term, setTerm] = useState('');
   const [hydrated, setHydrated] = useState(false);
   const [isCondensed, setIsCondensed] = useState(false);
-  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [backToTopVisible, setBackToTopVisible] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = React.useRef<HTMLElement | null>(null);
   const router = useRouter();
@@ -33,7 +33,7 @@ export default function Header() {
     const onScroll = () => {
       const offsetY = window.scrollY || 0;
       setIsCondensed(offsetY > 64);
-      setShowBackToTop(offsetY > 520);
+      setBackToTopVisible(offsetY > 520);
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -53,6 +53,23 @@ export default function Header() {
   const isCheckoutFlow = pathname.startsWith('/e-commerce/checkout');
   const isCartFlow = pathname.startsWith('/e-commerce/cart');
   const isSimpleHeader = isCheckoutFlow || isCartFlow;
+  const enableCondensed = isOn('ecom.header.condensed');
+  const showPromoBar = isOn('ecom.header.promoBar');
+  const showDeliveryPill = isOn('ecom.header.deliveryPill');
+  const showUtilBar = isOn('ecom.header.utilBar');
+  const showUtilClub = isOn('ecom.header.util.club');
+  const showUtilHelp = isOn('ecom.header.util.help');
+  const showUtilLogin = isOn('ecom.header.util.login');
+  const showTopRow = isOn('ecom.header.topRow');
+  const showLogo = isOn('ecom.header.logo');
+  const showSearch = isOn('ecom.header.search');
+  const showFavorite = isOn('ecom.header.actions.favorite');
+  const showCartAction = isOn('ecom.header.actions.cart');
+  const showQuickLogin = isOn('ecom.header.actions.loginQuick');
+  const showNav = isOn('ecom.header.nav');
+  const showNavDepartments = isOn('ecom.header.nav.departments');
+  const showNavMeta = isOn('ecom.header.nav.meta');
+  const showBackToTop = isOn('ecom.header.backToTop') && backToTopVisible;
   const selectedAddress = orderForm.shipping.selectedAddress;
   const selectedOption = orderForm.shipping.deliveryOptions[orderForm.shipping.deliveryOptions.length - 1];
   const cepDigits = (selectedAddress?.postalCode || '').replace(/\D/g, '');
@@ -98,82 +115,100 @@ export default function Header() {
 
   return (
     <>
-      <header ref={headerRef} className={`ecom-header ${isCondensed ? 'ecom-header--condensed' : ''}`}>
+      <header ref={headerRef} className={`ecom-header ${isCondensed && enableCondensed ? 'ecom-header--condensed' : ''}`}>
         <div className="container">
-          <div className="ecom-header__promo" role="note" aria-label="Promoções">
-            <strong>Prime</strong> • Frete grátis e ofertas exclusivas
-          </div>
-          <div className="ecom-header__delivery">
-            <button 
-              className="delivery-pill" 
-              aria-label="Selecionar como deseja receber"
-              data-track-id="header-open-delivery"
-              onClick={() => setIsDeliveryModalOpen(true)}
-            >
-              <span className="pill-ico" aria-hidden>📍</span>
-              <span>{deliverySummaryLabel}</span>
-            </button>
-          </div>
-          <div className="ecom-header__util">
-            <div className="ecom-header__loc">
-              <button 
-                className="delivery-trigger"
+          {showPromoBar ? (
+            <div className="ecom-header__promo" role="note" aria-label="Promoções">
+              <strong>Prime</strong> • Frete grátis e ofertas exclusivas
+            </div>
+          ) : null}
+          {showDeliveryPill ? (
+            <div className="ecom-header__delivery">
+              <button
+                className="delivery-pill"
+                aria-label="Selecionar como deseja receber"
                 data-track-id="header-open-delivery"
                 onClick={() => setIsDeliveryModalOpen(true)}
               >
-                {deliveryModeLabel}
+                <span className="pill-ico" aria-hidden>📍</span>
+                <span>{deliverySummaryLabel}</span>
               </button>
             </div>
-            <div className="ecom-header__links">
-              <button className="ecom-link">Clube</button>
-              <button className="ecom-link">Ajuda</button>
-              <button className="ecom-link">Login</button>
+          ) : null}
+          {showUtilBar ? (
+            <div className="ecom-header__util">
+              <div className="ecom-header__loc">
+                <button
+                  className="delivery-trigger"
+                  data-track-id="header-open-delivery"
+                  onClick={() => setIsDeliveryModalOpen(true)}
+                >
+                  {deliveryModeLabel}
+                </button>
+              </div>
+              <div className="ecom-header__links">
+                {showUtilClub ? <button className="ecom-link">Clube</button> : null}
+                {showUtilHelp ? <button className="ecom-link">Ajuda</button> : null}
+                {showUtilLogin ? <button className="ecom-link">Login</button> : null}
+              </div>
             </div>
-          </div>
+          ) : null}
 
-          <div className="ecom-header__top">
-            <div className="ecom-header__burger">
-              <DepartmentsDropdown trigger={<button className="ecom-nav__btn ecom-nav__btn--departments" aria-label="Abrir menu"><MenuIcon /></button>} />
+          {showTopRow ? (
+            <div className="ecom-header__top">
+              <div className="ecom-header__burger">
+                {showNavDepartments ? (
+                  <DepartmentsDropdown trigger={<button className="ecom-nav__btn ecom-nav__btn--departments" aria-label="Abrir menu"><MenuIcon /></button>} />
+                ) : null}
+              </div>
+              {showLogo ? (
+                <div className="ecom-header__brand">
+                  <Link href="/e-commerce" aria-label="Ir para a Home">SuperMart</Link>
+                </div>
+              ) : null}
+              {showSearch ? (
+                <form
+                  className="ecom-header__search"
+                  role="search"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    router.push(`/e-commerce/plp?q=${encodeURIComponent(term)}`);
+                  }}
+                >
+                  <input
+                    placeholder="Pesquise aqui"
+                    aria-label="Buscar produtos"
+                    value={term}
+                    onChange={(e) => setTerm(e.target.value)}
+                  />
+                  <Button type="submit" variant="icon" aria-label="Buscar" className="ecom-header__searchBtn"><SearchIcon size={26} /></Button>
+                </form>
+              ) : null}
+              <div className="ecom-header__actions">
+                {showQuickLogin ? <button className="ecom-header__quick-login" type="button">Login</button> : null}
+                {showFavorite ? <Button variant="icon" aria-label="Favoritos" data-fav>❤</Button> : null}
+                {showCartAction ? (
+                  <Button
+                    variant="icon"
+                    aria-label="Ver carrinho"
+                    onClick={toggleCart}
+                    data-track-id="header-open-cart"
+                    className="ecom-cartBtn"
+                    data-count={hydrated ? totalItems : 0}
+                  >
+                    <CartIcon />
+                  </Button>
+                ) : null}
+              </div>
             </div>
-            <div className="ecom-header__brand">
-              <Link href="/e-commerce" aria-label="Ir para a Home">SuperMart</Link>
-            </div>
-            <form
-              className="ecom-header__search"
-              role="search"
-              onSubmit={(e) => {
-                e.preventDefault();
-                router.push(`/e-commerce/plp?q=${encodeURIComponent(term)}`);
-              }}
-            >
-              <input
-                placeholder="Pesquise aqui"
-                aria-label="Buscar produtos"
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
-              />
-              <Button type="submit" variant="icon" aria-label="Buscar" className="ecom-header__searchBtn"><SearchIcon size={26} /></Button>
-            </form>
-            <div className="ecom-header__actions">
-              <button className="ecom-header__quick-login" type="button">Login</button>
-              <Button variant="icon" aria-label="Favoritos" data-fav>❤</Button>
-              <Button 
-                variant="icon" 
-                aria-label="Ver carrinho" 
-                onClick={toggleCart}
-                data-track-id="header-open-cart"
-                className="ecom-cartBtn"
-                data-count={hydrated ? totalItems : 0}
-              >
-                <CartIcon />
-              </Button>
-            </div>
-          </div>
+          ) : null}
 
-          <nav className="ecom-header__nav">
-            <DepartmentsDropdown />
-            <span className="ecom-nav__meta">Atacado e Varejo</span>
-          </nav>
+          {showNav ? (
+            <nav className="ecom-header__nav">
+              {showNavDepartments ? <DepartmentsDropdown /> : null}
+              {showNavMeta ? <span className="ecom-nav__meta">Atacado e Varejo</span> : null}
+            </nav>
+          ) : null}
         </div>
         
         <Modal 

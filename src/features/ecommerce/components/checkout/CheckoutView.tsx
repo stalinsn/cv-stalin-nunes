@@ -8,6 +8,7 @@ import { lookupCep } from '../../lib/cepService';
 import { formatBRL } from '../../utils/currency';
 import { safeGet, safeSet } from '@/utils/safeStorage';
 import { STORAGE_KEYS } from '@/utils/storageKeys';
+import { isOn } from '../../config/featureFlags';
 
 type CheckoutStep = 'profile' | 'address' | 'shipping' | 'payment' | 'review';
 type PaymentMethod = 'pix' | 'cash_on_delivery' | 'credit_card';
@@ -63,6 +64,21 @@ export default function CheckoutView() {
   const [ccExpiry, setCcExpiry] = useState('');
   const [ccCvc, setCcCvc] = useState('');
   const [ccHolder, setCcHolder] = useState('');
+  const showError = isOn('ecom.checkout.error');
+  const enabledStepMap = React.useMemo(
+    () => ({
+      profile: isOn('ecom.checkout.step.profile'),
+      address: isOn('ecom.checkout.step.address'),
+      shipping: isOn('ecom.checkout.step.shipping'),
+      payment: isOn('ecom.checkout.step.payment'),
+      review: isOn('ecom.checkout.step.review'),
+    }),
+    [],
+  );
+  const stepsOrder: CheckoutStep[] = ['profile', 'address', 'shipping', 'payment', 'review'];
+  const enabledSteps = stepsOrder.filter((checkoutStep) => enabledStepMap[checkoutStep]);
+  const firstEnabledStep = enabledSteps[0] || 'review';
+  const hasAnyStepEnabled = enabledSteps.length > 0;
 
   useEffect(() => {
     setAddr(orderForm.shipping.selectedAddress || {});
@@ -96,6 +112,24 @@ export default function CheckoutView() {
   );
   const grandTotal = useMemo(() => itemsTotal + shippingValue + discounts, [itemsTotal, shippingValue, discounts]);
 
+  useEffect(() => {
+    if (!enabledStepMap[step]) setStep(firstEnabledStep);
+  }, [enabledStepMap, step, firstEnabledStep]);
+
+  function nextEnabledStep(from: CheckoutStep): CheckoutStep {
+    const currentIndex = stepsOrder.indexOf(from);
+    for (let index = currentIndex + 1; index < stepsOrder.length; index++) {
+      const candidate = stepsOrder[index];
+      if (enabledStepMap[candidate]) return candidate;
+    }
+    return from;
+  }
+
+  function shouldValidate(requiredStep: CheckoutStep, targetStep: CheckoutStep) {
+    if (!enabledStepMap[requiredStep]) return false;
+    return stepsOrder.indexOf(targetStep) >= stepsOrder.indexOf(requiredStep);
+  }
+
   function updateProfile(data: Partial<typeof profile>) {
     setOrderForm((prev) => ({ ...prev, clientProfileData: { ...(prev.clientProfileData ?? {}), ...data } }));
   }
@@ -115,6 +149,7 @@ export default function CheckoutView() {
   }
 
   function openStep(nextStep: CheckoutStep) {
+    if (!enabledStepMap[nextStep]) return;
     setFormError(null);
     if (nextStep === 'address' || nextStep === 'shipping' || nextStep === 'payment' || nextStep === 'review') {
       persistProfile();
@@ -174,10 +209,10 @@ export default function CheckoutView() {
   }
 
   function handleContinue(nextStep: CheckoutStep) {
-    if (nextStep === 'address' && !validateProfile()) return;
-    if (nextStep === 'shipping' && (!validateProfile() || !validateAddress())) return;
-    if (nextStep === 'payment' && (!validateProfile() || !validateAddress() || !validateShipping())) return;
-    if (nextStep === 'review' && (!validateProfile() || !validateAddress() || !validateShipping() || !validatePayment())) return;
+    if (shouldValidate('profile', nextStep) && !validateProfile()) return;
+    if (shouldValidate('address', nextStep) && !validateAddress()) return;
+    if (shouldValidate('shipping', nextStep) && !validateShipping()) return;
+    if (shouldValidate('payment', nextStep) && !validatePayment()) return;
     openStep(nextStep);
   }
 
@@ -186,7 +221,10 @@ export default function CheckoutView() {
       setFormError('Seu carrinho está vazio.');
       return;
     }
-    if (!validateProfile() || !validateAddress() || !validateShipping() || !validatePayment()) return;
+    if (enabledStepMap.profile && !validateProfile()) return;
+    if (enabledStepMap.address && !validateAddress()) return;
+    if (enabledStepMap.shipping && !validateShipping()) return;
+    if (enabledStepMap.payment && !validatePayment()) return;
 
     setPlacing(true);
     setFormError(null);
@@ -242,13 +280,19 @@ export default function CheckoutView() {
   return (
     <div className="checkout">
       <div className="checkout__content">
-        {formError ? (
+        {!hasAnyStepEnabled ? (
+          <div className="co-error" role="status">
+            Nenhuma etapa do checkout está habilitada no feature flag.
+          </div>
+        ) : null}
+        {showError && formError ? (
           <div className="co-error" role="alert">
             {formError}
           </div>
         ) : null}
 
-        <section className="co-step">
+        {enabledStepMap.profile ? (
+          <section className="co-step">
           <h2 className="co-step__header">
             <button
               type="button"
@@ -304,13 +348,15 @@ export default function CheckoutView() {
                 />
               </div>
               <div className="co-actions">
-                <button type="button" onClick={() => handleContinue('address')}>Continuar</button>
+                <button type="button" onClick={() => handleContinue(nextEnabledStep('profile'))}>Continuar</button>
               </div>
             </div>
           )}
         </section>
+        ) : null}
 
-        <section className="co-step">
+        {enabledStepMap.address ? (
+          <section className="co-step">
           <h2 className="co-step__header">
             <button
               type="button"
@@ -378,13 +424,15 @@ export default function CheckoutView() {
                 </div>
               </div>
               <div className="co-actions">
-                <button type="button" onClick={() => handleContinue('shipping')}>Continuar</button>
+                <button type="button" onClick={() => handleContinue(nextEnabledStep('address'))}>Continuar</button>
               </div>
             </div>
           )}
         </section>
+        ) : null}
 
-        <section className="co-step">
+        {enabledStepMap.shipping ? (
+          <section className="co-step">
           <h2 className="co-step__header">
             <button
               type="button"
@@ -431,13 +479,15 @@ export default function CheckoutView() {
                 </label>
               </div>
               <div className="co-actions">
-                <button type="button" onClick={() => handleContinue('payment')}>Continuar</button>
+                <button type="button" onClick={() => handleContinue(nextEnabledStep('shipping'))}>Continuar</button>
               </div>
             </div>
           )}
         </section>
+        ) : null}
 
-        <section className="co-step">
+        {enabledStepMap.payment ? (
+          <section className="co-step">
           <h2 className="co-step__header">
             <button
               type="button"
@@ -463,13 +513,15 @@ export default function CheckoutView() {
                 </div>
               )}
               <div className="co-actions">
-                <button type="button" onClick={() => handleContinue('review')}>Revisão</button>
+                <button type="button" onClick={() => handleContinue(nextEnabledStep('payment'))}>Revisão</button>
               </div>
             </div>
           )}
         </section>
+        ) : null}
 
-        <section className="co-step">
+        {enabledStepMap.review ? (
+          <section className="co-step">
           <h2 className="co-step__header">
             <button
               type="button"
@@ -502,8 +554,10 @@ export default function CheckoutView() {
             </div>
           )}
         </section>
+        ) : null}
       </div>
 
+      {isOn('ecom.checkout.asideSummary') ? (
       <aside className="checkout__aside">
         <div className="co-card">
           <h3>Resumo</h3>
@@ -513,6 +567,7 @@ export default function CheckoutView() {
           <div className="co-row co-row--total"><span>Total</span><span>{formatBRL(grandTotal)}</span></div>
         </div>
       </aside>
+      ) : null}
     </div>
   );
 }

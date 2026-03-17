@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { isOn } from '../../config/featureFlags';
 
 export function HeroBannerLarge() {
   return (
@@ -10,11 +11,15 @@ export function HeroBannerLarge() {
 }
 
 export function StripsBelow() {
+  const show1 = isOn('ecom.home.banner.strip.1');
+  const show2 = isOn('ecom.home.banner.strip.2');
+  const show3 = isOn('ecom.home.banner.strip.3');
+  if (!show1 && !show2 && !show3) return null;
   return (
     <section className="ecom-strips">
-      <div className="ecom-strip">Faixa promocional 1</div>
-      <div className="ecom-strip">Faixa promocional 2</div>
-      <div className="ecom-strip">Faixa promocional 3</div>
+      {show1 ? <div className="ecom-strip">Faixa promocional 1</div> : null}
+      {show2 ? <div className="ecom-strip">Faixa promocional 2</div> : null}
+      {show3 ? <div className="ecom-strip">Faixa promocional 3</div> : null}
     </section>
   );
 }

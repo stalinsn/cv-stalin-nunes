@@ -74,6 +74,7 @@ export default function HomeGallery() {
         <Link href="/cv" className="pill">CV</Link>
         <Link href="/motd" className="pill">MOTD</Link>
         <Link href="/e-commerce" className="pill">E-commerce</Link>
+        <Link href="/ecommpanel/login" className="pill">EcommPanel</Link>
       </footer>
     </div>
   );

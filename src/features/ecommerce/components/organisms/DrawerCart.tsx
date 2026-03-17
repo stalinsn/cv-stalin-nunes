@@ -5,6 +5,7 @@ import { useCart } from '../../state/CartContext';
 import { useUI } from '../../state/UIContext';
 import Image from 'next/image';
 import { Button } from '../atoms/Button';
+import { isOn } from '../../config/featureFlags';
 
 interface CartItemWithDetails {
   id: string;
@@ -27,7 +28,21 @@ export default function DrawerCart() {
   const { state, inc, dec, remove, totalItems, clear } = useCart();
   const router = useRouter();
   const items = Object.values(state.items);
-  const [viewMode, setViewMode] = React.useState<'detailed' | 'compact'>('compact');
+  const hasCompactView = isOn('ecom.drawer.list.compact');
+  const hasDetailedView = isOn('ecom.drawer.list.detailed');
+  const hasViewSwitch = isOn('ecom.drawer.viewSwitch') && hasCompactView && hasDetailedView;
+  const showPromotionBanner = isOn('ecom.drawer.promotionBanner');
+  const showFooterSummary = isOn('ecom.drawer.footerSummary');
+  const [viewMode, setViewMode] = React.useState<'detailed' | 'compact'>(hasCompactView ? 'compact' : 'detailed');
+
+  React.useEffect(() => {
+    if (viewMode === 'compact' && !hasCompactView && hasDetailedView) {
+      setViewMode('detailed');
+    }
+    if (viewMode === 'detailed' && !hasDetailedView && hasCompactView) {
+      setViewMode('compact');
+    }
+  }, [viewMode, hasCompactView, hasDetailedView]);
   
   const calculations = React.useMemo(() => {
     let originalTotal = 0;
@@ -142,26 +157,28 @@ export default function DrawerCart() {
             </div>
           ) : (
             <div className="drawer__list-container">
-              <div className="drawer__view-switch" role="tablist" aria-label="Visualização do carrinho">
-                <button
-                  role="tab"
-                  className={`drawer__view-tab ${viewMode === 'detailed' ? 'is-active' : ''}`}
-                  aria-selected={viewMode === 'detailed'}
-                  onClick={() => setViewMode('detailed')}
-                >
-                  Visão detalhada
-                </button>
-                <button
-                  role="tab"
-                  className={`drawer__view-tab ${viewMode === 'compact' ? 'is-active' : ''}`}
-                  aria-selected={viewMode === 'compact'}
-                  onClick={() => setViewMode('compact')}
-                >
-                  Visão rápida
-                </button>
-              </div>
+              {hasViewSwitch ? (
+                <div className="drawer__view-switch" role="tablist" aria-label="Visualização do carrinho">
+                  <button
+                    role="tab"
+                    className={`drawer__view-tab ${viewMode === 'detailed' ? 'is-active' : ''}`}
+                    aria-selected={viewMode === 'detailed'}
+                    onClick={() => setViewMode('detailed')}
+                  >
+                    Visão detalhada
+                  </button>
+                  <button
+                    role="tab"
+                    className={`drawer__view-tab ${viewMode === 'compact' ? 'is-active' : ''}`}
+                    aria-selected={viewMode === 'compact'}
+                    onClick={() => setViewMode('compact')}
+                  >
+                    Visão rápida
+                  </button>
+                </div>
+              ) : null}
 
-              {calculations.hasDiscounts && (
+              {showPromotionBanner && calculations.hasDiscounts && (
                 <div className="drawer__promotion-banner">
                   <div className="drawer__promotion-icon">🎉</div>
                   <div className="drawer__promotion-text">
@@ -171,7 +188,7 @@ export default function DrawerCart() {
                 </div>
               )}
               
-              {viewMode === 'detailed' ? (
+              {(viewMode === 'detailed' && hasDetailedView) || !hasCompactView ? (
                 <ul className="drawer__list">
                   {items.map((it) => {
                     const productInfo = getProductInfo(it as CartItemWithDetails);
@@ -277,7 +294,7 @@ export default function DrawerCart() {
                     );
                   })}
                 </ul>
-              ) : (
+              ) : hasCompactView ? (
                 <ul className="drawer__list drawer__list--compact">
                   {items.map((it) => {
                     const productInfo = getProductInfo(it as CartItemWithDetails);
@@ -328,12 +345,12 @@ export default function DrawerCart() {
                     );
                   })}
                 </ul>
-              )}
+              ) : null}
             </div>
           )}
         </div>
         
-        {items.length > 0 && (
+        {items.length > 0 && showFooterSummary && (
           <footer className="drawer__footer">
             <div className="drawer__summary">
               <div className="drawer__summary-header">

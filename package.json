@@ -25,7 +25,8 @@
     "export:cv": "node ./scripts/export-app.mjs --app=cv --out=exports --install --zip",
     "export:motd": "node ./scripts/export-app.mjs --app=motd --out=exports --install --zip",
     "export:ecommerce": "node ./scripts/export-app.mjs --app=ecommerce --out=exports --install --zip",
-    "export:all": "node ./scripts/export-app.mjs --app=cv --out=exports --install --zip && node ./scripts/export-app.mjs --app=motd --out=exports --install --zip && node ./scripts/export-app.mjs --app=ecommerce --out=exports --install --zip"
+    "export:ecommpanel": "node ./scripts/export-app.mjs --app=ecommpanel --out=exports --install --zip",
+    "export:all": "node ./scripts/export-app.mjs --app=cv --out=exports --install --zip && node ./scripts/export-app.mjs --app=motd --out=exports --install --zip && node ./scripts/export-app.mjs --app=ecommerce --out=exports --install --zip && node ./scripts/export-app.mjs --app=ecommpanel --out=exports --install --zip"
   },
   "dependencies": {
     "@types/dompurify": "^3.0.5",
