@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "thang-nm.catppuccin-perfect-icons",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "aaron-bond.better-comments",
+    "gruntfuggly.todo-tree",
+    "formulahendry.auto-rename-tag",
+    "wix.vscode-import-cost",
+    "oderwat.indent-rainbow",
+    "naumovs.color-highlight",
+    "usernamehw.errorlens",
+    "mhutchie.git-graph",
+    "PKief.material-icon-theme"
+  ]
+}

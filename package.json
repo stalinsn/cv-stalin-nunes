@@ -1,0 +1,56 @@
+{
+  "name": "cv-stalin-nunes",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Currículo multilíngue com tradução por IA, controle de tokens e exportação PDF.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "dev:tp": "next dev --turbopack",
+    "build": "next build",
+    "build:prod": "NEXT_LINT=false NODE_ENV=production next build",
+    "build:fast": "NEXT_LINT=false NEXT_TELEMETRY_DISABLED=1 NODE_ENV=production next build",
+    "clean": "rimraf .next-build .next node_modules/.cache",
+    "start": "next start",
+    "lint": "eslint src",
+    "format": "prettier --check \"src/styles/**/*.css\"",
+    "format:write": "prettier --write \"src/styles/**/*.css\"",
+    "previews:install": "playwright install --with-deps",
+    "previews:gen": "node ./scripts/generate-previews.mjs",
+    "previews:dev": "start-server-and-test \"yarn dev\" http://localhost:3000 \"yarn previews:gen\"",
+    "previews:cv": "node ./scripts/generate-previews.mjs --quality=88 --delay=1100",
+    "previews:cv:dev": "start-server-and-test \"yarn dev\" http://localhost:3000 \"yarn previews:cv\"",
+    "export:cv": "node ./scripts/export-app.mjs --out=exports --install --zip"
+  },
+  "dependencies": {
+    "@types/dompurify": "^3.0.5",
+    "dompurify": "^3.3.0",
+    "googleapis": "^150.0.1",
+    "next": "^15.5.7",
+    "openai": "^5.5.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.3",
+    "playwright": "^1.46.1",
+    "postcss-import": "^16.1.1",
+    "postcss-nested": "^7.0.2",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "start-server-and-test": "^2.0.3",
+    "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  },
+  "browserslist": [
+    "since 2020",
+    "not dead"
+  ]
+}

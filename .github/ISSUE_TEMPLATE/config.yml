@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussão Geral
+    url: https://github.com/stalinsn/cv-stalin-nunes/discussions
+    about: Para dúvidas gerais, sugestões ou discussões sobre o projeto
+  - name: 🔒 Questões de Segurança
+    url: https://github.com/stalinsn/cv-stalin-nunes/security/advisories/new
+    about: Para reportar vulnerabilidades de segurança (não abra issue pública)
