@@ -85,14 +85,20 @@ Cada export cria um projeto Next independente com dependências mínimas + arqui
 - Rota: `/ecommpanel/login`
 - Doc: [docs/apps/ecommpanel.md](docs/apps/ecommpanel.md)
 
-## Integração EcommPanel -> E-commerce (modo arquivo)
+## Integração EcommPanel -> E-commerce (runtime de conteúdo)
 
-O painel publica páginas dinâmicas em artefatos JSON e o e-commerce consome apenas o snapshot publicado.
+O painel publica artefatos JSON e o e-commerce consome somente o snapshot publicado. Hoje isso cobre:
+
+- páginas dinâmicas do builder;
+- template estrutural do storefront;
+- tema visual;
+- mega menu e módulos operacionais de header/home/footer.
 
 ### Artefatos
 
 - `site-pages.published.json`
 - `manifest.json`
+- `storefront-template.published.json`
 
 ### Caminho padrão
 
@@ -112,6 +118,30 @@ Recomendação de permissão em produção:
 
 - Painel: `read/write`
 - E-commerce: `read-only`
+
+### Persistência administrativa local
+
+Os dados editáveis do painel ficam em `src/data/ecommpanel`, já quebrados por domínio:
+
+- `site-routes.json`
+- `site-pages/<pageId>.json`
+- `storefront/meta.json`
+- `storefront/theme.json`
+- `storefront/header.json`
+- `storefront/home.json`
+- `storefront/footer.json`
+
+Espelhos legados continuam sendo escritos por compatibilidade:
+
+- `site-pages.json`
+- `storefront-template.json`
+
+### Comportamento por modo de execução
+
+- `yarn dev` e `next start`: novas rotas dinâmicas e mudanças de template são lidas por runtime, sem gerar arquivos em `src/app/e-commerce`.
+- `export` estático: novas rotas exigem nova exportação para fazer parte da saída estática.
+
+Referência detalhada: [docs/ECOM_CONTENT_RUNTIME.md](docs/ECOM_CONTENT_RUNTIME.md)
 
 ## Rodar exports de forma independente
 
@@ -137,6 +167,7 @@ Observação: em build local, rotas de tradução podem exigir `OPENAI_API_KEY`.
 
 - Índice técnico: [docs/README_INDEX.md](docs/README_INDEX.md)
 - Apps: [docs/apps/README.md](docs/apps/README.md)
+- Runtime de conteúdo do e-commerce: [docs/ECOM_CONTENT_RUNTIME.md](docs/ECOM_CONTENT_RUNTIME.md)
 - Runbook operacional: [docs/RUNBOOK.md](docs/RUNBOOK.md)
 - Roadmap técnico: [docs/IMPLEMENTATION_ROADMAP.md](docs/IMPLEMENTATION_ROADMAP.md)
 - Backlog executável P0: [docs/P0_EXECUTION_BACKLOG.md](docs/P0_EXECUTION_BACKLOG.md)

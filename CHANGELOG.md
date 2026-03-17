@@ -4,6 +4,30 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), e este projeto adota [Semantic Versioning](https://semver.org/).
 
+## [3.0.0] - 2026-03-17
+
+### Added
+- Novo site interno de documentação em `/docs`, com navegação própria, home dedicada, sumário lateral, aliases a partir de `/e-commerce/docs` e renderização estática de notas Markdown.
+- Nova base canônica de conteúdo em `docs/content`, organizada em `Base do projeto`, `Guias` e `Slides`, substituindo o acoplamento anterior com a pasta auxiliar de Obsidian.
+- Nova camada visual para a documentação com recortes por seção, ícones SVG inline, destaques contextuais e estrutura pensada para leitura técnica longa em desktop.
+- Nova trilha de guias cobrindo storefront, painel administrativo, APIs, builder, runtime, segurança e fluxos end-to-end.
+
+### Changed
+- EcommPanel consolidado como centro de operação do storefront, com edição granular de `Template`, `Tema`, `Mega Menu`, builder de rotas/páginas e publicação por runtime desacoplado.
+- Storefront do e-commerce ampliado para consumir template, tema, mega menu e páginas dinâmicas publicadas via JSON, sem depender de geração de arquivos de rota no `src/app`.
+- Persistência administrativa reorganizada em documentos menores por domínio (`theme`, `header`, `home`, `footer`, `site-routes`, `site-pages/*`), mantendo espelhos legados apenas por compatibilidade.
+- Builder evoluído para namespaces operacionais (`landing`, `campanhas`, `institucional`, `conteúdo`, `custom`), com proteção contra colisão de rotas nativas e melhor contexto de criação no editor.
+- UI do painel administrativo refinada para uso real em desktop, com seções colapsáveis persistentes, ações sticky, densidade visual melhor distribuída e módulos/toggles por contexto.
+- Catálogo de presets visuais do storefront revisado com identidades distintas para cenários como `Dia das Mães` e `Black Friday`.
+
+### Removed
+- Pasta `docs/obsidian` removida do repositório; a documentação do projeto passa a ser servida e mantida pela árvore `docs/content`.
+
+### Technical
+- Fonte do site `/docs` migrada para `docs/content`, com compatibilidade mantida para URLs antigas em `/docs/aulas` via redirect para `/docs/guias`.
+- Texto e taxonomia da documentação padronizados em português com acentuação corrigida e nomenclatura alinhada a `Guias`.
+- Estrutura de runtime e publicação validada para seguir servindo conteúdo sem rebuild em modo servidor, preservando o desacoplamento entre painel e loja.
+
 
 ## [2.8.0] - 2026-03-03
 

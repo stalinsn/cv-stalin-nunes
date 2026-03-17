@@ -13,6 +13,7 @@ import {
   listSitePages,
   normalizeSlug,
 } from '@/features/ecommpanel/server/siteBuilderStore';
+import { getReservedStorefrontSlugError } from '@/features/site-runtime/routeRules';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,7 +69,12 @@ export async function POST(req: NextRequest) {
   }
 
   if (!isValidSlug(slug)) {
-    return errorNoStore(400, 'Slug inválido. Use apenas letras minúsculas, números e hífen.');
+    return errorNoStore(400, 'Caminho inválido. Use letras minúsculas, números, hífen e barra para segmentação.');
+  }
+
+  const reservedError = getReservedStorefrontSlugError(slug);
+  if (reservedError) {
+    return errorNoStore(409, reservedError);
   }
 
   if (getSitePageBySlug(slug)) {

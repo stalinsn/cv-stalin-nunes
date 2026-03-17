@@ -146,6 +146,6 @@ export function resolveDynamicRuntimePath(pathname: string): RuntimeResolvedPage
   }
 
   const slug = normalizedPath.replace(/^\//, '');
-  if (!slug || slug.includes('/')) return null;
+  if (!slug) return null;
   return getPublishedRuntimePageBySlug(slug);
 }

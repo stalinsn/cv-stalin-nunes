@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useUI } from '../../features/ecommerce/state/UIContext';
-import { safeGet, safeSet } from '../../utils/safeStorage';
+import { safeSet } from '../../utils/safeStorage';
 import {
   ECOM_CAMPAIGNS,
   ECOM_THEMES,
@@ -32,23 +32,24 @@ export default function EcommerceLayoutClient({ children }: { children: React.Re
   useEffect(() => {
     // Fallback simples para navegadores que não suportam :has()
     document.body.classList.add('ecom-body-override');
-    // Parse flags from URL
+    // The published template is the authoritative base.
+    // Query params still allow explicit local inspection without silently overriding admin changes.
     const enableDebug = params.get('debug') === 'true' || params.get('inspect') === 'true';
     const themeParam = (params.get('theme') || '').trim().toLowerCase();
     const campaignParam = (params.get('campaign') || '').trim().toLowerCase();
     const root = document.querySelector('main.ecom');
-    const persistedTheme = (safeGet(THEME_STORAGE_KEY) || '').trim().toLowerCase();
-    const persistedCampaign = (safeGet(CAMPAIGN_STORAGE_KEY) || '').trim().toLowerCase();
+    const publishedTheme = (root?.getAttribute('data-theme') || '').trim().toLowerCase();
+    const publishedCampaign = (root?.getAttribute('data-campaign') || '').trim().toLowerCase();
 
     const nextTheme = VALID_THEMES.has(themeParam)
       ? themeParam
-      : VALID_THEMES.has(persistedTheme)
-        ? persistedTheme
+      : VALID_THEMES.has(publishedTheme)
+        ? publishedTheme
         : DEFAULT_ECOM_THEME;
     const nextCampaign = VALID_CAMPAIGNS.has(campaignParam)
       ? campaignParam
-      : VALID_CAMPAIGNS.has(persistedCampaign)
-        ? persistedCampaign
+      : VALID_CAMPAIGNS.has(publishedCampaign)
+        ? publishedCampaign
         : DEFAULT_ECOM_CAMPAIGN;
 
     if (root && enableDebug) {

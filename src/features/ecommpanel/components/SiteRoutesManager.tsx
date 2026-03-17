@@ -2,6 +2,14 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import {
+  SITE_ROUTE_NAMESPACES,
+  buildNamespacedRoutePath,
+  describeSiteRoutePath,
+  getSiteRouteNamespace,
+  resolveSiteRouteNamespaceBySlug,
+  type SiteRouteNamespaceId,
+} from '@/features/ecommpanel/siteNamespaces';
 
 type MeResponse = { csrfToken?: string };
 
@@ -36,16 +44,28 @@ export default function SiteRoutesManager() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
+  const [namespaceId, setNamespaceId] = useState<SiteRouteNamespaceId>('landing');
+  const [customPrefix, setCustomPrefix] = useState('');
+  const [leafPath, setLeafPath] = useState('');
   const [query, setQuery] = useState('');
+  const [namespaceFilter, setNamespaceFilter] = useState<'all' | SiteRouteNamespaceId>('all');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  const selectedNamespace = getSiteRouteNamespace(namespaceId);
+  const composedPath = buildNamespacedRoutePath({ namespaceId, customPrefix, leafPath });
+  const namespaceExample = describeSiteRoutePath(selectedNamespace.examplePath);
+
   const filteredRoutes = useMemo(() => {
     const term = query.trim().toLowerCase();
-    if (!term) return routes;
-    return routes.filter((route) => route.title.toLowerCase().includes(term) || route.slug.toLowerCase().includes(term));
-  }, [routes, query]);
+
+    return routes.filter((route) => {
+      const namespace = resolveSiteRouteNamespaceBySlug(route.slug);
+      const matchesNamespace = namespaceFilter === 'all' || namespace.id === namespaceFilter;
+      const matchesTerm = !term || route.title.toLowerCase().includes(term) || route.slug.toLowerCase().includes(term);
+      return matchesNamespace && matchesTerm;
+    });
+  }, [namespaceFilter, query, routes]);
 
   async function fetchAll() {
     setLoading(true);
@@ -89,7 +109,7 @@ export default function SiteRoutesManager() {
 
   async function createRoute(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!csrfToken || saving) return;
+    if (!csrfToken || saving || !composedPath) return;
 
     setSaving(true);
     setError(null);
@@ -102,7 +122,7 @@ export default function SiteRoutesManager() {
           'Content-Type': 'application/json',
           'x-csrf-token': csrfToken,
         },
-        body: JSON.stringify({ title, slug }),
+        body: JSON.stringify({ title, slug: composedPath }),
       });
 
       const payload = (await req.json().catch(() => null)) as ApiErrorResponse | null;
@@ -112,7 +132,9 @@ export default function SiteRoutesManager() {
       }
 
       setTitle('');
-      setSlug('');
+      setNamespaceId('landing');
+      setCustomPrefix('');
+      setLeafPath('');
       setSuccess('Rota criada em modo rascunho.');
       await fetchAll();
     } catch {
@@ -184,7 +206,7 @@ export default function SiteRoutesManager() {
         <p className="panel-kicker">Experiência do Site · Rotas</p>
         <h1 id="site-routes-title">Cadastro de rotas e páginas</h1>
         <p className="panel-muted">
-          Crie e gerencie os caminhos do site. Exclusões vão para lixeira temporária por 30 dias antes da remoção definitiva.
+          Crie e gerencie caminhos dinâmicos do storefront. No modo servidor, a publicação é lida por runtime via JSON e não exige gerar arquivos em `app/` nem rebuild do Next.
         </p>
       </article>
 
@@ -199,24 +221,64 @@ export default function SiteRoutesManager() {
                 className="panel-input"
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
-                placeholder="Quem Somos"
+                placeholder="Landing de Black Friday"
                 required
               />
             </div>
 
             <div className="panel-field">
-              <label htmlFor="route-slug">Slug da rota</label>
+              <label htmlFor="route-namespace">Namespace operacional</label>
+              <select
+                id="route-namespace"
+                className="panel-select"
+                value={namespaceId}
+                onChange={(event) => setNamespaceId(event.target.value as SiteRouteNamespaceId)}
+              >
+                {SITE_ROUTE_NAMESPACES.map((namespace) => (
+                  <option key={namespace.id} value={namespace.id}>
+                    {namespace.label}
+                  </option>
+                ))}
+              </select>
+              <small className="panel-muted">{selectedNamespace.description}</small>
+            </div>
+
+            {namespaceId === 'custom' ? (
+              <div className="panel-field">
+                <label htmlFor="route-custom-prefix">Prefixo custom</label>
+                <input
+                  id="route-custom-prefix"
+                  className="panel-input"
+                  value={customPrefix}
+                  onChange={(event) => setCustomPrefix(event.target.value)}
+                  placeholder={namespaceExample.customPrefix || 'especial/parceiros'}
+                  required
+                />
+              </div>
+            ) : null}
+
+            <div className="panel-field">
+              <label htmlFor="route-slug">Caminho final</label>
               <input
                 id="route-slug"
                 className="panel-input"
-                value={slug}
-                onChange={(event) => setSlug(event.target.value)}
-                placeholder="quem-somos"
+                value={leafPath}
+                onChange={(event) => setLeafPath(event.target.value)}
+                placeholder={namespaceExample.leafPath || selectedNamespace.examplePath}
                 required
               />
+              <small className="panel-muted">Reservados: `plp`, `cart`, `checkout`, `paginas`.</small>
             </div>
 
-            <button type="submit" className="panel-btn panel-btn-primary" disabled={saving}>
+            <div className="panel-template-callout panel-template-callout--inline">
+              <div>
+                <strong>/{composedPath || 'caminho-da-rota'}</strong>
+                <p className="panel-muted">Preset sugerido: {selectedNamespace.layoutPreset}</p>
+              </div>
+              <span className="panel-badge panel-badge-neutral">{selectedNamespace.label}</span>
+            </div>
+
+            <button type="submit" className="panel-btn panel-btn-primary" disabled={saving || !composedPath}>
               {saving ? 'Salvando...' : 'Criar rota'}
             </button>
           </form>
@@ -225,13 +287,28 @@ export default function SiteRoutesManager() {
         <article className="panel-card">
           <div className="panel-users-toolbar">
             <h2>Rotas existentes</h2>
-            <input
-              className="panel-search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por título ou slug"
-              aria-label="Buscar rotas"
-            />
+            <div className="panel-inline panel-inline-wrap">
+              <select
+                className="panel-select"
+                value={namespaceFilter}
+                onChange={(event) => setNamespaceFilter(event.target.value as 'all' | SiteRouteNamespaceId)}
+                aria-label="Filtrar por namespace"
+              >
+                <option value="all">Todos os namespaces</option>
+                {SITE_ROUTE_NAMESPACES.map((namespace) => (
+                  <option key={namespace.id} value={namespace.id}>
+                    {namespace.label}
+                  </option>
+                ))}
+              </select>
+              <input
+                className="panel-search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Buscar por título ou caminho"
+                aria-label="Buscar rotas"
+              />
+            </div>
           </div>
 
           {loading ? <p className="panel-muted">Carregando rotas...</p> : null}
@@ -248,36 +325,41 @@ export default function SiteRoutesManager() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredRoutes.map((route) => (
-                    <tr key={route.id}>
-                      <td>
-                        <strong>{route.title}</strong>
-                        <br />
-                        <span className="panel-muted">/{route.slug}</span>
-                      </td>
-                      <td>
-                        <span className={`panel-badge ${route.status === 'published' ? 'panel-badge-success' : 'panel-badge-neutral'}`}>
-                          {route.status === 'published' ? 'Publicado' : 'Rascunho'}
-                        </span>
-                      </td>
-                      <td>{formatDate(route.updatedAt)}</td>
-                      <td>
-                        <div className="panel-inline panel-inline-wrap">
-                          <Link className="panel-btn panel-btn-secondary panel-btn-sm" href={`/ecommpanel/admin/site/editor?pageId=${route.id}`}>
-                            Editar
-                          </Link>
-                          <button
-                            className="panel-btn panel-btn-danger panel-btn-sm"
-                            type="button"
-                            onClick={() => removeRoute(route.id)}
-                            disabled={saving}
-                          >
-                            Excluir
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredRoutes.map((route) => {
+                    const namespace = resolveSiteRouteNamespaceBySlug(route.slug);
+                    return (
+                      <tr key={route.id}>
+                        <td>
+                          <strong>{route.title}</strong>
+                          <br />
+                          <span className="panel-badge panel-badge-neutral">{namespace.label}</span>
+                          <br />
+                          <span className="panel-muted">/{route.slug}</span>
+                        </td>
+                        <td>
+                          <span className={`panel-badge ${route.status === 'published' ? 'panel-badge-success' : 'panel-badge-neutral'}`}>
+                            {route.status === 'published' ? 'Publicado' : 'Rascunho'}
+                          </span>
+                        </td>
+                        <td>{formatDate(route.updatedAt)}</td>
+                        <td>
+                          <div className="panel-inline panel-inline-wrap">
+                            <Link className="panel-btn panel-btn-secondary panel-btn-sm" href={`/ecommpanel/admin/site/editor?pageId=${route.id}`}>
+                              Editar
+                            </Link>
+                            <button
+                              className="panel-btn panel-btn-danger panel-btn-sm"
+                              type="button"
+                              onClick={() => removeRoute(route.id)}
+                              disabled={saving}
+                            >
+                              Excluir
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -294,6 +376,9 @@ export default function SiteRoutesManager() {
                   <li key={route.id} className="panel-site-trash-item">
                     <div>
                       <strong>{route.title}</strong>
+                      <p className="panel-muted">
+                        <span className="panel-badge panel-badge-neutral">{resolveSiteRouteNamespaceBySlug(route.slug).label}</span>
+                      </p>
                       <p className="panel-muted">/{route.slug}</p>
                       <p className="panel-muted">Expira em: {formatDate(route.deleteExpiresAt)}</p>
                     </div>

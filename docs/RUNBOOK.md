@@ -32,12 +32,13 @@ cd exports/ecommpanel && yarn install && yarn dev
 
 ## 2. Bridge de conteúdo (painel -> storefront)
 
-O painel publica JSON de páginas dinâmicas e o storefront consome somente o snapshot publicado.
+O painel publica JSON de páginas dinâmicas e do template estrutural. O storefront consome somente os snapshots publicados.
 
 Arquivos:
 
 - `site-pages.published.json`
 - `manifest.json`
+- `storefront-template.published.json`
 
 Variável recomendada nos dois apps:
 
@@ -50,6 +51,11 @@ Permissões:
 - `ecommpanel`: leitura/escrita
 - `e-commerce`: leitura
 
+Observação:
+
+- em `yarn dev` e `next start`, o storefront lê esse conteúdo por runtime;
+- em export estático, novas rotas exigem nova exportação do app.
+
 ## 3. Checklist de deploy
 
 1. Configurar variáveis de ambiente (`.env.local` ou secret manager).
@@ -57,24 +63,29 @@ Permissões:
 3. Ajustar permissão do sistema de arquivos.
 4. Build da aplicação.
 5. Smoke test de login no painel.
-6. Criar/editar/publicar uma página no painel.
-7. Validar renderização da rota dinâmica no storefront.
+6. Alterar e publicar `tema` ou `template` no painel.
+7. Validar header/home/footer/mega menu no storefront.
+8. Criar/editar/publicar uma página no painel.
+9. Validar renderização da rota dinâmica no storefront.
 
 ## 4. Smoke tests mínimos
 
 1. Login com usuário mock no painel.
-2. Criar rota no módulo de rotas.
-3. Abrir editor e salvar rascunho.
-4. Publicar página.
-5. Acessar `e-commerce/<slug>` e confirmar renderização.
-6. Voltar para rascunho e validar fallback.
+2. Alterar `preset` ou `override` de tema e publicar.
+3. Alterar um item fixo do template e publicar.
+4. Alterar mega menu e publicar.
+5. Criar rota no módulo de rotas.
+6. Abrir editor e salvar rascunho.
+7. Publicar página.
+8. Acessar `e-commerce/<slug>` e confirmar renderização.
+9. Voltar para rascunho e validar fallback.
 
 ## 5. Rollback de conteúdo
 
 Rollback por arquivo (rápido):
 
 1. Backup atual do diretório `ECOM_CONTENT_PATH`.
-2. Restaurar versão anterior de `site-pages.published.json` e `manifest.json`.
+2. Restaurar versão anterior de `site-pages.published.json`, `manifest.json` e/ou `storefront-template.published.json`.
 3. Reiniciar processo do storefront (ou limpar cache do runtime).
 4. Validar rotas críticas.
 
@@ -88,6 +99,22 @@ Verificar:
 2. Permissões de leitura no processo do storefront.
 3. Presença e validade de `manifest.json` e snapshot.
 
+### Painel publica template, mas header/home/footer não mudam
+
+Verificar:
+
+1. Presença de `storefront-template.published.json`.
+2. Se o storefront está lendo o mesmo `ECOM_CONTENT_PATH`.
+3. Se o processo foi iniciado em modo servidor ou em export estático.
+
+### Nova rota criada no painel não aparece em ambiente exportado
+
+Verificar:
+
+1. Se a página foi realmente publicada.
+2. Se o ambiente é export estático.
+3. Se a exportação do e-commerce foi refeita após a criação da rota.
+
 ### Build falha em export standalone
 
 Verificar:
@@ -99,6 +126,10 @@ Verificar:
 ## 7. Operação diária recomendada
 
 1. Desenvolver no monorepo.
-2. Validar com `yarn lint` e `yarn build`.
-3. Gerar exports para ambientes desacoplados.
-4. Registrar alterações de conteúdo/publicação em changelog operacional interno.
+2. Publicar alterações de template/tema/mega menu e validar no storefront.
+3. Publicar páginas dinâmicas e validar resolução por runtime.
+4. Validar com `yarn lint` e `yarn build`.
+5. Gerar exports para ambientes desacoplados quando necessário.
+6. Registrar alterações de conteúdo/publicação em changelog operacional interno.
+
+Referência detalhada: [ECOM_CONTENT_RUNTIME.md](ECOM_CONTENT_RUNTIME.md)

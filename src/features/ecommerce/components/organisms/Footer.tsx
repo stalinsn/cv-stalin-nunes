@@ -1,11 +1,38 @@
 "use client";
 import React from 'react';
+import Link from 'next/link';
 import { isOn } from '../../config/featureFlags';
+import type { StorefrontTemplate, StorefrontTemplateLink } from '@/features/site-runtime/storefrontTemplate';
+import { DEFAULT_STOREFRONT_TEMPLATE } from '@/features/site-runtime/storefrontTemplate';
 
-export default function Footer() {
-  const enabled = isOn('ecom.footer');
+function renderFooterLink(link: StorefrontTemplateLink, ariaLabel?: string) {
+  if (!link.enabled) return null;
+  if (/^https?:\/\//.test(link.href)) {
+    return (
+      <a key={link.id} href={link.href} aria-label={ariaLabel || link.label}>
+        {link.label}
+      </a>
+    );
+  }
+
+  return (
+    <Link key={link.id} href={link.href} aria-label={ariaLabel || link.label}>
+      {link.label}
+    </Link>
+  );
+}
+
+export default function Footer({ template = DEFAULT_STOREFRONT_TEMPLATE }: { template?: StorefrontTemplate }) {
+  const enabled = isOn('ecom.footer') && template.footer.modules.enabled;
   const [isMobile, setIsMobile] = React.useState(false);
-  const [open, setOpen] = React.useState<[boolean, boolean, boolean, boolean]>([true, true, true, true]);
+  const showFooterColumns = template.footer.modules.columns;
+  const showFooterApps = template.footer.modules.apps;
+  const showFooterNewsletter = template.footer.modules.newsletter;
+  const showFooterSocial = template.footer.modules.social;
+  const sections = showFooterColumns ? template.footer.sections.filter((section) => section.enabled) : [];
+  const showAppsNewsletterColumn = showFooterApps || showFooterNewsletter;
+  const accordionSize = sections.length + (showAppsNewsletterColumn ? 1 : 0);
+  const [open, setOpen] = React.useState<boolean[]>(Array.from({ length: accordionSize }, () => true));
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -13,7 +40,6 @@ export default function Footer() {
     const apply = (m: MediaQueryList | MediaQueryListEvent) => {
       const mql = 'matches' in m ? m.matches : (m as MediaQueryList).matches;
       setIsMobile(mql);
-      setOpen(mql ? [false, false, false, false] : [true, true, true, true]);
     };
     apply(mq);
     const handler = (e: MediaQueryListEvent) => apply(e);
@@ -21,10 +47,14 @@ export default function Footer() {
     return () => mq.removeEventListener?.('change', handler);
   }, []);
 
+  React.useEffect(() => {
+    setOpen(Array.from({ length: accordionSize }, () => !isMobile));
+  }, [accordionSize, isMobile]);
+
   const toggle = (i: number) => {
-  if (!isMobile) return;
+    if (!isMobile) return;
     setOpen((prev) => {
-      const next = [...prev] as [boolean, boolean, boolean, boolean];
+      const next = [...prev];
       next[i] = !next[i];
       return next;
     });
@@ -35,72 +65,65 @@ export default function Footer() {
   return (
     <footer className="ecom-footer">
       <div className="ecom-footer__grid">
-          <div className="ecom-footer__col">
-            <button className="ecom-footer__toggle" aria-expanded={open[0]} aria-controls="footer-sec-0" onClick={() => toggle(0)}>
-              <span>Institucional</span>
+        {sections.map((section, index) => (
+          <div key={section.id} className="ecom-footer__col">
+            <button className="ecom-footer__toggle" aria-expanded={open[index]} aria-controls={`footer-sec-${index}`} onClick={() => toggle(index)}>
+              <span>{section.title}</span>
               <span className="ecom-footer__chevron" aria-hidden>▾</span>
             </button>
-            <div id="footer-sec-0" className="ecom-footer__content" data-open={open[0] ? 'true' : 'false'}>
+            <div id={`footer-sec-${index}`} className="ecom-footer__content" data-open={open[index] ? 'true' : 'false'}>
               <ul>
-                <li><a href="#">Quem somos</a></li>
-                <li><a href="#">Lojas e horários</a></li>
-                <li><a href="#">Trabalhe conosco</a></li>
+                {section.links.filter((link) => link.enabled).map((link) => (
+                  <li key={link.id}>{renderFooterLink(link)}</li>
+                ))}
               </ul>
             </div>
           </div>
+        ))}
+        {showAppsNewsletterColumn ? (
           <div className="ecom-footer__col">
-            <button className="ecom-footer__toggle" aria-expanded={open[1]} aria-controls="footer-sec-1" onClick={() => toggle(1)}>
-              <span>Atendimento</span>
-              <span className="ecom-footer__chevron" aria-hidden>▾</span>
-            </button>
-            <div id="footer-sec-1" className="ecom-footer__content" data-open={open[1] ? 'true' : 'false'}>
-              <ul>
-                <li><a href="#">Central de ajuda</a></li>
-                <li><a href="#">Trocas e devoluções</a></li>
-                <li><a href="#">Fale conosco</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="ecom-footer__col">
-            <button className="ecom-footer__toggle" aria-expanded={open[2]} aria-controls="footer-sec-2" onClick={() => toggle(2)}>
-              <span>Políticas</span>
-              <span className="ecom-footer__chevron" aria-hidden>▾</span>
-            </button>
-            <div id="footer-sec-2" className="ecom-footer__content" data-open={open[2] ? 'true' : 'false'}>
-              <ul>
-                <li><a href="#">Privacidade</a></li>
-                <li><a href="#">Termos de uso</a></li>
-                <li><a href="#">Cookies</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="ecom-footer__col">
-            <button className="ecom-footer__toggle" aria-expanded={open[3]} aria-controls="footer-sec-3" onClick={() => toggle(3)}>
+            <button
+              className="ecom-footer__toggle"
+              aria-expanded={open[sections.length]}
+              aria-controls={`footer-sec-${sections.length}`}
+              onClick={() => toggle(sections.length)}
+            >
               <span>Apps e Newsletter</span>
               <span className="ecom-footer__chevron" aria-hidden>▾</span>
             </button>
-            <div id="footer-sec-3" className="ecom-footer__content" data-open={open[3] ? 'true' : 'false'}>
-              <h4>Baixe o app</h4>
-              <div className="ecom-footer__apps">
-                <a href="#" aria-label="App Store"> App Store</a>
-                <a href="#" aria-label="Google Play">▶ Google Play</a>
-              </div>
-              <h4>Receba novidades</h4>
-              <form className="ecom-footer__newsletter" onSubmit={(e) => e.preventDefault()}>
-                <input type="email" placeholder="Seu e-mail" aria-label="E-mail" />
-                <button type="submit">Assinar</button>
-              </form>
+            <div
+              id={`footer-sec-${sections.length}`}
+              className="ecom-footer__content"
+              data-open={open[sections.length] ? 'true' : 'false'}
+            >
+              {showFooterApps ? (
+                <>
+                  <h4>{template.footer.appTitle}</h4>
+                  <div className="ecom-footer__apps">
+                    {template.footer.appLinks.filter((link) => link.enabled).map((link) => renderFooterLink(link, link.label))}
+                  </div>
+                </>
+              ) : null}
+
+              {showFooterNewsletter ? (
+                <>
+                  <h4>{template.footer.newsletterTitle}</h4>
+                  <form className="ecom-footer__newsletter" onSubmit={(e) => e.preventDefault()}>
+                    <input type="email" placeholder={template.footer.newsletterPlaceholder} aria-label="E-mail" />
+                    <button type="submit">{template.footer.newsletterButtonLabel}</button>
+                  </form>
+                </>
+              ) : null}
             </div>
           </div>
-        </div>
+        ) : null}
         <div className="ecom-footer__bar">
-          <small>© {new Date().getFullYear()} SuperMart • Preços e condições válidos para compras online.</small>
+          <small>© {new Date().getFullYear()} {template.footer.copyrightText}</small>
           <div className="ecom-footer__social">
-            <a href="#" aria-label="Instagram">IG</a>
-            <a href="#" aria-label="Facebook">FB</a>
-            <a href="#" aria-label="YouTube">YT</a>
+            {showFooterSocial ? template.footer.socialLinks.filter((link) => link.enabled).map((link) => renderFooterLink(link, link.id)) : null}
           </div>
         </div>
+      </div>
     </footer>
   );
 }

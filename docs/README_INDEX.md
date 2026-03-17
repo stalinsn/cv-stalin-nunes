@@ -10,6 +10,8 @@ Bem-vindo à documentação técnica do projeto! Após refatoração completa do
   - Visão geral, fluxos, e design decisions do sistema de tradução refatorado
 - **[Mapa do Sistema](SYSTEM_MAP.md)** `[NOVO]`
   - Mapa arquitetural consolidado dos apps e blueprint do novo painel administrativo
+- **[Runtime de Conteúdo do E-commerce](ECOM_CONTENT_RUNTIME.md)** `[NOVO]`
+  - Contrato atual entre `EcommPanel` e `E-commerce`, snapshots publicados, persistência local e comportamento por modo de execução
 
 ---
 
@@ -89,6 +91,7 @@ Bem-vindo à documentação técnica do projeto! Após refatoração completa do
 - [MOTD](apps/motd.md)
 - [E‑commerce](apps/ecommerce.md)
 - [EcommPanel](apps/ecommpanel.md)
+- [Runtime de Conteúdo do E-commerce](ECOM_CONTENT_RUNTIME.md)
 - [Índice de Apps e operação integrada](apps/README.md)
 
 Consulte cada seção para detalhes técnicos específicos. A documentação é atualizada continuamente para refletir o estado atual do código.

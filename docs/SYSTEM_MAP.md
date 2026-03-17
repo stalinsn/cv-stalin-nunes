@@ -21,7 +21,7 @@ Visão arquitetural consolidada dos apps principais (`cv`, `motd`, `e-commerce`)
 
 - `cv` e `motd`: não dependem do `e-commerce`.
 - `e-commerce`: continua independente, sem dependência obrigatória do painel.
-- `ecommpanel`: camada administrativa externa, preparada para manipular o e-commerce via REST (`/api/ecommpanel/*`).
+- `ecommpanel`: camada administrativa externa, preparada para manipular o e-commerce via REST (`/api/ecommpanel/*`) e por snapshots JSON publicados.
 
 ## Fluxo-alvo de administração
 
@@ -29,7 +29,38 @@ Visão arquitetural consolidada dos apps principais (`cv`, `motd`, `e-commerce`)
 2. Permissões efetivas (role + allow/deny) são resolvidas.
 3. Painel chama endpoints administrativos protegidos.
 4. Endpoints aplicam validações de segurança e (no futuro) persistem em banco.
-5. Storefront consome as configurações/dados publicados.
+5. Storefront consome apenas as configurações/dados publicados.
+
+## Bridge de conteúdo atual
+
+O acoplamento entre `ecommpanel` e `e-commerce` está concentrado em um runtime de conteúdo por arquivo.
+
+### Persistência administrativa
+
+Site builder:
+
+- `src/data/ecommpanel/site-routes.json`
+- `src/data/ecommpanel/site-pages/<pageId>.json`
+
+Storefront:
+
+- `src/data/ecommpanel/storefront/meta.json`
+- `src/data/ecommpanel/storefront/theme.json`
+- `src/data/ecommpanel/storefront/header.json`
+- `src/data/ecommpanel/storefront/home.json`
+- `src/data/ecommpanel/storefront/footer.json`
+
+### Snapshot publicado
+
+- `site-pages.published.json`
+- `manifest.json`
+- `storefront-template.published.json`
+
+### Responsabilidade do storefront
+
+- resolver páginas dinâmicas no catch-all;
+- respeitar rotas nativas e namespaces reservados;
+- aplicar o template publicado como base autoritativa do tema e da estrutura da home.
 
 ## Camadas de segurança (mock atual)
 
@@ -46,5 +77,8 @@ Visão arquitetural consolidada dos apps principais (`cv`, `motd`, `e-commerce`)
 - Persistência real (users/sessions/audit/tokens) em banco.
 - Integração de segredos/KMS para material sensível.
 - Integrações REST versionadas para módulos do e-commerce:
-  - catálogo, preços, conteúdo, feature flags, logística e configurações de loja.
-- Painel visual para ativar/desativar módulos por página e contexto (home, PLP, PDP, checkout).
+  - catálogo, preços, conteúdo, logística e configurações de loja.
+- Migração do runtime atual em JSON para persistência por domínio em banco, preservando a separação já adotada entre `theme`, `header`, `home`, `footer`, `mega menu`, `site routes` e `site pages`.
+- Painel visual para ativar/desativar módulos por página e contexto (home, PLP, PDP, checkout), expandindo o modelo já aplicado ao template atual.
+
+Referência detalhada: [ECOM_CONTENT_RUNTIME.md](ECOM_CONTENT_RUNTIME.md)

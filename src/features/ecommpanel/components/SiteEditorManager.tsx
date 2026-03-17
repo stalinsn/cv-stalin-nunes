@@ -2,6 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import {
+  SITE_ROUTE_NAMESPACES,
+  buildNamespacedRoutePath,
+  describeSiteRoutePath,
+  getSiteRouteNamespace,
+  resolveSiteRouteNamespaceBySlug,
+  type SiteRouteNamespaceId,
+} from '@/features/ecommpanel/siteNamespaces';
 import type { SiteBlock, SiteBlockType, SiteLayoutPreset, SitePage, SitePageSlot } from '@/features/ecommpanel/types/siteBuilder';
 import SitePagePreview from './SitePagePreview';
 
@@ -294,6 +302,10 @@ export default function SiteEditorManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dragOverKey, setDragOverKey] = useState<string | null>(null);
   const [query, setQuery] = useState('');
+  const [namespaceFilter, setNamespaceFilter] = useState<'all' | SiteRouteNamespaceId>('all');
+  const [namespaceId, setNamespaceId] = useState<SiteRouteNamespaceId>('landing');
+  const [customPrefix, setCustomPrefix] = useState('');
+  const [leafPath, setLeafPath] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -302,13 +314,23 @@ export default function SiteEditorManager() {
   const canAdjustAreas = layoutPreset === 'three_horizontal' || layoutPreset === 'three_vertical';
   const isHorizontalPreset = layoutPreset === 'three_horizontal';
   const horizontalRows = isHorizontalPreset ? Math.ceil(slots.length / HORIZONTAL_COLUMNS) : 0;
+  const selectedNamespace = getSiteRouteNamespace(namespaceId);
+  const namespaceExample = describeSiteRoutePath(selectedNamespace.examplePath);
+  const composedSlug = useMemo(
+    () => buildNamespacedRoutePath({ namespaceId, customPrefix, leafPath }),
+    [customPrefix, leafPath, namespaceId],
+  );
 
   const filteredRoutes = useMemo(() => {
     const items = routes || [];
     const term = query.trim().toLowerCase();
-    if (!term) return items;
-    return items.filter((route) => route.title.toLowerCase().includes(term) || route.slug.toLowerCase().includes(term));
-  }, [query, routes]);
+    return items.filter((route) => {
+      const namespace = resolveSiteRouteNamespaceBySlug(route.slug);
+      const matchesNamespace = namespaceFilter === 'all' || namespace.id === namespaceFilter;
+      const matchesTerm = !term || route.title.toLowerCase().includes(term) || route.slug.toLowerCase().includes(term);
+      return matchesNamespace && matchesTerm;
+    });
+  }, [namespaceFilter, query, routes]);
 
   async function fetchData() {
     setLoading(true);
@@ -357,6 +379,9 @@ export default function SiteEditorManager() {
     if (!page) {
       setTitle('');
       setSlug('');
+      setNamespaceId('landing');
+      setCustomPrefix('');
+      setLeafPath('');
       setDescription('');
       setSeoTitle('');
       setSeoDescription('');
@@ -371,8 +396,12 @@ export default function SiteEditorManager() {
       return;
     }
 
+    const routeContext = describeSiteRoutePath(page.slug);
     setTitle(page.title);
     setSlug(page.slug);
+    setNamespaceId(routeContext.namespace.id);
+    setCustomPrefix(routeContext.customPrefix);
+    setLeafPath(routeContext.leafPath);
     setDescription(page.description);
     setSeoTitle(page.seo?.title || page.title);
     setSeoDescription(page.seo?.description || page.description);
@@ -391,6 +420,11 @@ export default function SiteEditorManager() {
     void fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (composedSlug === slug) return;
+    setSlug(composedSlug);
+  }, [composedSlug, slug]);
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -677,20 +711,35 @@ export default function SiteEditorManager() {
         <p className="panel-kicker">Experiência do Site · Editor</p>
         <h1 id="site-editor-title">Editor visual por rota</h1>
         <p className="panel-muted">
-          Escolha uma rota e abra o editor fullscreen com drag-and-drop avançado: adição, movimentação entre áreas e reordenação dentro do mesmo slot.
+          Escolha uma rota e abra o editor fullscreen com drag-and-drop avançado: adição, movimentação entre áreas e reordenação dentro do mesmo slot. O storefront resolve isso por runtime, sem gerar arquivos físicos em `src/app/e-commerce`.
         </p>
       </article>
 
       <article className="panel-card">
         <div className="panel-users-toolbar">
           <h2>Rotas disponíveis para edição</h2>
-          <input
-            className="panel-search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar rota por título ou slug"
-            aria-label="Buscar rota"
-          />
+          <div className="panel-inline panel-inline-wrap">
+            <select
+              className="panel-select"
+              value={namespaceFilter}
+              onChange={(event) => setNamespaceFilter(event.target.value as 'all' | SiteRouteNamespaceId)}
+              aria-label="Filtrar rotas por namespace"
+            >
+              <option value="all">Todos os namespaces</option>
+              {SITE_ROUTE_NAMESPACES.map((namespace) => (
+                <option key={namespace.id} value={namespace.id}>
+                  {namespace.label}
+                </option>
+              ))}
+            </select>
+            <input
+              className="panel-search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar rota por título ou caminho"
+              aria-label="Buscar rota"
+            />
+          </div>
         </div>
 
         {loading ? <p className="panel-muted">Carregando rotas...</p> : null}
@@ -707,26 +756,31 @@ export default function SiteEditorManager() {
                 </tr>
               </thead>
               <tbody>
-                {filteredRoutes.map((route) => (
-                  <tr key={route.id}>
-                    <td>
-                      <strong>{route.title}</strong>
-                      <br />
-                      <span className="panel-muted">/{route.slug}</span>
-                    </td>
-                    <td>
-                      <span className={`panel-badge ${route.status === 'published' ? 'panel-badge-success' : 'panel-badge-neutral'}`}>
-                        {route.status === 'published' ? 'Publicado' : 'Rascunho'}
-                      </span>
-                    </td>
-                    <td>{formatDate(route.updatedAt)}</td>
-                    <td>
-                      <button type="button" className="panel-btn panel-btn-primary panel-btn-sm" onClick={() => openEditorForPage(route.id)}>
-                        Abrir editor
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {filteredRoutes.map((route) => {
+                  const routeContext = describeSiteRoutePath(route.slug);
+                  return (
+                    <tr key={route.id}>
+                      <td>
+                        <strong>{route.title}</strong>
+                        <br />
+                        <span className="panel-badge panel-badge-neutral">{routeContext.namespace.label}</span>
+                        <br />
+                        <span className="panel-muted">/{route.slug}</span>
+                      </td>
+                      <td>
+                        <span className={`panel-badge ${route.status === 'published' ? 'panel-badge-success' : 'panel-badge-neutral'}`}>
+                          {route.status === 'published' ? 'Publicado' : 'Rascunho'}
+                        </span>
+                      </td>
+                      <td>{formatDate(route.updatedAt)}</td>
+                      <td>
+                        <button type="button" className="panel-btn panel-btn-primary panel-btn-sm" onClick={() => openEditorForPage(route.id)}>
+                          Abrir editor
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -743,6 +797,11 @@ export default function SiteEditorManager() {
               <p className="panel-muted">
                 {title} · /{slug}
               </p>
+              <div className="panel-inline panel-inline-wrap">
+                <span className="panel-badge panel-badge-neutral">{selectedNamespace.label}</span>
+                <span className="panel-badge panel-badge-neutral">Preset sugerido: {selectedNamespace.layoutPreset}</span>
+                {customPrefix ? <span className="panel-badge panel-badge-neutral">Prefixo: {customPrefix}</span> : null}
+              </div>
             </div>
             <button type="button" className="panel-btn panel-btn-secondary" onClick={() => setIsModalOpen(true)}>
               Reabrir editor
@@ -772,7 +831,12 @@ export default function SiteEditorManager() {
             <header className="panel-editor-modal__header">
               <div>
                 <h2>{title || 'Página sem título'}</h2>
-                <p className="panel-muted">/{slug || 'slug-da-pagina'} · Arraste blocos para as áreas pontilhadas da grade.</p>
+                <div className="panel-inline panel-inline-wrap">
+                  <span className="panel-badge panel-badge-neutral">{selectedNamespace.label}</span>
+                  <span className="panel-badge panel-badge-neutral">/{slug || 'slug-da-pagina'}</span>
+                  <span className="panel-badge panel-badge-neutral">Preset sugerido: {selectedNamespace.layoutPreset}</span>
+                </div>
+                <p className="panel-muted">{selectedNamespace.description}</p>
               </div>
               <div className="panel-inline panel-inline-wrap">
                 <button
@@ -956,13 +1020,69 @@ export default function SiteEditorManager() {
                 <h3>Propriedades</h3>
 
                 <div className="panel-grid">
+                  <div className="panel-form-section panel-editor-meta-full">
+                    <div className="panel-inline panel-inline-between panel-inline-wrap">
+                      <div>
+                        <strong>Rota operacional</strong>
+                        <p className="panel-muted">Organize o caminho da página por namespace para manter o catálogo de rotas consistente.</p>
+                      </div>
+                      <span className="panel-badge panel-badge-neutral">{selectedNamespace.label}</span>
+                    </div>
+
+                    <div className="panel-editor-meta-grid">
+                      <div className="panel-field">
+                        <label htmlFor="editor-namespace">Namespace</label>
+                        <select
+                          id="editor-namespace"
+                          className="panel-select"
+                          value={namespaceId}
+                          onChange={(event) => setNamespaceId(event.target.value as SiteRouteNamespaceId)}
+                        >
+                          {SITE_ROUTE_NAMESPACES.map((namespace) => (
+                            <option key={namespace.id} value={namespace.id}>
+                              {namespace.label}
+                            </option>
+                          ))}
+                        </select>
+                        <small className="panel-muted">{selectedNamespace.description}</small>
+                      </div>
+
+                      {namespaceId === 'custom' ? (
+                        <div className="panel-field">
+                          <label htmlFor="editor-custom-prefix">Prefixo custom</label>
+                          <input
+                            id="editor-custom-prefix"
+                            className="panel-input"
+                            value={customPrefix}
+                            onChange={(event) => setCustomPrefix(event.target.value)}
+                            placeholder={namespaceExample.customPrefix || 'especial/parceiros'}
+                          />
+                        </div>
+                      ) : null}
+
+                      <div className="panel-field">
+                        <label htmlFor="editor-leaf-path">Entrada final</label>
+                        <input
+                          id="editor-leaf-path"
+                          className="panel-input"
+                          value={leafPath}
+                          onChange={(event) => setLeafPath(event.target.value)}
+                          placeholder={namespaceExample.leafPath || selectedNamespace.examplePath}
+                        />
+                        <small className="panel-muted">Use letras minúsculas, números e hífen. Barra só quando fizer parte do leaf path.</small>
+                      </div>
+
+                      <div className="panel-field">
+                        <label htmlFor="editor-slug">Caminho final</label>
+                        <input id="editor-slug" className="panel-input" value={`/${slug || 'caminho-da-pagina'}`} readOnly />
+                        <small className="panel-muted">Reservados: `plp`, `cart`, `checkout`, `paginas`.</small>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="panel-field">
                     <label htmlFor="editor-title">Título</label>
                     <input id="editor-title" className="panel-input" value={title} onChange={(event) => setTitle(event.target.value)} />
-                  </div>
-                  <div className="panel-field">
-                    <label htmlFor="editor-slug">Slug</label>
-                    <input id="editor-slug" className="panel-input" value={slug} onChange={(event) => setSlug(event.target.value)} />
                   </div>
                   <div className="panel-field">
                     <label htmlFor="editor-description">Descrição</label>

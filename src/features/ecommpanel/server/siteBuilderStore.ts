@@ -4,6 +4,8 @@ import path from 'node:path';
 
 import type { RuntimeResolvedPage } from '@/features/site-runtime/contracts';
 import { publishRuntimePages } from '@/features/site-runtime/server/publishedStore';
+import { normalizeStorefrontRoutePathCandidate } from '@/features/site-runtime/routeRules';
+import { resolveSiteRouteNamespaceBySlug } from '@/features/ecommpanel/siteNamespaces';
 import type {
   SiteBlock,
   SiteBlockType,
@@ -14,7 +16,7 @@ import type {
 } from '../types/siteBuilder';
 import { nowIso, randomToken } from './crypto';
 
-const VALID_PAGE_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const VALID_PAGE_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/;
 const TRASH_RETENTION_MS = 1000 * 60 * 60 * 24 * 30;
 
 type SiteBuilderDb = {
@@ -23,11 +25,24 @@ type SiteBuilderDb = {
   seeded: boolean;
 };
 
+type SitePageRecord = Omit<SitePage, 'slots'>;
+
 type PersistedSiteBuilder = {
   pages: SitePage[];
 };
 
-const DATA_FILE = path.join(process.cwd(), 'src/data/ecommpanel/site-pages.json');
+type PersistedSiteRouteRegistry = {
+  routes: SitePageRecord[];
+};
+
+type PersistedSitePageDocument = {
+  pageId: string;
+  slots: SitePageSlot[];
+};
+
+const LEGACY_DATA_FILE = path.join(process.cwd(), 'src/data/ecommpanel/site-pages.json');
+const ROUTES_FILE = path.join(process.cwd(), 'src/data/ecommpanel/site-routes.json');
+const PAGES_DIR = path.join(process.cwd(), 'src/data/ecommpanel/site-pages');
 
 declare global {
   var __ECOMMPANEL_SITE_BUILDER_DB__: SiteBuilderDb | undefined;
@@ -80,41 +95,36 @@ function hydratePage(page: SitePage): SitePage {
   };
 }
 
-function ensureDataDir(): void {
-  fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
+function toPageRecord(page: SitePage): SitePageRecord {
+  const { slots: _slots, ...record } = page;
+  return record;
 }
 
-function saveDb(): void {
-  const db = getDb();
-  ensureDataDir();
-  const payload: PersistedSiteBuilder = {
-    pages: Array.from(db.pages.values()),
-  };
-  fs.writeFileSync(DATA_FILE, JSON.stringify(payload, null, 2), 'utf-8');
-  syncPublishedRuntimeSnapshot(payload.pages);
+function getPageDocumentPath(pageId: string): string {
+  return path.join(PAGES_DIR, `${pageId}.json`);
 }
 
-function loadDb(): void {
-  const db = getDb();
-  if (db.loaded) return;
-
-  db.loaded = true;
-  if (!fs.existsSync(DATA_FILE)) return;
-
+function readJsonFile<T>(filePath: string): T | null {
+  if (!fs.existsSync(filePath)) return null;
   try {
-    const raw = fs.readFileSync(DATA_FILE, 'utf-8');
-    const parsed = JSON.parse(raw) as PersistedSiteBuilder;
-    db.pages.clear();
-    for (const page of parsed.pages || []) {
-      const hydrated = hydratePage(page);
-      db.pages.set(hydrated.id, hydrated);
-    }
-    db.seeded = db.pages.size > 0;
-    syncPublishedRuntimeSnapshot(Array.from(db.pages.values()));
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(raw) as T;
   } catch {
-    db.pages.clear();
-    db.seeded = false;
+    return null;
   }
+}
+
+function writeJsonAtomic(filePath: string, value: unknown): void {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  const payload = JSON.stringify(value, null, 2);
+  const tmpPath = `${filePath}.tmp-${process.pid}-${Date.now()}`;
+  fs.writeFileSync(tmpPath, payload, 'utf-8');
+  fs.renameSync(tmpPath, filePath);
+}
+
+function ensureDataDir(): void {
+  fs.mkdirSync(path.dirname(ROUTES_FILE), { recursive: true });
+  fs.mkdirSync(PAGES_DIR, { recursive: true });
 }
 
 function toRuntimePublishedPage(page: SitePage): RuntimeResolvedPage | null {
@@ -240,20 +250,117 @@ function seedSlots(): SitePageSlot[] {
   return slots;
 }
 
-function purgeExpiredTrash(): void {
+function createStarterSlotsForSlug(slug: string): { layoutPreset: SiteLayoutPreset; slots: SitePageSlot[] } {
+  const namespace = resolveSiteRouteNamespaceBySlug(slug);
+  const slots = createSlotsForPreset(namespace.layoutPreset);
+
+  namespace.starterPlan.forEach((plan, slotIndex) => {
+    const slot = slots[slotIndex];
+    if (!slot) return;
+    slot.blocks.push(...plan.map((blockType) => createBlock(blockType)));
+  });
+
+  return {
+    layoutPreset: namespace.layoutPreset,
+    slots,
+  };
+}
+
+function readSitePageSlots(pageId: string, layoutPreset: SiteLayoutPreset): SitePageSlot[] {
+  const document = readJsonFile<PersistedSitePageDocument>(getPageDocumentPath(pageId));
+  if (!document?.pageId || document.pageId !== pageId || !Array.isArray(document.slots)) {
+    return createSlotsForPreset(layoutPreset);
+  }
+
+  return document.slots;
+}
+
+function saveDb(): void {
+  const db = getDb();
+  ensureDataDir();
+  const pages = Array.from(db.pages.values());
+
+  const registry: PersistedSiteRouteRegistry = {
+    routes: pages.map((page) => toPageRecord(page)),
+  };
+  writeJsonAtomic(ROUTES_FILE, registry);
+  writeJsonAtomic(LEGACY_DATA_FILE, { pages });
+
+  for (const page of pages) {
+    const document: PersistedSitePageDocument = {
+      pageId: page.id,
+      slots: page.slots,
+    };
+    writeJsonAtomic(getPageDocumentPath(page.id), document);
+  }
+
+  syncPublishedRuntimeSnapshot(pages);
+}
+
+function loadFromSplitFiles(db: SiteBuilderDb): boolean {
+  const registry = readJsonFile<PersistedSiteRouteRegistry>(ROUTES_FILE);
+  if (!registry?.routes) return false;
+
+  db.pages.clear();
+  for (const route of registry.routes) {
+    const hydrated = hydratePage({
+      ...route,
+      slots: readSitePageSlots(route.id, route.layoutPreset),
+    } as SitePage);
+    db.pages.set(hydrated.id, hydrated);
+  }
+
+  db.seeded = db.pages.size > 0;
+  syncPublishedRuntimeSnapshot(Array.from(db.pages.values()));
+  return true;
+}
+
+function loadFromLegacyFile(db: SiteBuilderDb): boolean {
+  const legacy = readJsonFile<PersistedSiteBuilder>(LEGACY_DATA_FILE);
+  if (!legacy?.pages) return false;
+
+  db.pages.clear();
+  for (const page of legacy.pages) {
+    const hydrated = hydratePage(page);
+    db.pages.set(hydrated.id, hydrated);
+  }
+
+  db.seeded = db.pages.size > 0;
+  saveDb();
+  return true;
+}
+
+function loadDb(): void {
+  const db = getDb();
+  if (db.loaded) return;
+
+  db.loaded = true;
+  if (loadFromSplitFiles(db)) return;
+  if (loadFromLegacyFile(db)) return;
+
+  db.pages.clear();
+  db.seeded = false;
+}
+
+function purgeExpiredTrash(): boolean {
   const db = getDb();
   const now = Date.now();
+  let changed = false;
   for (const [id, page] of db.pages.entries()) {
     if (!page.deleteExpiresAt) continue;
     if (now >= new Date(page.deleteExpiresAt).getTime()) {
       db.pages.delete(id);
+      changed = true;
     }
   }
+  return changed;
 }
 
 export function ensureSeededSiteBuilder(): void {
   loadDb();
-  purgeExpiredTrash();
+  if (purgeExpiredTrash()) {
+    saveDb();
+  }
   const db = getDb();
   if (db.seeded) return;
 
@@ -324,14 +431,7 @@ export function getPublishedSitePageBySlug(slug: string): SitePage | null {
 }
 
 export function normalizeSlug(raw: string): string {
-  return raw
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
+  return normalizeStorefrontRoutePathCandidate(raw);
 }
 
 export function isValidSlug(slug: string): boolean {
@@ -342,10 +442,12 @@ export function createSitePage(input: { title: string; slug: string; description
   const db = getDb();
   const now = nowIso();
   const description = input.description?.trim() || '';
+  const normalizedSlug = normalizeSlug(input.slug);
+  const starter = createStarterSlotsForSlug(normalizedSlug);
   const page: SitePage = {
     id: `page-${randomToken(6)}`,
     title: input.title.trim(),
-    slug: normalizeSlug(input.slug),
+    slug: normalizedSlug,
     description,
     seo: createDefaultSeo({
       title: input.title.trim(),
@@ -353,8 +455,8 @@ export function createSitePage(input: { title: string; slug: string; description
     }),
     theme: createDefaultTheme(),
     status: 'draft',
-    layoutPreset: 'three_vertical',
-    slots: createSlotsForPreset('three_vertical'),
+    layoutPreset: starter.layoutPreset,
+    slots: starter.slots,
     createdAt: now,
     updatedAt: now,
   };

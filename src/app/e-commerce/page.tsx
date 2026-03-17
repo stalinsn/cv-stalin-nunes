@@ -11,6 +11,7 @@ import type { EcommerceItem } from '../../features/ecommerce/types/product';
 import { isOn } from '../../features/ecommerce/config/featureFlags';
 import CmsPageRenderer from '../../features/ecommerce/components/cms/CmsPageRenderer';
 import { resolveStorefrontPath } from '../../features/ecommerce/server/routeResolver';
+import { resolveStorefrontTemplate } from '../../features/ecommerce/server/storefrontTemplateResolver';
 
 export default function EcommerceHome() {
   if (isOn('ecom.siteResolver.enabled') && isOn('ecom.siteResolver.overrideHome')) {
@@ -20,6 +21,10 @@ export default function EcommerceHome() {
     }
   }
 
+  const template = resolveStorefrontTemplate();
+  const homeModules = template.home.modules;
+  const homeEnabled = homeModules.enabled;
+
   // Keep mock data available for local testing regardless of flags
   const data = (raw as unknown as EcommerceItem[]).map(mapToUIProduct);
   const demo2 = data.slice(0, 2);
@@ -27,24 +32,28 @@ export default function EcommerceHome() {
   return (
     <>
       {/* Hero principal */}
-      {isOn('ecom.home.hero.main') && <HeroBanner />}
+      {homeEnabled && homeModules.heroMessage && isOn('ecom.home.hero.main') && <HeroBanner message={template.home.heroMessage} />}
 
       {/* Ofertas do dia (primeira vitrine após hero) */}
-      {isOn('ecom.home.showcase.daily') && <Showcase title="Ofertas do dia" flag="ecom.showcaseDaily" />}
+      {homeEnabled && homeModules.showcaseDaily && isOn('ecom.home.showcase.daily') && <Showcase title={template.home.dailyShowcaseTitle} flag="ecom.showcaseDaily" />}
 
       {/* Services (pílulas) */}
-      {isOn('ecom.home.services') && <ServicesBar />}
+      {homeEnabled && homeModules.services && isOn('ecom.home.services') && <ServicesBar items={template.home.services} />}
 
-  {isOn('ecom.home.showcase.grocery') && <Showcase title="Para sua despensa" flag="ecom.showcaseGrocery" />}
+      {homeEnabled && homeModules.showcaseGrocery && isOn('ecom.home.showcase.grocery') && (
+        <Showcase title={template.home.groceryShowcaseTitle} flag="ecom.showcaseGrocery" />
+      )}
 
-  {/* Combos (demo banners) */}
-  {isOn('ecom.demoBanners') && isOn('ecom.home.banner.heroLarge') && <HeroBannerLarge />}
+      {/* Combos (demo banners) */}
+      {homeEnabled && homeModules.largeBanner && isOn('ecom.demoBanners') && isOn('ecom.home.banner.heroLarge') && (
+        <HeroBannerLarge text={template.home.largeBannerText} />
+      )}
 
-  {/* Demais faixas (demo) */}
-  {isOn('ecom.demoBanners') && <StripsBelow />}
+      {/* Demais faixas (demo) */}
+      {homeEnabled && homeModules.strips && isOn('ecom.demoBanners') && <StripsBelow strips={template.home.strips} />}
 
   {/* Demo shelves (kept for testing, gated by flag) */}
-  {isOn('ecom.demoShelves') && isOn('ecom.home.demo.carousel.twoItems') && (
+      {isOn('ecom.demoShelves') && isOn('ecom.home.demo.carousel.twoItems') && (
         <Carousel
           title="Exemplo: Somente 2 itens (alinhado à esquerda)"
           config={{ variant: 'default', banner: { image: '/globe.svg', alt: 'Pague como preferir', position: 'left' }, seeMoreHref: '#' }}
@@ -85,8 +94,7 @@ export default function EcommerceHome() {
           ))}
         </Carousel>
       )}
-
-  {/* Inline mini-cart removed: use only DrawerCart (layout-client) */}
+      {/* Inline mini-cart removed: use only DrawerCart (layout-client) */}
     </>
   );
 }

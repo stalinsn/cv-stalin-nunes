@@ -7,6 +7,7 @@ import { catalogCategories, catalogProducts, productCollectionsById, productDepa
 import { isVtexLive } from '../../lib/runtimeConfig';
 import { MegaMenu } from './MegaMenu';
 import Link from 'next/link';
+import type { StorefrontDepartmentCategory, StorefrontTemplate } from '@/features/site-runtime/storefrontTemplate';
 
 type Category = (typeof catalogCategories)[number];
 const allCats = catalogCategories as Category[];
@@ -101,11 +102,43 @@ function mapToMega(cats: Category[]): MegaCategory[] {
     });
 }
 
-export function DepartmentsDropdown({ trigger }: { trigger?: React.ReactNode }) {
+function mapTemplateDepartmentsToMega(categories: StorefrontDepartmentCategory[]): MegaCategory[] {
+  return categories
+    .filter((category) => category.enabled)
+    .map((category) => ({
+      key: category.id,
+      label: category.label,
+      href: category.href,
+      sections: category.sections.map((section) => ({
+        title: section.title,
+        items: section.links
+          .filter((link) => link.enabled)
+          .map((link) => ({
+            name: link.label,
+            href: link.href,
+          })),
+      })),
+    }))
+    .filter((category) => category.sections.some((section) => section.items.length > 0));
+}
+
+export function DepartmentsDropdown({ trigger, template }: { trigger?: React.ReactNode; template?: StorefrontTemplate }) {
   const [openKeys, setOpenKeys] = useState<Record<string, boolean>>({});
-  const [cats, setCats] = useState<MegaCategory[]>(mapToMega(allCats));
+  const fallbackCategories = React.useMemo(() => mapToMega(allCats), []);
+  const templateCategories = React.useMemo(
+    () => mapTemplateDepartmentsToMega(template?.header.departmentsMenu || []),
+    [template]
+  );
+  const hasTemplateCategories = templateCategories.length > 0;
+  const [cats, setCats] = useState<MegaCategory[]>(hasTemplateCategories ? templateCategories : fallbackCategories);
 
   React.useEffect(() => {
+    if (hasTemplateCategories) {
+      setCats(templateCategories);
+      return;
+    }
+
+    setCats(fallbackCategories);
     let cancelled = false;
     async function load() {
       if (!isVtexLive()) return;
@@ -126,9 +159,9 @@ export function DepartmentsDropdown({ trigger }: { trigger?: React.ReactNode }) 
         if (!cancelled) setCats(mapToMega(top));
       } catch { /* ignore */ }
     }
-    load();
+    void load();
     return () => { cancelled = true; };
-  }, []);
+  }, [fallbackCategories, hasTemplateCategories, templateCategories]);
 
   const toggle = (key: string) => setOpenKeys((s) => ({ ...s, [key]: !s[key] }));
   const categories = cats;
@@ -136,7 +169,7 @@ export function DepartmentsDropdown({ trigger }: { trigger?: React.ReactNode }) 
     <Dropdown
       trigger={
         trigger ?? (
-          <button className="ecom-nav__btn ecom-nav__btn--departments">☰ Departamentos</button>
+          <button className="ecom-nav__btn ecom-nav__btn--departments">☰ {template?.header.departmentsButtonLabel || 'Departamentos'}</button>
         )
       }
       className="dropdown--departments dropdown--departments-full"

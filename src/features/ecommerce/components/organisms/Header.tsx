@@ -12,8 +12,27 @@ import { Modal } from '../atoms/Modal';
 import dynamic from 'next/dynamic';
 const DeliveryModal = dynamic(() => import('../molecules/DeliveryModal').then(module => module.DeliveryModal), { ssr: false });
 import { SearchIcon, CartIcon, MenuIcon } from '../atoms/Icon';
+import type { StorefrontTemplate, StorefrontTemplateLink } from '@/features/site-runtime/storefrontTemplate';
+import { DEFAULT_STOREFRONT_TEMPLATE } from '@/features/site-runtime/storefrontTemplate';
 
-export default function Header() {
+function renderTemplateLink(link: StorefrontTemplateLink, className: string) {
+  if (!link.enabled) return null;
+  if (/^https?:\/\//.test(link.href)) {
+    return (
+      <a key={link.id} href={link.href} className={className}>
+        {link.label}
+      </a>
+    );
+  }
+
+  return (
+    <Link key={link.id} href={link.href} className={className}>
+      {link.label}
+    </Link>
+  );
+}
+
+export default function Header({ template = DEFAULT_STOREFRONT_TEMPLATE }: { template?: StorefrontTemplate }) {
   const { totalItems } = useCart();
   const { orderForm } = useOrderForm();
   const { toggleCart } = useUI();
@@ -26,6 +45,7 @@ export default function Header() {
   const headerRef = React.useRef<HTMLElement | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const headerModules = template.header.modules;
   useEffect(() => {
     setHydrated(true);
   }, []);
@@ -54,9 +74,9 @@ export default function Header() {
   const isCartFlow = pathname.startsWith('/e-commerce/cart');
   const isSimpleHeader = isCheckoutFlow || isCartFlow;
   const enableCondensed = isOn('ecom.header.condensed');
-  const showPromoBar = isOn('ecom.header.promoBar');
+  const showPromoBar = headerModules.promoBar && isOn('ecom.header.promoBar');
   const showDeliveryPill = isOn('ecom.header.deliveryPill');
-  const showUtilBar = isOn('ecom.header.utilBar');
+  const showUtilBar = headerModules.utilLinks && isOn('ecom.header.utilBar');
   const showUtilClub = isOn('ecom.header.util.club');
   const showUtilHelp = isOn('ecom.header.util.help');
   const showUtilLogin = isOn('ecom.header.util.login');
@@ -65,11 +85,19 @@ export default function Header() {
   const showSearch = isOn('ecom.header.search');
   const showFavorite = isOn('ecom.header.actions.favorite');
   const showCartAction = isOn('ecom.header.actions.cart');
-  const showQuickLogin = isOn('ecom.header.actions.loginQuick');
+  const showQuickLogin = headerModules.quickLogin && isOn('ecom.header.actions.loginQuick');
   const showNav = isOn('ecom.header.nav');
-  const showNavDepartments = isOn('ecom.header.nav.departments');
-  const showNavMeta = isOn('ecom.header.nav.meta');
+  const showNavDepartments = headerModules.departmentsMenu && isOn('ecom.header.nav.departments');
+  const showNavMeta = headerModules.navMeta && isOn('ecom.header.nav.meta');
   const showBackToTop = isOn('ecom.header.backToTop') && backToTopVisible;
+  const utilLinks = template.header.utilLinks.filter((link) => {
+    if (!link.enabled) return false;
+    if (link.id === 'club') return showUtilClub;
+    if (link.id === 'help') return showUtilHelp;
+    if (link.id === 'login') return showUtilLogin;
+    return true;
+  });
+  const quickLogin = template.header.quickLogin;
   const selectedAddress = orderForm.shipping.selectedAddress;
   const selectedOption = orderForm.shipping.deliveryOptions[orderForm.shipping.deliveryOptions.length - 1];
   const cepDigits = (selectedAddress?.postalCode || '').replace(/\D/g, '');
@@ -85,6 +113,7 @@ export default function Header() {
     : 'Retirar em loja';
   
   if (!isOn('ecom.header')) return null;
+  if (!isSimpleHeader && !headerModules.enabled) return null;
 
   if (isSimpleHeader) {
     return (
@@ -93,15 +122,15 @@ export default function Header() {
           <div className="container">
             <div className="ecom-header__simpleRow">
               <div className="ecom-header__brand">
-                <Link href="/e-commerce" aria-label="Ir para a Home">SuperMart</Link>
+                <Link href="/e-commerce" aria-label="Ir para a Home">{template.brandName}</Link>
               </div>
               <div className="ecom-header__simpleActions">
                 <Link href="/e-commerce" className="ecom-header__simpleLink" data-track-id="simple-header-home">
-                  Home
+                  {template.header.simpleHomeLabel}
                 </Link>
                 {isCheckoutFlow ? (
                   <Link href="/e-commerce/cart" className="ecom-header__simpleLink" data-track-id="simple-header-cart">
-                    Carrinho
+                    {template.header.simpleCartLabel}
                   </Link>
                 ) : null}
               </div>
@@ -119,7 +148,7 @@ export default function Header() {
         <div className="container">
           {showPromoBar ? (
             <div className="ecom-header__promo" role="note" aria-label="Promoções">
-              <strong>Prime</strong> • Frete grátis e ofertas exclusivas
+              {template.header.promoText}
             </div>
           ) : null}
           {showDeliveryPill ? (
@@ -147,9 +176,7 @@ export default function Header() {
                 </button>
               </div>
               <div className="ecom-header__links">
-                {showUtilClub ? <button className="ecom-link">Clube</button> : null}
-                {showUtilHelp ? <button className="ecom-link">Ajuda</button> : null}
-                {showUtilLogin ? <button className="ecom-link">Login</button> : null}
+                {utilLinks.map((link) => renderTemplateLink(link, 'ecom-link'))}
               </div>
             </div>
           ) : null}
@@ -158,12 +185,15 @@ export default function Header() {
             <div className="ecom-header__top">
               <div className="ecom-header__burger">
                 {showNavDepartments ? (
-                  <DepartmentsDropdown trigger={<button className="ecom-nav__btn ecom-nav__btn--departments" aria-label="Abrir menu"><MenuIcon /></button>} />
+                  <DepartmentsDropdown
+                    template={template}
+                    trigger={<button className="ecom-nav__btn ecom-nav__btn--departments" aria-label="Abrir menu"><MenuIcon /></button>}
+                  />
                 ) : null}
               </div>
               {showLogo ? (
                 <div className="ecom-header__brand">
-                  <Link href="/e-commerce" aria-label="Ir para a Home">SuperMart</Link>
+                  <Link href="/e-commerce" aria-label="Ir para a Home">{template.brandName}</Link>
                 </div>
               ) : null}
               {showSearch ? (
@@ -176,7 +206,7 @@ export default function Header() {
                   }}
                 >
                   <input
-                    placeholder="Pesquise aqui"
+                    placeholder={template.header.searchPlaceholder}
                     aria-label="Buscar produtos"
                     value={term}
                     onChange={(e) => setTerm(e.target.value)}
@@ -185,7 +215,7 @@ export default function Header() {
                 </form>
               ) : null}
               <div className="ecom-header__actions">
-                {showQuickLogin ? <button className="ecom-header__quick-login" type="button">Login</button> : null}
+                {showQuickLogin && quickLogin.enabled ? renderTemplateLink(quickLogin, 'ecom-header__quick-login') : null}
                 {showFavorite ? <Button variant="icon" aria-label="Favoritos" data-fav>❤</Button> : null}
                 {showCartAction ? (
                   <Button
@@ -205,8 +235,8 @@ export default function Header() {
 
           {showNav ? (
             <nav className="ecom-header__nav">
-              {showNavDepartments ? <DepartmentsDropdown /> : null}
-              {showNavMeta ? <span className="ecom-nav__meta">Atacado e Varejo</span> : null}
+              {showNavDepartments ? <DepartmentsDropdown template={template} /> : null}
+              {showNavMeta ? <span className="ecom-nav__meta">{template.header.navMetaText}</span> : null}
             </nav>
           ) : null}
         </div>
