@@ -55,14 +55,14 @@ export const cvDataEs: CvData = {
     {
       company: "Stefanini Brasil",
       role: "Analista Desarrollador Sr. | Especialista VTEX (IO, Fast Store)",
-      period: "Jul 2022 – Actual",
+      period: "Jul 2022 – Feb 2026",
       location: "São Paulo – SP",
       bullets: [
         "Liderazgo técnico en squads de e-commerce, definiendo arquitectura escalable, buenas prácticas y estrategias de desarrollo con VTEX IO y Fast Store.",
         "Protagonista en proyectos estratégicos, liderando entregas de alto impacto para grandes marcas y garantizando integración eficiente entre equipos.",
-        "Implementación de pipelines CI/CD con GitHub Actions, aumentando en un 40% la eficiencia de los ciclos de QA y producción.",
-        "Modernización de tiendas multimarcas a arquitectura headless, reduciendo en un 30% el tiempo de entrega y aumentando la estabilidad en producción.",
-        "Mentoría activa y desarrollo de talentos, elevando la calidad técnica y reduciendo el retrabajo en más del 90%.",
+        "Implementación de pipelines CI/CD con GitHub Actions, aportando más eficiencia y previsibilidad a los ciclos de QA y producción.",
+        "Modernización de tiendas multimarcas hacia una arquitectura headless, reduciendo el tiempo de entrega y aumentando la estabilidad en producción.",
+        "Mentoría activa y desarrollo de talentos, elevando la calidad técnica y reduciendo el retrabajo del equipo.",
         "Actuación directa en troubleshooting, despliegue, mantenimiento evolutivo y soporte de código, siempre con foco en performance, innovación y evolución del negocio.",
       ],
     },
@@ -73,7 +73,7 @@ export const cvDataEs: CvData = {
       location: "São Paulo – SP",
       bullets: [
         "Participación activa en la migración de la plataforma de VTEX Legacy a VTEX IO, contribuyendo a la modernización de la arquitectura e interfaces.",
-        "Desarrollo de nuevas PDPs, Homepages y features, resultando en una ganancia de +18% en performance (page speed).",
+        "Desarrollo de nuevas PDPs, Homepages y features, con foco en la mejora del performance y la experiencia del usuario.",
         "Participación en la planificación de soluciones, revisión de código y definición de mejores prácticas junto al equipo.",
         "Colaboración en el mantenimiento y mejora de los procesos de versionado (Git Flow), contribuyendo a la reducción de fallos de integración y mejora de la calidad del código.",
       ],

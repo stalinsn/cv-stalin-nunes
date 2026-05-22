@@ -55,14 +55,14 @@ export const cvDataFr: CvData = {
     {
       company: "Stefanini Brasil",
       role: "Développeur Senior | Spécialiste VTEX (IO, Fast Store)",
-      period: "Juil 2022 – Présent",
+      period: "Juil 2022 – Fév 2026",
       location: "São Paulo – SP",
       bullets: [
         "Leadership technique dans des squads e-commerce, définition d'architectures évolutives, bonnes pratiques et stratégies de développement avec VTEX IO et Fast Store.",
         "Acteur clé dans des projets stratégiques, menant des livraisons à fort impact pour de grandes marques et garantissant une intégration efficace entre les équipes.",
-        "Mise en place de pipelines CI/CD avec GitHub Actions, augmentant de 40% l'efficacité des cycles QA et production.",
-        "Modernisation de boutiques multimarques vers une architecture headless, réduisant de 30% le temps de livraison et augmentant la stabilité en production.",
-        "Mentorat actif et développement de talents, élevant la qualité technique et réduisant la reprise de plus de 90%.",
+        "Mise en place de pipelines CI/CD avec GitHub Actions, apportant plus d'efficacité et de prévisibilité aux cycles QA et production.",
+        "Modernisation de boutiques multimarques vers une architecture headless, réduisant le temps de livraison et renforçant la stabilité en production.",
+        "Mentorat actif et développement de talents, élevant la qualité technique et réduisant les reprises au sein de l'équipe.",
         "Intervention directe sur le troubleshooting, le déploiement, la maintenance évolutive et le support du code, toujours avec un focus sur la performance, l'innovation et l'évolution du business.",
       ],
     },
@@ -73,7 +73,7 @@ export const cvDataFr: CvData = {
       location: "São Paulo – SP",
       bullets: [
         "Participation active à la migration de la plateforme VTEX Legacy vers VTEX IO, contribuant à la modernisation de l'architecture et des interfaces.",
-        "Développement de nouvelles PDP, homepages et fonctionnalités, aboutissant à un gain de +18% en performance (page speed).",
+        "Développement de nouvelles PDP, homepages et fonctionnalités, avec un focus sur la performance et l'expérience utilisateur.",
         "Participation à la planification des solutions, revue de code et définition des meilleures pratiques avec l'équipe.",
         "Collaboration à la maintenance et à l'amélioration des processus de gestion de versions (Git Flow), contribuant à la réduction des erreurs d'intégration et à l'amélioration de la qualité du code.",
       ],

@@ -48,14 +48,14 @@ export const cvData = {
     {
       company: "Stefanini Brasil",
       role: "Analista Desenvolvedor Sr. | Especialista VTEX IO",
-      period: "Jul 2022 – Atual",
+      period: "Jul 2022 – Fev 2026",
       location: "São Paulo – SP",
       bullets: [
         "Liderança técnica em squads VTEX IO, definindo arquitetura escalável, boas práticas, code review e estratégia de desenvolvimento.",
         "Responsável pelo ciclo completo de desenvolvimento de soluções e-commerce, desde requisitos até deploy e sustentação.",
-        "Implantação de pipelines CI/CD com GitHub Actions, gerando aumento de 40% na eficiência dos ciclos de QA e produção.",
-        "Conduziu migração completa para arquitetura headless VTEX IO em 5 lojas multimarcas, com redução de 30% no tempo de entrega e aumento da estabilidade em produção.",
-        "Mentoria ativa para o time de desenvolvimento, elevando a qualidade técnica e reduzindo retrabalho em mais de 90%.",
+        "Implantação de pipelines CI/CD com GitHub Actions, trazendo mais eficiência para os ciclos de QA e produção.",
+        "Conduziu migração completa para arquitetura headless VTEX IO em lojas multimarcas, reduzindo o tempo de entrega e aumentando a estabilidade em produção.",
+        "Mentoria ativa para o time de desenvolvimento, elevando a qualidade técnica e reduzindo retrabalho.",
         "Atuação direta em troubleshooting de ambientes produtivos, deploy, manutenção evolutiva e sustentação de código.",
       ],
     },
@@ -66,9 +66,9 @@ export const cvData = {
       location: "São Paulo – SP",
       bullets: [
         "Liderança na migração da plataforma de VTEX Legacy para VTEX IO, modernizando a arquitetura e interfaces.",
-        "Responsável pelo desenvolvimento de novas PDPs, Homepages e features, com ganho de +18% em performance (page speed).",
+        "Responsável pelo desenvolvimento de novas PDPs, Homepages e features, com foco em performance (page speed).",
         "Participação ativa no planejamento de soluções, revisão de código e definição de melhores práticas.",
-        "Aprimorou processos de versionamento implementando Git Flow, reduzindo falhas de integração em 25%.",
+        "Aprimorou processos de versionamento implementando Git Flow, reduzindo falhas de integração e melhorando a qualidade do código.",
       ],
     },
     {

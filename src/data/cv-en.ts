@@ -54,14 +54,14 @@ export const cvDataEn = {
     {
       company: "Stefanini Brasil",
       role: "Senior Developer | VTEX Specialist (IO, Fast Store)",
-      period: "Jul 2022 – Present",
+      period: "Jul 2022 – Feb 2026",
       location: "São Paulo – SP",
       bullets: [
         "Technical leadership in e-commerce squads, defining scalable architecture, best practices, and development strategies with VTEX IO and Fast Store.",
         "Key player in strategic projects, leading high-impact deliveries for major brands and ensuring efficient integration between teams.",
-        "Implemented CI/CD pipelines with GitHub Actions, increasing QA and production cycle efficiency by 40%.",
-        "Modernized multi-brand stores to headless architecture, reducing delivery time by 30% and increasing production stability.",
-        "Active mentoring and talent development, raising technical quality and reducing rework by over 90%.",
+        "Implemented CI/CD pipelines with GitHub Actions, bringing more efficiency and predictability to QA and production cycles.",
+        "Modernized multi-brand stores to headless architecture, reducing delivery time and increasing production stability.",
+        "Active mentoring and talent development, raising technical quality and reducing team rework.",
         "Direct involvement in troubleshooting, deployment, evolutionary maintenance, and code support, always focused on performance, innovation, and business evolution.",
       ],
     },
@@ -72,7 +72,7 @@ export const cvDataEn = {
       location: "São Paulo – SP",
       bullets: [
         "Active participation in the migration from VTEX Legacy to VTEX IO, contributing to the modernization of architecture and interfaces.",
-        "Development of new PDPs, homepages, and features, resulting in a +18% performance gain (page speed).",
+        "Development of new PDPs, homepages, and features, focused on improving performance and user experience.",
         "Involved in solution planning, code review, and best practices definition with the team.",
         "Collaboration in maintaining and improving versioning processes (Git Flow), reducing integration failures and improving code quality.",
       ],

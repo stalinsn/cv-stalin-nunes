@@ -54,14 +54,14 @@ export const cvData = {
     {
       company: "Stefanini Brasil",
       role: "Analista Desenvolvedor Sr. | Especialista VTEX (IO, Fast Store)",
-      period: "Jul 2022 – Atual",
+      period: "Jul 2022 – Fev 2026",
       location: "São Paulo – SP",
       bullets: [
         "Liderança técnica em squads de e-commerce, definindo arquitetura escalável, boas práticas e estratégias de desenvolvimento com VTEX IO e Fast Store.",
         "Protagonista em projetos estratégicos, conduzindo entregas de alto impacto para grandes marcas e garantindo integração eficiente entre times.",
-        "Implantação de pipelines CI/CD com GitHub Actions, elevando em 40% a eficiência dos ciclos de QA e produção.",
-        "Modernização de lojas multimarcas para arquitetura headless, reduzindo em 30% o tempo de entrega e aumentando a estabilidade em produção.",
-        "Mentoria ativa e desenvolvimento de talentos, elevando a qualidade técnica e reduzindo retrabalho em mais de 90%.",
+        "Implantação de pipelines CI/CD com GitHub Actions, trazendo mais eficiência e previsibilidade para os ciclos de QA e produção.",
+        "Modernização de lojas multimarcas para arquitetura headless, reduzindo o tempo de entrega e aumentando a estabilidade em produção.",
+        "Mentoria ativa e desenvolvimento de talentos, elevando a qualidade técnica e reduzindo retrabalho no time.",
         "Atuação direta em troubleshooting, deploy, manutenção evolutiva e sustentação de código, sempre com foco em performance, inovação e evolução do negócio.",
       ],
     },
@@ -72,7 +72,7 @@ export const cvData = {
       location: "São Paulo – SP",
       bullets: [
         "Participação ativa na migração da plataforma de VTEX Legacy para VTEX IO, contribuindo para a modernização da arquitetura e interfaces.",
-        "Desenvolvimento de novas PDPs, Homepages e features, resultando em ganho de +18% em performance (page speed).",
+        "Desenvolvimento de novas PDPs, Homepages e features, com foco na evolução de performance e experiência do usuário.",
         "Atuação no planejamento de soluções, revisão de código e definição de melhores práticas junto ao time.",
         "Colaboração na manutenção e aprimoramento dos processos de versionamento (Git Flow), contribuindo para a redução de falhas de integração e melhoria da qualidade do código.",
       ],
