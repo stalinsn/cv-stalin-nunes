@@ -2,25 +2,38 @@ import React from 'react';
 import { statusbarFacts } from './statusbarFacts';
 
 interface StatusBarDetailsProps {
+  loading: boolean;
   tokensUsed: number | null;
   elapsedTime: number | null;
   payloadSize: number | null;
   charCount: number | null;
   model: string;
+  promptTokens?: number | null;
+  completionTokens?: number | null;
+  inputPricePerMillion: number;
+  outputPricePerMillion: number;
+  isEstimatedTokenSplit: boolean;
+  mode?: 'ai' | 'mock' | 'cache' | null;
   costUSD: number;
   costBRL: number;
   speed: string | null;
   requisicoesPorDolar: string;
 }
 
-function formatSeconds(sec: number) {
-  if (sec > 600) sec = sec / 1000;
+function formatDuration(ms: number) {
+  if (ms < 1000) return `${Math.round(ms)} ms`;
+  const sec = ms / 1000;
   if (sec < 60) return `${sec.toFixed(2)}s`;
   const min = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
   if (min < 60) return `${min}min ${s}s`;
   const h = Math.floor(min / 60);
   return `${h}h ${min % 60}min ${s}s`;
+}
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  return `${(bytes / 1024).toFixed(2)} KB`;
 }
 
 function randomFact(arr: string[], vars?: Record<string, string|number>) {
@@ -30,11 +43,18 @@ function randomFact(arr: string[], vars?: Record<string, string|number>) {
 }
 
 export default function StatusBarDetails({
+  loading,
   tokensUsed,
   elapsedTime,
   payloadSize,
   charCount,
   model,
+  promptTokens,
+  completionTokens,
+  inputPricePerMillion,
+  outputPricePerMillion,
+  isEstimatedTokenSplit,
+  mode,
   costUSD,
   costBRL,
   speed,
@@ -43,6 +63,14 @@ export default function StatusBarDetails({
   return (
     <>
       <hr className="statusbar-divider" />
+      {loading && (
+        <div className="statusbar-section">
+          <p className="statusbar-section-title">⏳ Aguardando resposta da IA...</p>
+          <div className="statusbar-section-detail">
+            As estatísticas finais aparecem assim que a API retornar tokens, tempo e modelo.
+          </div>
+        </div>
+      )}
       {tokensUsed !== null && (
         <div className="statusbar-section">
           <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
@@ -50,15 +78,15 @@ export default function StatusBarDetails({
             <span className="statusbar-anecdote">{randomFact(statusbarFacts.tokens)}</span>
           </p>
           <div className="statusbar-section-detail">
-            Tokens são blocos de texto. Exemplo: <span className="statusbar-section-monospace">[Olá] [!] [mundo] [!]</span> = 4 tokens
+            Tokens são blocos de texto. Entrada: {promptTokens ?? 'estimada'}; saída: {completionTokens ?? 'estimada'}.
           </div>
         </div>
       )}
       {elapsedTime !== null && (
         <div className="statusbar-section">
           <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-            ⏱️ Tempo: {formatSeconds(elapsedTime)} <span className="statusbar-section-span">({Math.round(elapsedTime * 1000)} ms)</span>
-            <span className="statusbar-anecdote">{randomFact(statusbarFacts.elapsed, { ms: Math.round(elapsedTime * 1000) })}</span>
+            ⏱️ Tempo: {formatDuration(elapsedTime)}
+            <span className="statusbar-anecdote">{randomFact(statusbarFacts.elapsed, { ms: Math.round(elapsedTime) })}</span>
           </p>
           <div className="statusbar-section-detail">
             Tempo total de processamento da tradução.
@@ -76,18 +104,18 @@ export default function StatusBarDetails({
           </div>
         </div>
       )}
-      {payloadSize && (
+      {payloadSize !== null && (
         <div className="statusbar-section">
           <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-            📦 Payload: {payloadSize.toFixed(2)} KB
+            📦 Payload: {formatBytes(payloadSize)}
             <span className="statusbar-anecdote">{randomFact(statusbarFacts.payload)}</span>
           </p>
           <div className="statusbar-section-detail">
-            Aproximadamente {Math.ceil(payloadSize/2)} páginas de texto puro.
+            Tamanho aproximado do JSON enviado para tradução.
           </div>
         </div>
       )}
-      {charCount && (
+      {charCount !== null && (
         <div className="statusbar-section">
           <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
             📝 Caracteres: {charCount}
@@ -106,7 +134,7 @@ export default function StatusBarDetails({
               <span className="statusbar-anecdote">{randomFact(statusbarFacts.cost)}</span>
             </p>
             <div className="statusbar-section-detail">
-              Base OpenAI, dólar = R$5,20
+              Base OpenAI: ${inputPricePerMillion}/1M entrada e ${outputPricePerMillion}/1M saída. Dólar = R$5,20{isEstimatedTokenSplit ? '; divisão entrada/saída estimada.' : '.'}
             </div>
           </div>
           <div className="statusbar-section">
@@ -120,15 +148,19 @@ export default function StatusBarDetails({
           </div>
         </>
       )}
-      <div className="statusbar-section">
+      {(model || mode === 'mock' || mode === 'cache') && <div className="statusbar-section">
         <p className="statusbar-section-title statusbar-stat-hover" tabIndex={0}>
-          🤖 Modelo: {model}
+          🤖 Modelo: {mode === 'mock' ? 'mock local' : mode === 'cache' ? 'cache local' : model}
           <span className="statusbar-anecdote">{randomFact(statusbarFacts.model)}</span>
         </p>
         <div className="statusbar-section-detail">
-          Exemplo: gpt-3.5-turbo
+          {mode === 'mock'
+            ? 'Fallback local, sem custo de API.'
+            : mode === 'cache'
+              ? 'Tradução reutilizada do navegador, sem nova chamada de API.'
+              : 'Modelo usado na tradução por IA.'}
         </div>
-      </div>
+      </div>}
     </>
   );
 }

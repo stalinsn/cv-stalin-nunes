@@ -15,7 +15,22 @@ interface StatusBarProps {
   payloadSize: number | null;
   charCount: number | null;
   model: string;
+  promptTokens?: number | null;
+  completionTokens?: number | null;
+  mode?: 'ai' | 'mock' | 'cache' | null;
   usosRestantes?: number | null;
+}
+
+const TOKEN_PRICES_PER_MILLION: Record<string, { input: number; output: number }> = {
+  'gpt-4o-mini': { input: 0.15, output: 0.60 },
+  'gpt-4o': { input: 2.50, output: 10.00 },
+  'gpt-4.1-mini': { input: 0.40, output: 1.60 },
+  'gpt-5-mini': { input: 0.25, output: 2.00 },
+  'gpt-5-nano': { input: 0.05, output: 0.40 },
+};
+
+function getTokenPricing(model: string) {
+  return TOKEN_PRICES_PER_MILLION[model] || TOKEN_PRICES_PER_MILLION['gpt-4o-mini'];
 }
 
 export default function StatusBar({
@@ -26,6 +41,9 @@ export default function StatusBar({
   payloadSize,
   charCount,
   model,
+  promptTokens,
+  completionTokens,
+  mode,
   usosRestantes,
 }: StatusBarProps) {
   const [expanded, setExpanded] = useState(false);
@@ -78,10 +96,15 @@ export default function StatusBar({
   if (!shouldShow) return null;
 
   const dolar = 5.2; // Base de conversão manual
-  const costUSD = tokensUsed ? (tokensUsed / 1000) * 0.002 : 0;
+  const pricing = getTokenPricing(model);
+  const estimatedPromptTokens = promptTokens ?? Math.ceil((tokensUsed || 0) * 0.7);
+  const estimatedCompletionTokens = completionTokens ?? Math.max((tokensUsed || 0) - estimatedPromptTokens, 0);
+  const costUSD = tokensUsed && mode !== 'mock' && mode !== 'cache'
+    ? (estimatedPromptTokens / 1_000_000) * pricing.input + (estimatedCompletionTokens / 1_000_000) * pricing.output
+    : 0;
   const costBRL = costUSD * dolar;
   const speed =
-    tokensUsed && elapsedTime ? (tokensUsed / elapsedTime).toFixed(2) : null;
+    tokensUsed && elapsedTime ? (tokensUsed / (elapsedTime / 1000)).toFixed(2) : null;
   const requisicoesPorDolar =
     costUSD > 0 ? (1 / costUSD).toFixed(0) : '∞';
 
@@ -98,6 +121,7 @@ export default function StatusBar({
         style={!expanded ? { cursor: 'default', userSelect: 'auto' } : {}}
       >
         <StatusBarHeader
+          loading={loading}
           statusMessage={statusMessage}
           usosRestantes={usosRestantes}
           expanded={expanded}
@@ -107,11 +131,18 @@ export default function StatusBar({
       </div>
       {expanded && (
         <StatusBarDetails
+          loading={loading}
           tokensUsed={tokensUsed}
           elapsedTime={elapsedTime}
           payloadSize={payloadSize}
           charCount={charCount}
           model={model}
+          promptTokens={promptTokens}
+          completionTokens={completionTokens}
+          inputPricePerMillion={pricing.input}
+          outputPricePerMillion={pricing.output}
+          isEstimatedTokenSplit={tokensUsed !== null && (promptTokens == null || completionTokens == null)}
+          mode={mode}
           costUSD={costUSD}
           costBRL={costBRL}
           speed={speed}

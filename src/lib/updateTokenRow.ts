@@ -1,11 +1,13 @@
 import { google } from 'googleapis';
+import fs from 'fs';
+import path from 'path';
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID || '1ESe5JpZFiZTRVDAPZ3uxLAXBek3KoNE3NXDuLqXS6bk';
 const SHEET_NAME = 'TokensIA';
 
 // Função para obter credenciais do Google a partir das variáveis de ambiente
 function getGoogleCredentials() {
-  return {
+  const envCredentials = {
     type: process.env.GOOGLE_SERVICE_ACCOUNT_TYPE || 'service_account',
     project_id: process.env.GOOGLE_SERVICE_ACCOUNT_PROJECT_ID,
     private_key_id: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY_ID,
@@ -16,6 +18,36 @@ function getGoogleCredentials() {
     token_uri: process.env.GOOGLE_SERVICE_ACCOUNT_TOKEN_URI || 'https://oauth2.googleapis.com/token',
     auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
     client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${encodeURIComponent(process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL || '')}`,
+    universe_domain: 'googleapis.com'
+  };
+
+  if (
+    envCredentials.project_id &&
+    envCredentials.private_key_id &&
+    envCredentials.private_key &&
+    envCredentials.client_email &&
+    envCredentials.client_id
+  ) {
+    return envCredentials;
+  }
+
+  const serviceAccountPath = path.join(process.cwd(), 'google-service-account.json');
+  if (!fs.existsSync(serviceAccountPath)) {
+    throw new Error('Credenciais Google ausentes: defina GOOGLE_SERVICE_ACCOUNT_* ou google-service-account.json');
+  }
+
+  const fileCredentials = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8')) as Record<string, string>;
+  return {
+    type: fileCredentials.type || 'service_account',
+    project_id: fileCredentials.project_id,
+    private_key_id: fileCredentials.private_key_id,
+    private_key: fileCredentials.private_key?.replace(/\\n/g, '\n'),
+    client_email: fileCredentials.client_email,
+    client_id: fileCredentials.client_id,
+    auth_uri: fileCredentials.auth_uri || 'https://accounts.google.com/o/oauth2/auth',
+    token_uri: fileCredentials.token_uri || 'https://oauth2.googleapis.com/token',
+    auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+    client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${encodeURIComponent(fileCredentials.client_email || '')}`,
     universe_domain: 'googleapis.com'
   };
 }

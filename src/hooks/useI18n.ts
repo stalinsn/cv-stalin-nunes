@@ -9,7 +9,7 @@ import { cvDataDe } from '@/data/cv-de';
 import { translateWithAI } from '@/lib/translateService';
 import { CvData } from '@/types/cv';
 import { TranslationStatus, TranslationMode, TranslationCache } from '@/types/translation';
-import { getTranslationCache, setTranslationCache } from '@/utils/translationCache';
+import { clearTranslationCache, getTranslationCache, setTranslationCache } from '@/utils/translationCache';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { 
   SUPPORTED_LANGUAGES, 
@@ -37,6 +37,9 @@ const INITIAL_STATUS: TranslationStatus = {
   payloadSize: null,
   charCount: null,
   model: '',
+  promptTokens: null,
+  completionTokens: null,
+  mode: null,
 };
 
 export function useI18n() {
@@ -77,8 +80,18 @@ export function useI18n() {
       setData(translations[normalizedLang]);
       setLastLang(normalizedLang);
       setError(null);
+      setStatus({
+        tokensUsed: 0,
+        elapsedTime: 0,
+        payloadSize: JSON.stringify(data).length,
+        charCount: JSON.stringify(translations[normalizedLang]).length,
+        model: 'cache local',
+        promptTokens: null,
+        completionTokens: null,
+        mode: 'cache',
+      });
     }
-  }, [lang, translations, setLastLang]);
+  }, [lang, data, translations, setLastLang]);
 
   // Função para salvar tradução
   const saveTranslation = useCallback((targetLang: SupportedLanguage, translatedData: CvData) => {
@@ -92,16 +105,31 @@ export function useI18n() {
     setError(null);
   }, [setLastLang]);
 
+  const setCacheStatus = useCallback((sourceData: CvData, translatedData: CvData) => {
+    setStatus({
+      tokensUsed: 0,
+      elapsedTime: 0,
+      payloadSize: JSON.stringify(sourceData).length,
+      charCount: JSON.stringify(translatedData).length,
+      model: 'cache local',
+      promptTokens: null,
+      completionTokens: null,
+      mode: 'cache',
+    });
+  }, []);
+
   // Função principal de tradução
   const handleTranslate = useCallback(async (
     targetLang: string, 
     token?: string, 
-    origem?: string
+    origem?: string,
+    modeOverride?: TranslationMode
   ) => {
     setError(null);
     const normalizedLang = normalizeLangCode(targetLang);
+    const activeMode = modeOverride || translationMode;
     
-    if (lang === normalizedLang) return;
+    if (lang === normalizedLang) return true;
 
     // 1. Verifica cache local
     const cached = getTranslationCache(JSON.stringify(data), normalizedLang);
@@ -109,7 +137,8 @@ export function useI18n() {
       try {
         const parsed = JSON.parse(cached) as CvData;
         saveTranslation(normalizedLang, parsed);
-        return;
+        setCacheStatus(data, parsed);
+        return true;
       } catch (error) {
         console.warn('Erro ao parsear cache:', error);
       }
@@ -117,12 +146,13 @@ export function useI18n() {
 
     // 2. Verifica cache em memória
     if (translations[normalizedLang]) {
+      setCacheStatus(data, translations[normalizedLang]);
       switchLang(normalizedLang);
-      return;
+      return true;
     }
 
     // 3. Tradução por IA
-    if (translationMode === 'ai') {
+    if (activeMode === 'ai') {
       setLoading(true);
       const start = Date.now();
       
@@ -149,29 +179,47 @@ export function useI18n() {
           elapsedTime: elapsed,
           payloadSize: JSON.stringify(data).length,
           charCount: JSON.stringify(result.translated).length,
-          model: process.env.NEXT_PUBLIC_OPENAI_MODEL || 'gpt-3.5-turbo',
+          model: process.env.NEXT_PUBLIC_OPENAI_MODEL || 'gpt-4o-mini',
+          promptTokens: result.promptTokens || null,
+          completionTokens: result.completionTokens || null,
+          mode: 'ai',
         });
         
+        return true;
       } catch (error) {
         console.error('Erro na tradução IA:', error);
         setError('A tradução com IA está indisponível no momento. Gostaria de usar a tradução padrão?');
         setStatus(INITIAL_STATUS);
+        return false;
       } finally {
         setLoading(false);
       }
-      return;
     }
 
     // 4. Fallback para mock
-    if (translationMode === 'mock' || (error && userAcceptedFallback)) {
+    if (activeMode === 'mock' || (error && userAcceptedFallback)) {
+      const start = Date.now();
       const mockData = MOCK_DATA[normalizedLang];
-      if (mockData) {
-        saveTranslation(normalizedLang, mockData);
-      } else {
+      if (!mockData) {
         setError('Tradução padrão não disponível para este idioma.');
+        return false;
       }
-      return;
+
+      saveTranslation(normalizedLang, mockData);
+      setStatus({
+        tokensUsed: 0,
+        elapsedTime: Date.now() - start,
+        payloadSize: JSON.stringify(data).length,
+        charCount: JSON.stringify(mockData).length,
+        model: 'mock',
+        promptTokens: null,
+        completionTokens: null,
+        mode: 'mock',
+      });
+      return true;
     }
+
+    return false;
   }, [
     lang, 
     data, 
@@ -180,7 +228,8 @@ export function useI18n() {
     error, 
     userAcceptedFallback,
     saveTranslation,
-    switchLang
+    switchLang,
+    setCacheStatus
   ]);
 
   // Função para limpar traduções
@@ -191,11 +240,16 @@ export function useI18n() {
     setLastLang(DEFAULT_LANGUAGE);
     setError(null);
     setStatus(INITIAL_STATUS);
+    clearTranslationCache();
   }, [setLastLang]);
 
   // Função wrapper para mudança de modo de tradução
   const changeTranslationMode = useCallback((mode: string) => {
     setTranslationMode(mode as TranslationMode);
+  }, []);
+
+  const clearError = useCallback(() => {
+    setError(null);
   }, []);
 
   return {
@@ -218,5 +272,6 @@ export function useI18n() {
     clearTranslations,
     setTranslationMode: changeTranslationMode,
     setUserAcceptedFallback,
+    clearError,
   };
 }

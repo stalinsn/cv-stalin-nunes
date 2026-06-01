@@ -68,7 +68,7 @@ function getNavbarLabels(lang: string) {
 }
 
 export default function CVHome() {
-  const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode, translations, clearTranslations, saveTranslation, switchLang } = useI18n();
+  const { lang, data, error, handleTranslate, loading, setTranslationMode, setUserAcceptedFallback, status, translationMode, translations, clearTranslations, saveTranslation, switchLang, clearError } = useI18n();
   const { theme } = useTheme();
   const [pendingLang, setPendingLang] = useState<string | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -133,9 +133,11 @@ export default function CVHome() {
     setShowConfirmModal(false);
     setUsosRestantes(result.usos_restantes ?? null);
     setTokenError(null);
-    await handleTranslate(pendingLang, tokenInput, 'modal');
-    setPendingLang(null);
-    setShowConfirmModal(false);
+    const translated = await handleTranslate(pendingLang, tokenInput, 'modal');
+    if (translated) {
+      setPendingLang(null);
+      setShowConfirmModal(false);
+    }
   };
 
   const handleCancelTranslate = () => {
@@ -147,7 +149,7 @@ export default function CVHome() {
   const handleAcceptFallback = async () => {
     if (pendingLang) {
       setUserAcceptedFallback(true);
-      await handleTranslate(pendingLang);
+      await handleTranslate(pendingLang, undefined, 'fallback-modal', 'mock');
       setUserAcceptedFallback(false);
       setTranslationMode('ai');
       setPendingLang(null);
@@ -156,6 +158,7 @@ export default function CVHome() {
   const handleCancelFallback = () => {
     setUserAcceptedFallback(false);
     setPendingLang(null);
+    clearError();
   };
 
   const statusMessage = error
@@ -163,7 +166,7 @@ export default function CVHome() {
     : loading
     ? 'Traduzindo com IA... Aguarde.'
     : status.tokensUsed !== null
-    ? 'Tradução concluída com IA!'
+    ? status.mode === 'mock' ? 'Tradução padrão aplicada.' : status.mode === 'cache' ? 'Tradução carregada do cache.' : 'Tradução concluída com IA!'
     : '';
 
   const langTyped = lang as import("@/types/cv").Language;
@@ -245,6 +248,9 @@ export default function CVHome() {
         payloadSize={status.payloadSize}
         charCount={status.charCount}
         model={status.model}
+        promptTokens={status.promptTokens}
+        completionTokens={status.completionTokens}
+        mode={status.mode}
         usosRestantes={usosRestantes}
       />
       {error && (

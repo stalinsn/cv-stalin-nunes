@@ -35,5 +35,7 @@ export async function translateWithAI(
   return {
     translated: json.translated,
     tokensUsed: json.tokensUsed || 0,
+    promptTokens: json.promptTokens || 0,
+    completionTokens: json.completionTokens || 0,
   };
 }

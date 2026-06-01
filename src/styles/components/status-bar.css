@@ -23,11 +23,15 @@
   padding: 0.85rem 1.15rem;
 }
 .statusbar-header {
+  cursor: grab;
+  user-select: none;
+}
+.statusbar-header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: grab;
-  user-select: none;
+  gap: 8px;
+  width: 100%;
 }
 .statusbar-title,
 .statusbar-title-remaining {
@@ -56,6 +60,16 @@
   color: #fff;
   cursor: pointer;
   font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.statusbar-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
 }
 .statusbar-flex {
   display: flex;

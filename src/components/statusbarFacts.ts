@@ -61,7 +61,7 @@ export const statusbarFacts = {
   ],
   cost: [
     'Com esse valor, quase dá pra comprar um café... ☕',
-    'Cada 1.000 tokens custa cerca de $0.002 na OpenAI.',
+    'O custo depende do modelo e da separação entre tokens de entrada e saída.',
     'Quanto menor o custo, mais traduções por dólar!',
     'Dá pra traduzir muita coisa com 1 dólar, hein? 💵',
     'Fique de olho: textos grandes podem custar mais!',
@@ -86,7 +86,7 @@ export const statusbarFacts = {
   model: [
     'Esse modelo é mais inteligente que muito humano! 🤖',
     'Modelos diferentes, custos diferentes. Fique atento!',
-    'GPT-3.5 é rápido e barato. GPT-4 é mais caro, mas mais preciso.',
+    'Modelos pequenos como gpt-4o-mini costumam ser bem econômicos para tradução.',
     'A cada ano, modelos ficam mais poderosos!',
     'Você está usando IA de última geração!',
     'Se fosse um robô, já teria passado no ENEM!',
